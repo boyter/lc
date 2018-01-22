@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"unicode/utf8"
 )
 
 const dirPath = "/home/bboyter/Projects/python-license-checker/"
@@ -22,15 +21,14 @@ type License struct {
 	Concordance vectorspace.Concordance
 }
 
-func loadDatabase() []License {
-	jsonFile, err := os.Open("database_keywords.json")
+func loadDatabase(filepath string) []License {
+	jsonFile, err := os.Open(filepath)
 
 	if err != nil {
 		fmt.Println(err)
 		return []License{}
 	}
 
-	fmt.Println("Successfully Opened database_keywords.json")
 	defer jsonFile.Close()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
@@ -44,7 +42,6 @@ func loadDatabase() []License {
 	}
 
 	for _, v := range database {
-		println(v.Shortname, utf8.RuneCountInString(v.Text))
 		v.Concordance = vectorspace.BuildConcordance(v.Text)
 	}
 
@@ -74,7 +71,7 @@ func main() {
 		return nil
 	})
 
-	loadDatabase()
+	loadDatabase("database_keywords.json")
 
 	// println(fileList)
 
