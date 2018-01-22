@@ -1,55 +1,54 @@
 package main
 
 import (
-	"fmt"
-	// vectorspace "github.com/boyter/golangvectorspace"
 	"encoding/json"
+	"fmt"
+	vectorspace "github.com/boyter/golangvectorspace"
 	"github.com/urfave/cli"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"unicode/utf8"
 )
 
 const dirPath = "/home/bboyter/Projects/python-license-checker/"
 
 type License struct {
-	Keywords  []string `json:"keywords"`
-	Text      string   `json:"text"`
-	Fullname  string   `json:"fullname"`
-	Shortname string   `json:"shortname"`
-	Header    string   `json:"header"`
+	Keywords    []string `json:"keywords"`
+	Text        string   `json:"text"`
+	Fullname    string   `json:"fullname"`
+	Shortname   string   `json:"shortname"`
+	Header      string   `json:"header"`
+	Concordance vectorspace.Concordance
 }
 
-func loadDatabase() {
-	// Open our jsonFile
+func loadDatabase() []License {
 	jsonFile, err := os.Open("database_keywords.json")
-	// if we os.Open returns an error then handle it
+
 	if err != nil {
 		fmt.Println(err)
+		return []License{}
 	}
 
 	fmt.Println("Successfully Opened database_keywords.json")
-	// defer the closing of our jsonFile so that we can parse it later on
 	defer jsonFile.Close()
 
-	// read our opened xmlFile as a byte array.
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 
-	// we initialize our Users array
 	var database []License
-
-	// we unmarshal our byteArray which contains our
-	// jsonFile's content into 'users' which we defined above
 	err = json.Unmarshal(byteValue, &database)
 
 	if err != nil {
 		fmt.Println(err)
+		return []License{}
 	}
 
 	for _, v := range database {
-		println(v.Shortname)
+		println(v.Shortname, utf8.RuneCountInString(v.Text))
+		v.Concordance = vectorspace.BuildConcordance(v.Text)
 	}
 
+	return database
 }
 
 func main() {
