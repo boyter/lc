@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const dirPath = "/home/bboyter/Projects/python-license-checker/"
@@ -48,6 +49,69 @@ func loadDatabase(filepath string) []License {
 	return database
 }
 
+func keywordGuessLicense(content string, licenses []License) string {
+
+	var matchingName = ""
+	var contains = false
+
+	for _, license := range licenses {
+		for _, keyword := range license.Keywords {
+			contains = strings.Contains(content, keyword)
+			if contains {
+				matchingName = license.Shortname
+				return matchingName
+			}
+		}
+	}
+
+	return matchingName
+}
+
+// def _keyword_guess(check_license, licenses):
+//     matching = []
+
+//     for license in licenses:
+//         keywordmatch = 0
+//         for keyword in license['keywords']:
+//             if keyword in check_license:
+//                 keywordmatch = keywordmatch + 1
+
+//         if len(license['keywords']):
+//             if keywordmatch >= 1:
+//                 matching.append({
+//                     'shortname': license['shortname'],
+//                     'percentage': (float(keywordmatch) / float(len(license['keywords'])) * 100)
+//                 })
+
+//     return matching
+
+func guessLicense() {
+
+}
+
+// def guess_license(check_license, licenses):
+//     matching = _keyword_guess(check_license, licenses)
+
+//     matches = []
+//     vector_compare = VectorCompare()
+//     for match in matching:
+//         for license in [x for x in licenses if x['shortname'] in [y['shortname'] for y in matching]]:
+//             licence_concordance = vector_compare.concordance(license['clean'])
+
+//             check_license_concordance = vector_compare.concordance(check_license[:len(license['clean'])])
+
+//             relation = vector_compare.relation(license['concordance'], check_license_concordance)
+
+//             if relation >= 0.85:
+//                 matches.append({
+//                     'relation': relation,
+//                     'license': license
+//                 })
+
+//     matches.sort(reverse=True)
+
+//     return matches
+
 func main() {
 	// walk all files in directory
 
@@ -71,7 +135,7 @@ func main() {
 		return nil
 	})
 
-	loadDatabase("database_keywords.json")
+	licenses := loadDatabase("database_keywords.json")
 
 	// println(fileList)
 
@@ -79,21 +143,17 @@ func main() {
 	// 	println(v)
 	// }
 
-	// filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
-	// 	if !info.IsDir() {
-	// 		println(info.Name())
-	// 		println(path)
+	filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			b, err := ioutil.ReadFile(path) // just pass the file name
+			if err != nil {
+				fmt.Print(err)
+			}
+			str := string(b) // convert content to a 'string'
 
-	// 		b, err := ioutil.ReadFile(path) // just pass the file name
-	// 		if err != nil {
-	// 			fmt.Print(err)
-	// 		}
-	// 		str := string(b) // convert content to a 'string'
+			fmt.Println(info.Name(), path, keywordGuessLicense(str, licenses))
+		}
 
-	// 		var concordance = vectorspace.BuildConcordance(str)
-	// 		println(concordance)
-	// 	}
-
-	// 	return nil
-	// })
+		return nil
+	})
 }
