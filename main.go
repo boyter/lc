@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-const dirPath = "/home/bboyter/Projects/python-license-checker/"
+const dirPath = "/home/bboyter/Projects/hyperfine/"
 
 type License struct {
 	Keywords    []string `json:"keywords"`
@@ -49,22 +49,22 @@ func loadDatabase(filepath string) []License {
 	return database
 }
 
-func keywordGuessLicense(content string, licenses []License) string {
-
-	var matchingName = ""
-	var contains = false
-
+func keywordGuessLicense(content string, licenses []License) {
 	for _, license := range licenses {
+		var keywordmatch = 0
+		var contains = false
+
 		for _, keyword := range license.Keywords {
 			contains = strings.Contains(content, keyword)
 			if contains {
-				matchingName = license.Shortname
-				return matchingName
+				keywordmatch++
 			}
 		}
-	}
 
-	return matchingName
+		if keywordmatch > 0 {
+			fmt.Println(keywordmatch, len(license.Keywords), license.Shortname, (float64(keywordmatch) / float64(len(license.Keywords)*100)))
+		}
+	}
 }
 
 // def _keyword_guess(check_license, licenses):
@@ -151,7 +151,8 @@ func main() {
 			}
 			str := string(b) // convert content to a 'string'
 
-			fmt.Println(info.Name(), path, keywordGuessLicense(str, licenses))
+			keywordGuessLicense(str, licenses)
+			fmt.Println(info.Name(), path)
 		}
 
 		return nil
