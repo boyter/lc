@@ -22,6 +22,11 @@ type License struct {
 	Concordance vectorspace.Concordance
 }
 
+type LicenseMatch struct {
+	Shortname  string
+	Percentage float64
+}
+
 func loadDatabase(filepath string) []License {
 	jsonFile, err := os.Open(filepath)
 
@@ -49,7 +54,10 @@ func loadDatabase(filepath string) []License {
 	return database
 }
 
-func keywordGuessLicense(content string, licenses []License) {
+func keywordGuessLicense(content string, licenses []License) []LicenseMatch {
+	content = strings.ToLower(content)
+	var matchingLicenses = []LicenseMatch{}
+
 	for _, license := range licenses {
 		var keywordmatch = 0
 		var contains = false
@@ -62,9 +70,14 @@ func keywordGuessLicense(content string, licenses []License) {
 		}
 
 		if keywordmatch > 0 {
-			fmt.Println(keywordmatch, len(license.Keywords), license.Shortname, (float64(keywordmatch) / float64(len(license.Keywords)*100)))
+			var percentage = (float64(keywordmatch) / float64(len(license.Keywords))) * 100
+
+			fmt.Println(keywordmatch, len(license.Keywords), license.Shortname, percentage)
+			matchingLicenses = append(matchingLicenses, LicenseMatch{Shortname: license.Shortname, Percentage: percentage})
 		}
 	}
+
+	return matchingLicenses
 }
 
 // def _keyword_guess(check_license, licenses):
@@ -152,7 +165,7 @@ func main() {
 			str := string(b) // convert content to a 'string'
 
 			keywordGuessLicense(str, licenses)
-			fmt.Println(info.Name(), path)
+			fmt.Println(path)
 		}
 
 		return nil
