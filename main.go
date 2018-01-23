@@ -47,8 +47,8 @@ func loadDatabase(filepath string) []License {
 		return []License{}
 	}
 
-	for _, v := range database {
-		v.Concordance = vectorspace.BuildConcordance(v.Text)
+	for i, v := range database {
+		database[i].Concordance = vectorspace.BuildConcordance(v.Text)
 	}
 
 	return database
@@ -82,8 +82,16 @@ func guessLicense(content string, licenses []License) {
 	var matchingLicenses = keywordGuessLicense(content, licenses)
 
 	for _, license := range matchingLicenses {
-		vectorspace.BuildConcordance(license.Shortname)
-		fmt.Println(license.Shortname)
+
+		var matchingLicense = License{}
+
+		for _, l := range licenses {
+			if l.Shortname == license.Shortname {
+				matchingLicense = l
+			}
+		}
+
+		fmt.Println(matchingLicense.Shortname, vectorspace.Relation(matchingLicense.Concordance, vectorspace.BuildConcordance(content)))
 	}
 
 }
