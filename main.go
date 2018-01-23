@@ -71,8 +71,6 @@ func keywordGuessLicense(content string, licenses []License) []LicenseMatch {
 
 		if keywordmatch > 0 {
 			var percentage = (float64(keywordmatch) / float64(len(license.Keywords))) * 100
-
-			fmt.Println(keywordmatch, len(license.Keywords), license.Shortname, percentage)
 			matchingLicenses = append(matchingLicenses, LicenseMatch{Shortname: license.Shortname, Percentage: percentage})
 		}
 	}
@@ -80,25 +78,13 @@ func keywordGuessLicense(content string, licenses []License) []LicenseMatch {
 	return matchingLicenses
 }
 
-// def _keyword_guess(check_license, licenses):
-//     matching = []
+func guessLicense(content string, licenses []License) {
+	var matchingLicenses = keywordGuessLicense(content, licenses)
 
-//     for license in licenses:
-//         keywordmatch = 0
-//         for keyword in license['keywords']:
-//             if keyword in check_license:
-//                 keywordmatch = keywordmatch + 1
-
-//         if len(license['keywords']):
-//             if keywordmatch >= 1:
-//                 matching.append({
-//                     'shortname': license['shortname'],
-//                     'percentage': (float(keywordmatch) / float(len(license['keywords'])) * 100)
-//                 })
-
-//     return matching
-
-func guessLicense() {
+	for _, license := range matchingLicenses {
+		vectorspace.BuildConcordance(license.Shortname)
+		fmt.Println(license.Shortname)
+	}
 
 }
 
@@ -164,8 +150,14 @@ func main() {
 			}
 			str := string(b) // convert content to a 'string'
 
-			keywordGuessLicense(str, licenses)
-			fmt.Println(path)
+			var guesses = keywordGuessLicense(str, licenses)
+			guessLicense(str, licenses)
+
+			for _, v := range guesses {
+				fmt.Println(path, v.Shortname, v.Percentage)
+			}
+
+			// fmt.Println(path)
 		}
 
 		return nil
