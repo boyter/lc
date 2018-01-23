@@ -60,6 +60,9 @@ func loadDatabase(filepath string) []License {
 	return database
 }
 
+// Fast method of checking if supplied content contains a licence using
+// matching keyword ngrams to find if the licence is a match or not
+// returns the maching licences with shortname and the percentage of match.
 func keywordGuessLicense(content string, licenses []License) []LicenseMatch {
 	content = strings.ToLower(content)
 	matchingLicenses := []LicenseMatch{}
@@ -84,6 +87,9 @@ func keywordGuessLicense(content string, licenses []License) []LicenseMatch {
 	return matchingLicenses
 }
 
+// Parses the supplied file content against the list of licences and
+// returns the matching licences with the shortname and the percentage of match.
+// If fast lookup methods fail it will try deep matching which is slower.
 func guessLicense(content string, licenses []License) []LicenseMatch {
 	matchingLicenses := []LicenseMatch{}
 
@@ -184,7 +190,7 @@ func main() {
 
 				licenseString := ""
 				for _, v := range licenseGuesses {
-					licenseString += fmt.Sprintf(" %s (%.2f)", v.Shortname, v.Percentage)
+					licenseString += fmt.Sprintf(" %s (%.1f%%)", v.Shortname, (v.Percentage * 100))
 				}
 
 				fmt.Println(path, licenseString)
