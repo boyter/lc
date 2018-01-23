@@ -12,6 +12,9 @@ import (
 )
 
 const dirPath = "/home/bboyter/Projects/hyperfine/"
+const pathBlacklist = "/.git/,/.hg/,/.svn/"
+const licenceFiles = "license,copying"
+const extentionBlacklist = "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf"
 
 type License struct {
 	Keywords    []string `json:"keywords"`
@@ -78,10 +81,11 @@ func keywordGuessLicense(content string, licenses []License) []LicenseMatch {
 	return matchingLicenses
 }
 
-func guessLicense(content string, licenses []License) {
-	var matchingLicenses = keywordGuessLicense(content, licenses)
+func guessLicense(content string, licenses []License) []LicenseMatch {
+	var matchingLicenses = []LicenseMatch{}
+	var contentConcordance = vectorspace.BuildConcordance(content)
 
-	for _, license := range matchingLicenses {
+	for _, license := range keywordGuessLicense(content, licenses) {
 
 		var matchingLicense = License{}
 
@@ -91,33 +95,15 @@ func guessLicense(content string, licenses []License) {
 			}
 		}
 
-		fmt.Println(matchingLicense.Shortname, vectorspace.Relation(matchingLicense.Concordance, vectorspace.BuildConcordance(content)))
+		var relation = vectorspace.Relation(matchingLicense.Concordance, contentConcordance)
+
+		if relation >= 0.85 {
+			matchingLicenses = append(matchingLicenses, LicenseMatch{Shortname: license.Shortname, Percentage: relation})
+		}
 	}
 
+	return matchingLicenses
 }
-
-// def guess_license(check_license, licenses):
-//     matching = _keyword_guess(check_license, licenses)
-
-//     matches = []
-//     vector_compare = VectorCompare()
-//     for match in matching:
-//         for license in [x for x in licenses if x['shortname'] in [y['shortname'] for y in matching]]:
-//             licence_concordance = vector_compare.concordance(license['clean'])
-
-//             check_license_concordance = vector_compare.concordance(check_license[:len(license['clean'])])
-
-//             relation = vector_compare.relation(license['concordance'], check_license_concordance)
-
-//             if relation >= 0.85:
-//                 matches.append({
-//                     'relation': relation,
-//                     'license': license
-//                 })
-
-//     matches.sort(reverse=True)
-
-//     return matches
 
 func main() {
 	// walk all files in directory
@@ -134,38 +120,41 @@ func main() {
 
 	app.Run(os.Args)
 
-	fileList := []string{}
-	filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			fileList = append(fileList, path)
-		}
-		return nil
-	})
-
+	// Everything after here needs to be refactored out to a subpackage
 	licenses := loadDatabase("database_keywords.json")
 
-	// println(fileList)
-
-	// for _, v := range fileList {
-	// 	println(v)
-	// }
+	var extentionBlacklistStrings = strings.Split(extentionBlacklist, ",")
 
 	filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
-			b, err := ioutil.ReadFile(path) // just pass the file name
-			if err != nil {
-				fmt.Print(err)
-			}
-			str := string(b) // convert content to a 'string'
 
-			var guesses = keywordGuessLicense(str, licenses)
-			guessLicense(str, licenses)
+			var run = true
 
-			for _, v := range guesses {
-				fmt.Println(path, v.Shortname, v.Percentage)
+			for _, ext := range extentionBlacklistStrings {
+				if strings.HasSuffix(path, ext) {
+					run = false
+				}
 			}
 
-			// fmt.Println(path)
+			if strings.Contains(path, "/.git/") {
+				run = false
+			}
+
+			if run == true {
+				b, err := ioutil.ReadFile(path) // just pass the file name
+				if err != nil {
+					fmt.Print(err)
+				}
+				str := string(b) // convert content to a 'string'
+
+				var guesses = guessLicense(str, licenses)
+
+				for _, v := range guesses {
+					fmt.Println(">>>>>>>>>>>>>>>>>>>", path, v.Shortname, v.Percentage)
+				}
+
+				fmt.Println(path)
+			}
 		}
 
 		return nil
