@@ -108,16 +108,6 @@ func GuessLicense(content string, deepguess bool, licenses []License) []LicenseM
 	return matchingLicenses
 }
 
-// def find_possible_licence_files(project_directory):
-//     # Check the base for a LICENCE file or README which contains one
-//     directory_list = os.listdir(project_directory)
-//     possible_files = [project_directory + x for x in directory_list if 'license' in x.lower() or 'copying' in x.lower()]
-
-//     if len(possible_files) == 0:
-//         possible_files = [project_directory + x for x in directory_list if 'readme' in x.lower()]
-
-//     return possible_files
-
 func FindPossibleLicenseFiles(fileList []string) []string {
 	possibleList := []string{}
 
