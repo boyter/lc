@@ -53,7 +53,7 @@ func KeywordGuessLicense(content string, licenses []License) []LicenseMatch {
 // Parses the supplied file content against the list of licences and
 // returns the matching licences with the shortname and the percentage of match.
 // If fast lookup methods fail it will try deep matching which is slower.
-func GuessLicense(content string, licenses []License) []LicenseMatch {
+func GuessLicense(content string, deepguess bool, licenses []License) []LicenseMatch {
 	matchingLicenses := []LicenseMatch{}
 
 	for _, license := range KeywordGuessLicense(content, licenses) {
@@ -82,7 +82,7 @@ func GuessLicense(content string, licenses []License) []LicenseMatch {
 		}
 	}
 
-	if len(matchingLicenses) == 0 {
+	if len(matchingLicenses) == 0 && deepguess == true {
 		for _, license := range licenses {
 			runecontent := []rune(content)
 			trimto := utf8.RuneCountInString(license.Text)

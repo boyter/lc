@@ -61,8 +61,16 @@ func main() {
 
 	// Everything after here needs to be refactored out to a subpackage
 	licenses := loadDatabase("database_keywords.json")
-
 	extentionBlacklistStrings := strings.Split(extentionBlacklist, ",")
+
+	files, _ := ioutil.ReadDir(dirPath)
+	for _, f := range files {
+		if f.IsDir() {
+			fmt.Println("DIR>", f.Name())
+		} else {
+			fmt.Println("FIL>", f.Name())
+		}
+	}
 
 	filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
@@ -87,7 +95,7 @@ func main() {
 				}
 				content := string(b)
 
-				licenseGuesses := parsers.GuessLicense(content, licenses)
+				licenseGuesses := parsers.GuessLicense(content, true, licenses)
 
 				licenseString := ""
 				for _, v := range licenseGuesses {
