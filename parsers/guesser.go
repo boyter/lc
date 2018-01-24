@@ -8,6 +8,7 @@ import (
 )
 
 var confidence = 0.85
+var possibleLicenceFiles = "license,copying"
 
 type License struct {
 	Keywords    []string `json:"keywords"`
@@ -105,4 +106,34 @@ func GuessLicense(content string, deepguess bool, licenses []License) []LicenseM
 	})
 
 	return matchingLicenses
+}
+
+// def find_possible_licence_files(project_directory):
+//     # Check the base for a LICENCE file or README which contains one
+//     directory_list = os.listdir(project_directory)
+//     possible_files = [project_directory + x for x in directory_list if 'license' in x.lower() or 'copying' in x.lower()]
+
+//     if len(possible_files) == 0:
+//         possible_files = [project_directory + x for x in directory_list if 'readme' in x.lower()]
+
+//     return possible_files
+
+func FindPossibleLicenseFiles(fileList []string) []string {
+	possibleList := []string{}
+
+	for _, filename := range fileList {
+		possible := false
+
+		for _, indicator := range strings.Split(possibleLicenceFiles, ",") {
+			if strings.Contains(strings.ToLower(filename), indicator) {
+				possible = true
+			}
+		}
+
+		if possible == true {
+			possibleList = append(possibleList, filename)
+		}
+	}
+
+	return possibleList
 }

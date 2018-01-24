@@ -13,8 +13,7 @@ import (
 )
 
 const dirPath = "/home/bboyter/Projects/hyperfine/"
-const pathBlacklist = "/.git/,/.hg/,/.svn/"
-const licenceFiles = "license,copying"
+const pathBlacklist = ".git,.hg,.svn"
 const extentionBlacklist = "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf"
 
 func loadDatabase(filepath string) []parsers.License {
@@ -44,6 +43,42 @@ func loadDatabase(filepath string) []parsers.License {
 	return database
 }
 
+func walkDirectory(directory string) {
+	fmt.Println(directory)
+	all, _ := ioutil.ReadDir(directory)
+
+	directories := []string{}
+	files := []string{}
+
+	for _, f := range all {
+		if f.IsDir() {
+			add := true
+
+			for _, black := range strings.Split(pathBlacklist, ",") {
+				if f.Name() == black {
+					add = false
+				}
+			}
+
+			if add == true {
+				directories = append(directories, f.Name())
+			}
+		} else {
+			files = append(files, f.Name())
+		}
+	}
+
+	// fmt.Println(files, directories)
+
+	// Process the files
+	possibleLicenses := parsers.FindPossibleLicenseFiles(files)
+	fmt.Println(possibleLicenses)
+
+	for _, newdirectory := range directories {
+		walkDirectory(filepath.Join(directory, newdirectory))
+	}
+}
+
 func main() {
 	// walk all files in directory
 
@@ -59,53 +94,46 @@ func main() {
 	app.Run(os.Args)
 
 	// Everything after here needs to be refactored out to a subpackage
-	licenses := loadDatabase("database_keywords.json")
+	// licenses := loadDatabase("database_keywords.json")
 
-	files, _ := ioutil.ReadDir(dirPath)
-	for _, f := range files {
-		if f.IsDir() {
-			fmt.Println("DIR>", f.Name())
-		} else {
-			fmt.Println("FIL>", f.Name())
-		}
-	}
+	walkDirectory(dirPath)
 
-	filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
+	// filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+	// 	if !info.IsDir() {
 
-			run := true
+	// 		run := true
 
-			for _, ext := range strings.Split(extentionBlacklist, ",") {
-				if strings.HasSuffix(path, ext) {
-					// Needs to be smarter we should skip reading the contents but it should still be under the license in the root folders
-					run = false
-				}
-			}
+	// 		for _, ext := range strings.Split(extentionBlacklist, ",") {
+	// 			if strings.HasSuffix(path, ext) {
+	// 				// Needs to be smarter we should skip reading the contents but it should still be under the license in the root folders
+	// 				run = false
+	// 			}
+	// 		}
 
-			for _, black := range strings.Split(pathBlacklist, ",") {
-				if strings.Contains(path, black) {
-					run = false
-				}
-			}
+	// 		for _, black := range strings.Split(pathBlacklist, ",") {
+	// 			if strings.Contains(path, black) {
+	// 				run = false
+	// 			}
+	// 		}
 
-			if run == true {
-				b, err := ioutil.ReadFile(path)
-				if err != nil {
-					fmt.Print(err)
-				}
-				content := string(b)
+	// 		if run == true {
+	// 			b, err := ioutil.ReadFile(path)
+	// 			if err != nil {
+	// 				fmt.Print(err)
+	// 			}
+	// 			content := string(b)
 
-				licenseGuesses := parsers.GuessLicense(content, true, licenses)
+	// 			licenseGuesses := parsers.GuessLicense(content, true, licenses)
 
-				licenseString := ""
-				for _, v := range licenseGuesses {
-					licenseString += fmt.Sprintf(" %s (%.1f%%)", v.Shortname, (v.Percentage * 100))
-				}
+	// 			licenseString := ""
+	// 			for _, v := range licenseGuesses {
+	// 				licenseString += fmt.Sprintf(" %s (%.1f%%)", v.Shortname, (v.Percentage * 100))
+	// 			}
 
-				fmt.Println(path, licenseString)
-			}
-		}
+	// 			fmt.Println(path, licenseString)
+	// 		}
+	// 	}
 
-		return nil
-	})
+	// 	return nil
+	// })
 }
