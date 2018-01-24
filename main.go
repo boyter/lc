@@ -55,13 +55,13 @@ func loadDatabase(filepath string) []parsers.License {
 	return database
 }
 
-func walkDirectory(directory string) {
-	fmt.Println(directory)
+func walkDirectory(directory string, rootLicenses []parsers.LicenseMatch) {
 	all, _ := ioutil.ReadDir(directory)
 
 	directories := []string{}
 	files := []string{}
 
+	// Work out which directories and files we want to investigate
 	for _, f := range all {
 		if f.IsDir() {
 			add := true
@@ -80,12 +80,15 @@ func walkDirectory(directory string) {
 		}
 	}
 
-	// Process the files
+	// Determine any possible licence files which would classify everything else
 	possibleLicenses := parsers.FindPossibleLicenseFiles(files)
-
 	for _, possibleLicense := range possibleLicenses {
-		licenseGuesses := parsers.GuessLicense(readFile(filepath.Join(directory, possibleLicense)), true, loadDatabase("database_keywords.json"))
-		fmt.Println(licenseGuesses)
+
+		guessLicenses := parsers.GuessLicense(readFile(filepath.Join(directory, possibleLicense)), true, loadDatabase("database_keywords.json"))
+
+		if len(guessLicenses) != 0 {
+			rootLicenses = append(rootLicenses, guessLicenses[0])
+		}
 	}
 
 	for _, file := range files {
@@ -112,12 +115,12 @@ func walkDirectory(directory string) {
 				licenseString += fmt.Sprintf(" %s (%.1f%%)", v.Shortname, (v.Percentage * 100))
 			}
 
-			fmt.Println(file, licenseString)
+			fmt.Println(directory, file, licenseString, rootLicenses)
 		}
 	}
 
 	for _, newdirectory := range directories {
-		walkDirectory(filepath.Join(directory, newdirectory))
+		walkDirectory(filepath.Join(directory, newdirectory), rootLicenses)
 	}
 }
 
@@ -134,5 +137,5 @@ func main() {
 	app.Run(os.Args)
 
 	// Everything after here needs to be refactored out to a subpackage
-	walkDirectory(dirPath)
+	walkDirectory(dirPath, []parsers.LicenseMatch{})
 }
