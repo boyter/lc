@@ -8,4 +8,6 @@ Would be nice to have the following output styles,
 	JSON
 	CSV
 
-command line options include, deep guess, confidence, path, database file
+command line options include, deep guess, confidence, path, database file, short licence name to classify everything under by default
+
+Probably want to have something that allows you to specify which extensions to look for explicitly to speed things up
