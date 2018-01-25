@@ -2,8 +2,10 @@ package main
 
 import (
 	"github.com/boyter/golang-license-checker/parsers"
+	"github.com/briandowns/spinner"
 	"github.com/urfave/cli"
 	"os"
+	"time"
 )
 
 //go:generate go run scripts/include.go
@@ -23,10 +25,10 @@ func main() {
 			Value:       "cli",
 		},
 		cli.StringFlag{
-			Name:  "output, o",
-			Usage: "Set output file `FILE`",
-			// Destination: &parsers.Format,
-			Value: "./output",
+			Name:        "output, o",
+			Usage:       "Set output file `FILE`",
+			Destination: &parsers.FileOutput,
+			Value:       "./output",
 		},
 		cli.StringFlag{
 			Name:        "confidence, c",
@@ -46,5 +48,11 @@ func main() {
 		return nil
 	}
 
+	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	s.Writer = os.Stderr
+	s.Start()
+	s.Suffix = " processing"
 	app.Run(os.Args)
+	s.Stop()
+
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"github.com/ryanuber/columnize"
 	"io/ioutil"
 	"log"
 	"os"
@@ -63,9 +64,48 @@ func toCSV(fileResults []FileResult) {
 	if err := w.Error(); err != nil {
 		log.Fatalln("error writing csv:", err)
 	}
+
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("Results written to " + FileOutput)
 }
 
 func toJSON(fileResults []FileResult) {
 	t, _ := json.Marshal(fileResults)
 	ioutil.WriteFile(FileOutput, t, 0600)
+
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("Results written to " + FileOutput)
+}
+
+func toCli(fileResults []FileResult) {
+
+	output := []string{
+		"Directory | File | License | Confidence | Root Licenses | Size",
+	}
+
+	for _, result := range fileResults {
+		license := ""
+		confidence := ""
+
+		if len(result.LicenseGuesses) != 0 {
+			license = result.LicenseGuesses[0].Shortname
+			confidence = fmt.Sprintf("%.2f%%", result.LicenseGuesses[0].Percentage*100)
+		}
+
+		rootLicenseString := ""
+		for _, v := range result.LicenseRoots {
+			rootLicenseString += fmt.Sprintf("%s,", v.Shortname)
+		}
+		rootLicenseString = strings.TrimRight(rootLicenseString, ", ")
+
+		output = append(output, fmt.Sprintf("%s | %s | %s | %s | %s | %s", result.Directory, result.Filename, license, confidence, rootLicenseString, result.BytesHuman))
+	}
+
+	result := columnize.SimpleFormat(output)
+
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println(result)
 }

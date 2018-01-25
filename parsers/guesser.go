@@ -196,14 +196,6 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 			licenseGuesses = guessLicense(string(content), deepGuess, loadDatabase())
 		}
 
-		fmt.Println(filepath.Join(directory, file), file, licenseGuesses, rootLicenses, getMd5Hash(content), getSha1Hash(content), getSha256Hash(content), bytefmt.ByteSize(uint64(len(content))), len(content), "bytes")
-
-		// Required if the output format is meant to be command line
-		// licenseString := ""
-		// for _, v := range licenseGuesses {
-		// 	licenseString += fmt.Sprintf(" %s (%.1f%%)", v.Shortname, (v.Percentage * 100))
-		// }
-
 		fileResult := FileResult{
 			Directory:      directory,
 			Filename:       file,
@@ -244,7 +236,7 @@ func Process() {
 	case "json":
 		toJSON(fileResults)
 	default:
-		fmt.Println("cli output")
+		toCli(fileResults)
 	}
 
 }
