@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-var dirPath = "/home/bboyter/Projects/searchcode-server/"
+var dirPath = "/home/bboyter/Projects/hyperfine/"
 var pathBlacklist = ".git,.hg,.svn"
 var extentionBlacklist = "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf"
 
@@ -115,7 +115,7 @@ func walkDirectory(directory string, rootLicenses []parsers.LicenseMatch) {
 			// 	licenseString += fmt.Sprintf(" %s (%.1f%%)", v.Shortname, (v.Percentage * 100))
 			// }
 
-			fmt.Println(directory, file, licenseGuesses, rootLicenses)
+			fmt.Println(filepath.Join(directory, file), file, licenseGuesses, rootLicenses)
 		}
 	}
 
