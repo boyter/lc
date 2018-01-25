@@ -2,11 +2,7 @@ package parsers
 
 import (
 	"code.cloudfoundry.org/bytefmt"
-	"crypto/md5"
-	"crypto/sha1"
-	"crypto/sha256"
 	"encoding/base64"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	vectorspace "github.com/boyter/golangvectorspace"
@@ -26,20 +22,6 @@ var PathBlacklist = ".git,.hg,.svn"
 
 // Will not attempt tp process but will still list under
 var ExtentionBlacklist = "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf"
-
-type License struct {
-	Keywords    []string `json:"keywords"`
-	Text        string   `json:"text"`
-	Fullname    string   `json:"fullname"`
-	Shortname   string   `json:"shortname"`
-	Header      string   `json:"header"`
-	Concordance vectorspace.Concordance
-}
-
-type LicenseMatch struct {
-	Shortname  string
-	Percentage float64
-}
 
 // Fast method of checking if supplied content contains a licence using
 // matching keyword ngrams to find if the licence is a match or not
@@ -143,35 +125,6 @@ func findPossibleLicenseFiles(fileList []string) []string {
 	}
 
 	return possibleList
-}
-
-func getMd5Hash(content []byte) string {
-	hasher := md5.New()
-	hasher.Write(content)
-	return hex.EncodeToString(hasher.Sum(nil))
-}
-
-func getSha1Hash(content []byte) string {
-	hasher := sha1.New()
-	hasher.Write(content)
-	return hex.EncodeToString(hasher.Sum(nil))
-}
-
-func getSha256Hash(content []byte) string {
-	hasher := sha256.New()
-	hasher.Write(content)
-	return hex.EncodeToString(hasher.Sum(nil))
-}
-
-func readFile(filepath string) []byte {
-	// TODO only read as deep into the file as we need
-	bytes, err := ioutil.ReadFile(filepath)
-
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	return bytes
 }
 
 func loadDatabase() []License {
