@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/boyter/golang-license-checker/parsers"
+	"github.com/boyter/license-checker/parsers"
 	"github.com/briandowns/spinner"
 	"github.com/urfave/cli"
 	"os"
