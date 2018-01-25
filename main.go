@@ -2,10 +2,8 @@ package main
 
 import (
 	"github.com/boyter/licensechecker/parsers"
-	"github.com/briandowns/spinner"
 	"github.com/urfave/cli"
 	"os"
-	"time"
 )
 
 //go:generate go run scripts/include.go
@@ -20,15 +18,15 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:        "format, f",
-			Usage:       "Set output format, supports cli, json or `csv`",
+			Usage:       "Set output format, supports progress, cli, json or `csv`",
 			Destination: &parsers.Format,
-			Value:       "cli",
+			Value:       "progress",
 		},
 		cli.StringFlag{
 			Name:        "output, o",
 			Usage:       "Set output file `FILE`",
 			Destination: &parsers.FileOutput,
-			Value:       "./output",
+			Value:       "output",
 		},
 		cli.StringFlag{
 			Name:        "confidence, c",
@@ -48,11 +46,5 @@ func main() {
 		return nil
 	}
 
-	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
-	s.Writer = os.Stderr
-	s.Start()
-	s.Suffix = " processing"
 	app.Run(os.Args)
-	s.Stop()
-
 }

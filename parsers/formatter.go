@@ -66,7 +66,6 @@ func toCSV(fileResults []FileResult) {
 	}
 
 	fmt.Println("")
-	fmt.Println("")
 	fmt.Println("Results written to " + FileOutput)
 }
 
@@ -74,7 +73,6 @@ func toJSON(fileResults []FileResult) {
 	t, _ := json.Marshal(fileResults)
 	ioutil.WriteFile(FileOutput, t, 0600)
 
-	fmt.Println("")
 	fmt.Println("")
 	fmt.Println("Results written to " + FileOutput)
 }
@@ -105,7 +103,6 @@ func toCli(fileResults []FileResult) {
 
 	result := columnize.SimpleFormat(output)
 
-	fmt.Println("")
 	fmt.Println("")
 	fmt.Println(result)
 }

@@ -6,11 +6,14 @@ import (
 	"encoding/json"
 	"fmt"
 	vectorspace "github.com/boyter/golangvectorspace"
+	"github.com/briandowns/spinner"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 	"unicode/utf8"
 )
 
@@ -209,6 +212,24 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 
 		fileResults = append(fileResults, fileResult)
 
+		if strings.ToLower(Format) == "progress" {
+			license := ""
+			confidence := ""
+
+			if len(licenseGuesses) != 0 {
+				license = licenseGuesses[0].Shortname
+				confidence = fmt.Sprintf("%.2f%%", licenseGuesses[0].Percentage*100)
+			}
+
+			rootLicenseString := ""
+			for _, v := range rootLicenses {
+				rootLicenseString += fmt.Sprintf("%s,", v.Shortname)
+			}
+			rootLicenseString = strings.TrimRight(rootLicenseString, ", ")
+
+			fmt.Println(directory, file, license, confidence, rootLicenseString, bytefmt.ByteSize(uint64(len(content))))
+		}
+
 	}
 
 	for _, newdirectory := range directories {
@@ -228,15 +249,26 @@ func Process() {
 		fmt.Println("Using default confidence value")
 	}
 
+	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	s.Writer = os.Stderr
+	s.Suffix = " processing"
+
+	if strings.ToLower(Format) != "progress" {
+		s.Start()
+	}
+
 	fileResults := walkDirectory(DirPath, []LicenseMatch{})
+	s.Stop()
 
 	switch strings.ToLower(Format) {
 	case "csv":
 		toCSV(fileResults)
 	case "json":
 		toJSON(fileResults)
-	default:
+	case "cli":
 		toCli(fileResults)
+	default:
+		fmt.Println("")
 	}
 
 }
