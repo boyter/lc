@@ -2,7 +2,9 @@ package parsers
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
@@ -35,7 +37,7 @@ func toCSV(fileResults []FileResult) {
 
 		rootLicenseString := ""
 		for _, v := range result.LicenseRoots {
-			rootLicenseString += fmt.Sprintf("%s (%.3f%%),", v.Shortname, (v.Percentage * 100))
+			rootLicenseString += fmt.Sprintf("%s,", v.Shortname)
 		}
 		rootLicenseString = strings.TrimRight(rootLicenseString, ", ")
 
@@ -52,7 +54,10 @@ func toCSV(fileResults []FileResult) {
 			result.BytesHuman})
 	}
 
-	w := csv.NewWriter(os.Stdout)
+	csvfile, _ := os.Open(FileOutput)
+	defer csvfile.Close()
+
+	w := csv.NewWriter(csvfile)
 	w.WriteAll(records) // calls Flush internally
 
 	if err := w.Error(); err != nil {
@@ -61,5 +66,6 @@ func toCSV(fileResults []FileResult) {
 }
 
 func toJSON(fileResults []FileResult) {
-
+	t, _ := json.Marshal(fileResults)
+	ioutil.WriteFile(FileOutput, t, 0600)
 }
