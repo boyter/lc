@@ -5,41 +5,27 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	vectorspace "github.com/boyter/golangvectorspace"
-	"github.com/urfave/cli"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 )
 
 var confidence = 0.85
-var possibleLicenceFiles = "license,copying"
-var dirPath = "/home/bboyter/Projects/hyperfine/"
-var pathBlacklist = ".git,.hg,.svn"
-var extentionBlacklist = "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf"
-
-var Generate_Flags = []cli.Flag{
-	cli.StringFlag{
-		Name:  "confidence",
-		Usage: "",
-		Value: "0.85",
-	},
-	cli.StringFlag{
-		Name:  "env",
-		Usage: "environment config to use from ./config/env.yaml",
-		Value: "dev",
-	},
-	cli.StringSliceFlag{
-		Name:  "param",
-		Usage: "custom template parameters. eg. ( --param env=dev --param stackname=dev-stack )",
-	},
-}
+var Confidence = "0.85"
+var PossibleLicenceFiles = "license,copying"
+var DirPath = "/home/bboyter/Projects/hyperfine/"
+var PathBlacklist = ".git,.hg,.svn"
+var ExtentionBlacklist = "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf"
+var DatabasePath = "./database_keywords.json"
 
 type License struct {
 	Keywords    []string `json:"keywords"`
@@ -145,7 +131,7 @@ func findPossibleLicenseFiles(fileList []string) []string {
 	for _, filename := range fileList {
 		possible := false
 
-		for _, indicator := range strings.Split(possibleLicenceFiles, ",") {
+		for _, indicator := range strings.Split(PossibleLicenceFiles, ",") {
 			if strings.Contains(strings.ToLower(filename), indicator) {
 				possible = true
 			}
@@ -188,25 +174,10 @@ func readFile(filepath string) []byte {
 	return bytes
 }
 
-func loadDatabase(filepath string) []License {
-	jsonFile, err := os.Open(filepath)
-
-	if err != nil {
-		fmt.Println(err)
-		return []License{}
-	}
-
-	defer jsonFile.Close()
-
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-
+func loadDatabase() []License {
 	var database []License
-	err = json.Unmarshal(byteValue, &database)
-
-	if err != nil {
-		fmt.Println(err)
-		return []License{}
-	}
+	data, _ := base64.StdEncoding.DecodeString(database_keywords)
+	_ = json.Unmarshal(data, &database)
 
 	for i, v := range database {
 		database[i].Concordance = vectorspace.BuildConcordance(strings.ToLower(v.Text))
@@ -226,7 +197,7 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) {
 		if f.IsDir() {
 			add := true
 
-			for _, black := range strings.Split(pathBlacklist, ",") {
+			for _, black := range strings.Split(PathBlacklist, ",") {
 				if f.Name() == black {
 					add = false
 				}
@@ -244,7 +215,7 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) {
 	possibleLicenses := findPossibleLicenseFiles(files)
 	for _, possibleLicense := range possibleLicenses {
 		content := string(readFile(filepath.Join(directory, possibleLicense)))
-		guessLicenses := guessLicense(content, true, loadDatabase("database_keywords.json"))
+		guessLicenses := guessLicense(content, true, loadDatabase())
 
 		if len(guessLicenses) != 0 {
 			rootLicenses = append(rootLicenses, guessLicenses[0])
@@ -260,7 +231,7 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) {
 			}
 		}
 
-		for _, ext := range strings.Split(extentionBlacklist, ",") {
+		for _, ext := range strings.Split(ExtentionBlacklist, ",") {
 			if strings.HasSuffix(file, ext) {
 				// Needs to be smarter we should skip reading the contents but it should still be under the license in the root folders
 				process = false
@@ -269,7 +240,7 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) {
 
 		if process == true {
 			content := readFile(filepath.Join(directory, file))
-			licenseGuesses := guessLicense(string(content), true, loadDatabase("database_keywords.json"))
+			licenseGuesses := guessLicense(string(content), true, loadDatabase())
 
 			// licenseString := ""
 			// for _, v := range licenseGuesses {
@@ -285,6 +256,14 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) {
 	}
 }
 
-func Process(c *cli.Context) {
-	walkDirectory(dirPath, []LicenseMatch{})
+func Process() {
+	conf, err := strconv.ParseFloat(Confidence, 64)
+
+	if err == nil {
+		confidence = conf
+	} else {
+		os.Stderr.WriteString("Using default confidence value")
+	}
+
+	walkDirectory(DirPath, []LicenseMatch{})
 }

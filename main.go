@@ -1,11 +1,13 @@
 package main
 
 import (
+	// "fmt"
 	"github.com/boyter/golang-license-checker/parsers"
 	"github.com/urfave/cli"
 	"os"
 )
 
+//go:generate go run scripts/include.go
 func main() {
 	app := cli.NewApp()
 	app.EnableBashCompletion = true
@@ -13,25 +15,26 @@ func main() {
 	app.Version = "1.0"
 	app.Usage = "Check directory for licenses and list what license(s) a file is under"
 
-	app.Commands = []cli.Command{
-		{
-			Name:    "process",
-			Aliases: []string{"cf"},
-			Usage:   "tasks for building and deploying cloudformation templates",
-			Subcommands: []cli.Command{
-				{
-					Name:      "generate",
-					Usage:     "compile a new cf template from a config",
-					UsageText: "gostacks cloudformation generate [command options] [stack]",
-					Action:    parsers.Process,
-					Flags:     parsers.Generate_Flags,
-				},
-			},
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "format, f",
+			Usage: "Set output format, supports cli, json or `csv`",
 		},
+		cli.StringFlag{
+			Name:        "confidence, c",
+			Usage:       "Set required confidence level for licence matching defaults to `0.85`",
+			Destination: &parsers.Confidence,
+		},
+		cli.StringFlag{
+			Name:  "deepguess, dg",
+			Usage: "Should attempt to deep guess the licence false or true defaults to `true`",
+		},
+	}
+	app.Action = func(c *cli.Context) error {
+		parsers.DirPath = c.Args().Get(0)
+		parsers.Process()
+		return nil
 	}
 
 	app.Run(os.Args)
-
-	// Everything after here needs to be refactored out to a subpackage
-	// parsers.Process(nil)
 }
