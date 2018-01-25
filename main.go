@@ -1,7 +1,6 @@
 package main
 
 import (
-	// "fmt"
 	"github.com/boyter/golang-license-checker/parsers"
 	"github.com/urfave/cli"
 	"os"

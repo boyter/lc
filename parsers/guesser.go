@@ -11,7 +11,6 @@ import (
 	"fmt"
 	vectorspace "github.com/boyter/golangvectorspace"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -22,10 +21,11 @@ import (
 var confidence = 0.85
 var Confidence = "0.85"
 var PossibleLicenceFiles = "license,copying"
-var DirPath = "/home/bboyter/Projects/hyperfine/"
+var DirPath = "./"
 var PathBlacklist = ".git,.hg,.svn"
+
+// Will not attempt tp process but will still list under
 var ExtentionBlacklist = "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf"
-var DatabasePath = "./database_keywords.json"
 
 type License struct {
 	Keywords    []string `json:"keywords"`
@@ -225,12 +225,6 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) {
 	for _, file := range files {
 		process := true
 
-		for _, possibleLicenses := range possibleLicenses {
-			if file == possibleLicenses {
-				process = false
-			}
-		}
-
 		for _, ext := range strings.Split(ExtentionBlacklist, ",") {
 			if strings.HasSuffix(file, ext) {
 				// Needs to be smarter we should skip reading the contents but it should still be under the license in the root folders
@@ -238,17 +232,19 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) {
 			}
 		}
 
+		content := readFile(filepath.Join(directory, file))
+		licenseGuesses := []LicenseMatch{}
 		if process == true {
-			content := readFile(filepath.Join(directory, file))
-			licenseGuesses := guessLicense(string(content), true, loadDatabase())
-
-			// licenseString := ""
-			// for _, v := range licenseGuesses {
-			// 	licenseString += fmt.Sprintf(" %s (%.1f%%)", v.Shortname, (v.Percentage * 100))
-			// }
-
-			fmt.Println(filepath.Join(directory, file), file, licenseGuesses, rootLicenses, getMd5Hash(content), getSha1Hash(content), getSha256Hash(content), len(content), bytefmt.ByteSize(uint64(len(content))))
+			licenseGuesses = guessLicense(string(content), true, loadDatabase())
 		}
+
+		fmt.Println(filepath.Join(directory, file), file, licenseGuesses, rootLicenses, getMd5Hash(content), getSha1Hash(content), getSha256Hash(content), len(content), bytefmt.ByteSize(uint64(len(content))))
+
+		// licenseString := ""
+		// for _, v := range licenseGuesses {
+		// 	licenseString += fmt.Sprintf(" %s (%.1f%%)", v.Shortname, (v.Percentage * 100))
+		// }
+
 	}
 
 	for _, newdirectory := range directories {
@@ -262,7 +258,7 @@ func Process() {
 	if err == nil {
 		confidence = conf
 	} else {
-		os.Stderr.WriteString("Using default confidence value")
+		fmt.Println("Using default confidence value")
 	}
 
 	walkDirectory(DirPath, []LicenseMatch{})
