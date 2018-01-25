@@ -1,7 +1,18 @@
 package parsers
 
 import (
+	"code.cloudfoundry.org/bytefmt"
+	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	vectorspace "github.com/boyter/golangvectorspace"
+	"github.com/urfave/cli"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"unicode/utf8"
@@ -9,6 +20,23 @@ import (
 
 var confidence = 0.85
 var possibleLicenceFiles = "license,copying"
+
+var Generate_Flags = []cli.Flag{
+	cli.StringFlag{
+		Name:  "confidence",
+		Usage: "",
+		Value: "0.85",
+	},
+	cli.StringFlag{
+		Name:  "env",
+		Usage: "environment config to use from ./config/env.yaml",
+		Value: "dev",
+	},
+	cli.StringSliceFlag{
+		Name:  "param",
+		Usage: "custom template parameters. eg. ( --param env=dev --param stackname=dev-stack )",
+	},
+}
 
 type License struct {
 	Keywords    []string `json:"keywords"`
@@ -126,4 +154,138 @@ func FindPossibleLicenseFiles(fileList []string) []string {
 	}
 
 	return possibleList
+}
+
+var dirPath = "/home/bboyter/Projects/hyperfine/"
+var pathBlacklist = ".git,.hg,.svn"
+var extentionBlacklist = "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf"
+
+func getMd5Hash(content []byte) string {
+	hasher := md5.New()
+	hasher.Write(content)
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func getSha1Hash(content []byte) string {
+	hasher := sha1.New()
+	hasher.Write(content)
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func getSha256Hash(content []byte) string {
+	hasher := sha256.New()
+	hasher.Write(content)
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func readFile(filepath string) []byte {
+	// TODO only read as deep into the file as we need
+	bytes, err := ioutil.ReadFile(filepath)
+
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	return bytes
+}
+
+func loadDatabase(filepath string) []License {
+	jsonFile, err := os.Open(filepath)
+
+	if err != nil {
+		fmt.Println(err)
+		return []License{}
+	}
+
+	defer jsonFile.Close()
+
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	var database []License
+	err = json.Unmarshal(byteValue, &database)
+
+	if err != nil {
+		fmt.Println(err)
+		return []License{}
+	}
+
+	for i, v := range database {
+		database[i].Concordance = vectorspace.BuildConcordance(strings.ToLower(v.Text))
+	}
+
+	return database
+}
+
+func WalkDirectory(directory string, rootLicenses []LicenseMatch) {
+	if directory == "" {
+		directory = dirPath
+	}
+
+	all, _ := ioutil.ReadDir(directory)
+
+	directories := []string{}
+	files := []string{}
+
+	// Work out which directories and files we want to investigate
+	for _, f := range all {
+		if f.IsDir() {
+			add := true
+
+			for _, black := range strings.Split(pathBlacklist, ",") {
+				if f.Name() == black {
+					add = false
+				}
+			}
+
+			if add == true {
+				directories = append(directories, f.Name())
+			}
+		} else {
+			files = append(files, f.Name())
+		}
+	}
+
+	// Determine any possible licence files which would classify everything else
+	possibleLicenses := FindPossibleLicenseFiles(files)
+	for _, possibleLicense := range possibleLicenses {
+		content := string(readFile(filepath.Join(directory, possibleLicense)))
+		guessLicenses := GuessLicense(content, true, loadDatabase("database_keywords.json"))
+
+		if len(guessLicenses) != 0 {
+			rootLicenses = append(rootLicenses, guessLicenses[0])
+		}
+	}
+
+	for _, file := range files {
+		process := true
+
+		for _, possibleLicenses := range possibleLicenses {
+			if file == possibleLicenses {
+				process = false
+			}
+		}
+
+		for _, ext := range strings.Split(extentionBlacklist, ",") {
+			if strings.HasSuffix(file, ext) {
+				// Needs to be smarter we should skip reading the contents but it should still be under the license in the root folders
+				process = false
+			}
+		}
+
+		if process == true {
+			content := readFile(filepath.Join(directory, file))
+			licenseGuesses := GuessLicense(string(content), true, loadDatabase("database_keywords.json"))
+
+			// licenseString := ""
+			// for _, v := range licenseGuesses {
+			// 	licenseString += fmt.Sprintf(" %s (%.1f%%)", v.Shortname, (v.Percentage * 100))
+			// }
+
+			fmt.Println(filepath.Join(directory, file), file, licenseGuesses, rootLicenses, getMd5Hash(content), getSha1Hash(content), getSha256Hash(content), len(content), bytefmt.ByteSize(uint64(len(content))))
+		}
+	}
+
+	for _, newdirectory := range directories {
+		WalkDirectory(filepath.Join(directory, newdirectory), rootLicenses)
+	}
 }
