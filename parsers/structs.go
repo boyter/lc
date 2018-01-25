@@ -17,3 +17,15 @@ type LicenseMatch struct {
 	Shortname  string
 	Percentage float64
 }
+
+type FileResult struct {
+	Directory      string
+	Filename       string
+	LicenseGuesses []LicenseMatch
+	LicenseRoots   []LicenseMatch
+	Md5Hash        string
+	Sha1Hash       string
+	Sha256Hash     string
+	BytesHuman     string
+	Bytes          int
+}

@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	// "io"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -33,17 +32,12 @@ func main() {
 		if strings.HasSuffix(f.Name(), ".json") {
 			// The constant variable name
 			out.Write([]byte(strings.TrimSuffix(f.Name(), ".json") + " = `"))
-			// file, _ := os.Open(f.Name())
 
 			contents := readFile(f.Name())
 			str := base64.StdEncoding.EncodeToString(contents)
 
-			// io.Copy(out, file)
 			out.Write([]byte(str))
 			out.Write([]byte("`\n"))
-
-			// str := base64.StdEncoding.EncodeToString([]byte(out))
-			// fmt.Println(str)
 		}
 	}
 

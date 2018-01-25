@@ -141,7 +141,8 @@ func loadDatabase() []License {
 	return database
 }
 
-func walkDirectory(directory string, rootLicenses []LicenseMatch) {
+func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
+	fileResults := []FileResult{}
 	all, _ := ioutil.ReadDir(directory)
 
 	directories := []string{}
@@ -193,18 +194,35 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) {
 			licenseGuesses = guessLicense(string(content), deepGuess, loadDatabase())
 		}
 
-		fmt.Println(filepath.Join(directory, file), file, licenseGuesses, rootLicenses, getMd5Hash(content), getSha1Hash(content), getSha256Hash(content), len(content), bytefmt.ByteSize(uint64(len(content))))
+		fmt.Println(filepath.Join(directory, file), file, licenseGuesses, rootLicenses, getMd5Hash(content), getSha1Hash(content), getSha256Hash(content), bytefmt.ByteSize(uint64(len(content))), len(content), "bytes")
 
+		// Required if the output format is meant to be command line
 		// licenseString := ""
 		// for _, v := range licenseGuesses {
 		// 	licenseString += fmt.Sprintf(" %s (%.1f%%)", v.Shortname, (v.Percentage * 100))
 		// }
 
+		fileResult := FileResult{
+			Directory:      directory,
+			Filename:       file,
+			LicenseGuesses: licenseGuesses,
+			LicenseRoots:   rootLicenses,
+			Md5Hash:        getMd5Hash(content),
+			Sha1Hash:       getSha1Hash(content),
+			Sha256Hash:     getSha256Hash(content),
+			BytesHuman:     bytefmt.ByteSize(uint64(len(content))),
+			Bytes:          len(content)}
+
+		fileResults = append(fileResults, fileResult)
+
 	}
 
 	for _, newdirectory := range directories {
-		walkDirectory(filepath.Join(directory, newdirectory), rootLicenses)
+		results := walkDirectory(filepath.Join(directory, newdirectory), rootLicenses)
+		fileResults = append(fileResults, results...)
 	}
+
+	return fileResults
 }
 
 func Process() {
@@ -216,5 +234,7 @@ func Process() {
 		fmt.Println("Using default confidence value")
 	}
 
-	walkDirectory(DirPath, []LicenseMatch{})
+	fileResults := walkDirectory(DirPath, []LicenseMatch{})
+
+	toCSV(fileResults)
 }
