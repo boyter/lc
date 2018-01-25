@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/boyter/license-checker/parsers"
+	"github.com/boyter/licensechecker/parsers"
 	"github.com/briandowns/spinner"
 	"github.com/urfave/cli"
 	"os"
@@ -12,10 +12,10 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.EnableBashCompletion = true
-	app.Name = "golang-license-checker"
+	app.Name = "licensechecker"
 	app.Version = "1.0"
 	app.Usage = "Check directory for licenses and list what license(s) a file is under"
-	app.UsageText = "golang-licence-checker [global options] DIRECTORY"
+	app.UsageText = "licencechecker [global options] DIRECTORY"
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
