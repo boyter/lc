@@ -20,6 +20,9 @@ import (
 
 var confidence = 0.85
 var possibleLicenceFiles = "license,copying"
+var dirPath = "/home/bboyter/Projects/hyperfine/"
+var pathBlacklist = ".git,.hg,.svn"
+var extentionBlacklist = "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf"
 
 var Generate_Flags = []cli.Flag{
 	cli.StringFlag{
@@ -55,7 +58,7 @@ type LicenseMatch struct {
 // Fast method of checking if supplied content contains a licence using
 // matching keyword ngrams to find if the licence is a match or not
 // returns the maching licences with shortname and the percentage of match.
-func KeywordGuessLicense(content string, licenses []License) []LicenseMatch {
+func keywordGuessLicense(content string, licenses []License) []LicenseMatch {
 	content = strings.ToLower(content)
 	matchingLicenses := []LicenseMatch{}
 
@@ -82,10 +85,10 @@ func KeywordGuessLicense(content string, licenses []License) []LicenseMatch {
 // Parses the supplied file content against the list of licences and
 // returns the matching licences with the shortname and the percentage of match.
 // If fast lookup methods fail it will try deep matching which is slower.
-func GuessLicense(content string, deepguess bool, licenses []License) []LicenseMatch {
+func guessLicense(content string, deepguess bool, licenses []License) []LicenseMatch {
 	matchingLicenses := []LicenseMatch{}
 
-	for _, license := range KeywordGuessLicense(content, licenses) {
+	for _, license := range keywordGuessLicense(content, licenses) {
 
 		matchingLicense := License{}
 
@@ -136,7 +139,7 @@ func GuessLicense(content string, deepguess bool, licenses []License) []LicenseM
 	return matchingLicenses
 }
 
-func FindPossibleLicenseFiles(fileList []string) []string {
+func findPossibleLicenseFiles(fileList []string) []string {
 	possibleList := []string{}
 
 	for _, filename := range fileList {
@@ -155,10 +158,6 @@ func FindPossibleLicenseFiles(fileList []string) []string {
 
 	return possibleList
 }
-
-var dirPath = "/home/bboyter/Projects/hyperfine/"
-var pathBlacklist = ".git,.hg,.svn"
-var extentionBlacklist = "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf"
 
 func getMd5Hash(content []byte) string {
 	hasher := md5.New()
@@ -216,11 +215,7 @@ func loadDatabase(filepath string) []License {
 	return database
 }
 
-func WalkDirectory(directory string, rootLicenses []LicenseMatch) {
-	if directory == "" {
-		directory = dirPath
-	}
-
+func walkDirectory(directory string, rootLicenses []LicenseMatch) {
 	all, _ := ioutil.ReadDir(directory)
 
 	directories := []string{}
@@ -246,10 +241,10 @@ func WalkDirectory(directory string, rootLicenses []LicenseMatch) {
 	}
 
 	// Determine any possible licence files which would classify everything else
-	possibleLicenses := FindPossibleLicenseFiles(files)
+	possibleLicenses := findPossibleLicenseFiles(files)
 	for _, possibleLicense := range possibleLicenses {
 		content := string(readFile(filepath.Join(directory, possibleLicense)))
-		guessLicenses := GuessLicense(content, true, loadDatabase("database_keywords.json"))
+		guessLicenses := guessLicense(content, true, loadDatabase("database_keywords.json"))
 
 		if len(guessLicenses) != 0 {
 			rootLicenses = append(rootLicenses, guessLicenses[0])
@@ -274,7 +269,7 @@ func WalkDirectory(directory string, rootLicenses []LicenseMatch) {
 
 		if process == true {
 			content := readFile(filepath.Join(directory, file))
-			licenseGuesses := GuessLicense(string(content), true, loadDatabase("database_keywords.json"))
+			licenseGuesses := guessLicense(string(content), true, loadDatabase("database_keywords.json"))
 
 			// licenseString := ""
 			// for _, v := range licenseGuesses {
@@ -286,6 +281,10 @@ func WalkDirectory(directory string, rootLicenses []LicenseMatch) {
 	}
 
 	for _, newdirectory := range directories {
-		WalkDirectory(filepath.Join(directory, newdirectory), rootLicenses)
+		walkDirectory(filepath.Join(directory, newdirectory), rootLicenses)
 	}
+}
+
+func Process(c *cli.Context) {
+	walkDirectory(dirPath, []LicenseMatch{})
 }
