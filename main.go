@@ -35,9 +35,10 @@ func main() {
 			Destination: &parsers.Confidence,
 		},
 		cli.StringFlag{
-			Name:  "deepguess, dg",
-			Usage: "Should attempt to deep guess the licence false or true `true`",
-			Value: "true",
+			Name:        "deepguess, dg",
+			Usage:       "Should attempt to deep guess the licence false or true `true`",
+			Value:       "true",
+			Destination: &parsers.DeepGuess,
 		},
 	}
 	app.Action = func(c *cli.Context) error {
