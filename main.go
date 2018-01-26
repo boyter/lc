@@ -2,12 +2,15 @@ package main
 
 import (
 	"github.com/boyter/licensechecker/parsers"
+	// "github.com/pkg/profile"
 	"github.com/urfave/cli"
 	"os"
 )
 
 //go:generate go run scripts/include.go
 func main() {
+	// defer profile.Start().Stop()
+
 	app := cli.NewApp()
 	app.EnableBashCompletion = true
 	app.Name = "licensechecker"

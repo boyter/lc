@@ -55,7 +55,7 @@ func toCSV(fileResults []FileResult) {
 			result.BytesHuman})
 	}
 
-	csvfile, _ := os.Open(FileOutput)
+	csvfile, _ := os.OpenFile(FileOutput, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0755)
 	defer csvfile.Close()
 
 	w := csv.NewWriter(csvfile)
@@ -65,7 +65,6 @@ func toCSV(fileResults []FileResult) {
 		log.Fatalln("error writing csv:", err)
 	}
 
-	fmt.Println("")
 	fmt.Println("Results written to " + FileOutput)
 }
 
@@ -73,7 +72,6 @@ func toJSON(fileResults []FileResult) {
 	t, _ := json.Marshal(fileResults)
 	ioutil.WriteFile(FileOutput, t, 0600)
 
-	fmt.Println("")
 	fmt.Println("Results written to " + FileOutput)
 }
 
@@ -103,6 +101,5 @@ func toCli(fileResults []FileResult) {
 
 	result := columnize.SimpleFormat(output)
 
-	fmt.Println("")
 	fmt.Println(result)
 }

@@ -20,7 +20,7 @@ import (
 var confidence = 0.85
 var Confidence = "0.85"
 var PossibleLicenceFiles = "license,copying"
-var DirPath = "./"
+var DirPath = "/home/bboyter/Projects/hyperfine/"
 var PathBlacklist = ".git,.hg,.svn"
 var deepGuess = true
 var DeepGuess = "true"
@@ -43,7 +43,8 @@ func keywordGuessLicense(content string, licenses []License) []LicenseMatch {
 
 		for _, keyword := range license.Keywords {
 			contains = strings.Contains(content, keyword)
-			if contains {
+
+			if contains == true {
 				keywordmatch++
 			}
 		}
@@ -121,6 +122,7 @@ func findPossibleLicenseFiles(fileList []string) []string {
 		possible := false
 
 		for _, indicator := range strings.Split(PossibleLicenceFiles, ",") {
+
 			if strings.Contains(strings.ToLower(filename), indicator) {
 				possible = true
 			}
