@@ -259,7 +259,16 @@ func Process() {
 		s.Start()
 	}
 
-	fileResults := walkDirectory(DirPath, []LicenseMatch{})
+	fileResults := []FileResult{}
+	if info, err := os.Stat(DirPath); err == nil && info.IsDir() {
+		fileResults = walkDirectory(DirPath, []LicenseMatch{})
+	} else {
+		content := string(readFile(DirPath))
+		guessLicenses := guessLicense(content, deepGuess, loadDatabase())
+
+		fmt.Println(guessLicenses)
+	}
+
 	s.Stop()
 
 	switch strings.ToLower(Format) {
@@ -272,5 +281,4 @@ func Process() {
 	default:
 		fmt.Println("")
 	}
-
 }
