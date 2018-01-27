@@ -47,11 +47,15 @@ func keywordGuessLicense(content string, licenses []License) []LicenseMatch {
 			if contains == true {
 				keywordmatch++
 			}
+
+			// if index >= 5 {
+			// 	break
+			// }
 		}
 
 		if keywordmatch > 0 {
 			percentage := (float64(keywordmatch) / float64(len(license.Keywords))) * 100
-			matchingLicenses = append(matchingLicenses, LicenseMatch{Shortname: license.Shortname, Percentage: percentage})
+			matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: percentage})
 		}
 	}
 
@@ -69,14 +73,14 @@ func guessLicense(content string, deepguess bool, licenses []License) []LicenseM
 		matchingLicense := License{}
 
 		for _, l := range licenses {
-			if l.Shortname == license.Shortname {
+			if l.LicenseId == license.LicenseId {
 				matchingLicense = l
 				break
 			}
 		}
 
 		runecontent := []rune(content)
-		trimto := utf8.RuneCountInString(matchingLicense.Text)
+		trimto := utf8.RuneCountInString(matchingLicense.LicenseText)
 
 		if trimto > len(runecontent) {
 			trimto = len(runecontent)
@@ -86,14 +90,14 @@ func guessLicense(content string, deepguess bool, licenses []License) []LicenseM
 		relation := vectorspace.Relation(matchingLicense.Concordance, contentConcordance)
 
 		if relation >= confidence {
-			matchingLicenses = append(matchingLicenses, LicenseMatch{Shortname: license.Shortname, Percentage: relation})
+			matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: relation})
 		}
 	}
 
 	if len(matchingLicenses) == 0 && deepguess == true {
 		for _, license := range licenses {
 			runecontent := []rune(content)
-			trimto := utf8.RuneCountInString(license.Text)
+			trimto := utf8.RuneCountInString(license.LicenseText)
 
 			if trimto > len(runecontent) {
 				trimto = len(runecontent)
@@ -103,7 +107,7 @@ func guessLicense(content string, deepguess bool, licenses []License) []LicenseM
 			relation := vectorspace.Relation(license.Concordance, contentConcordance)
 
 			if relation >= confidence {
-				matchingLicenses = append(matchingLicenses, LicenseMatch{Shortname: license.Shortname, Percentage: relation})
+				matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: relation})
 			}
 		}
 	}
@@ -142,7 +146,7 @@ func loadDatabase() []License {
 	_ = json.Unmarshal(data, &database)
 
 	for i, v := range database {
-		database[i].Concordance = vectorspace.BuildConcordance(strings.ToLower(v.Text))
+		database[i].Concordance = vectorspace.BuildConcordance(strings.ToLower(v.LicenseText))
 	}
 
 	return database
@@ -219,13 +223,13 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 			confidence := ""
 
 			if len(licenseGuesses) != 0 {
-				license = licenseGuesses[0].Shortname
+				license = licenseGuesses[0].LicenseId
 				confidence = fmt.Sprintf("%.2f%%", licenseGuesses[0].Percentage*100)
 			}
 
 			rootLicenseString := ""
 			for _, v := range rootLicenses {
-				rootLicenseString += fmt.Sprintf("%s,", v.Shortname)
+				rootLicenseString += fmt.Sprintf("%s,", v.LicenseId)
 			}
 			rootLicenseString = strings.TrimRight(rootLicenseString, ", ")
 

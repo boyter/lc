@@ -32,13 +32,13 @@ func toCSV(fileResults []FileResult) {
 		confidence := ""
 
 		if len(result.LicenseGuesses) != 0 {
-			license = result.LicenseGuesses[0].Shortname
+			license = result.LicenseGuesses[0].LicenseId
 			confidence = fmt.Sprintf("%.3f", result.LicenseGuesses[0].Percentage*100)
 		}
 
 		rootLicenseString := ""
 		for _, v := range result.LicenseRoots {
-			rootLicenseString += fmt.Sprintf("%s,", v.Shortname)
+			rootLicenseString += fmt.Sprintf("%s,", v.LicenseId)
 		}
 		rootLicenseString = strings.TrimRight(rootLicenseString, ", ")
 
@@ -86,13 +86,13 @@ func toCli(fileResults []FileResult) {
 		confidence := ""
 
 		if len(result.LicenseGuesses) != 0 {
-			license = result.LicenseGuesses[0].Shortname
+			license = result.LicenseGuesses[0].LicenseId
 			confidence = fmt.Sprintf("%.2f%%", result.LicenseGuesses[0].Percentage*100)
 		}
 
 		rootLicenseString := ""
 		for _, v := range result.LicenseRoots {
-			rootLicenseString += fmt.Sprintf("%s,", v.Shortname)
+			rootLicenseString += fmt.Sprintf("%s,", v.LicenseId)
 		}
 		rootLicenseString = strings.TrimRight(rootLicenseString, ", ")
 

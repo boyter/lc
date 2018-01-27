@@ -6,15 +6,14 @@ import (
 
 type License struct {
 	Keywords    []string `json:"keywords"`
-	Text        string   `json:"text"`
-	Fullname    string   `json:"fullname"`
-	Shortname   string   `json:"shortname"`
-	Header      string   `json:"header"`
+	LicenseText string   `json:"licenseText"`
+	Name        string   `json:"name"`
+	LicenseId   string   `json:"licenseId"`
 	Concordance vectorspace.Concordance
 }
 
 type LicenseMatch struct {
-	Shortname  string
+	LicenseId  string
 	Percentage float64
 }
 
