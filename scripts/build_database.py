@@ -11,11 +11,14 @@ from os.path import isfile, join
 '''
 Parses based on the SPDX uploaded licenses in github https://github.com/spdx/license-list-data
 
-Running this takes a long time so be prepared to wait while it churns away
+Running this takes a while so be prepared to wait a long time while it churns away
+Might be worth running using pypy which might be a little faster
 '''
 
 def clean_text(text):
     text = text.lower()
+    text = re.sub('[^a-zA-Z0-9 ]', ' ', text)
+    text = re.sub('\s+', ' ', text)
     return text
 
 
@@ -27,7 +30,6 @@ def build_database():
     license_dir = './license-list-data/json/details/'
 
     onlyfiles = [f for f in listdir(license_dir) if isfile(join(license_dir, f))]
-
     licenses = []
 
     for license in onlyfiles:
@@ -41,8 +43,10 @@ def build_database():
             if license_json['licenseId'] in ['Artistic-1.0', 'BSD-3-Clause']:
                 ngramrange = range(2, 35)
 
+            cleaned = clean_text(license_json['licenseText']).split()
+
             for x in ngramrange:
-                ngrams = ngrams + find_ngrams(license_json['licenseText'].split(), x)
+                ngrams = ngrams + find_ngrams(cleaned, x)
             license_json['ngrams'] = ngrams
 
             licenses.append(license_json)
