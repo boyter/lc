@@ -23,28 +23,6 @@ def find_ngrams(input_list, n):
     return zip(*[input_list[i:] for i in range(n)])
 
 
-def load_database():
-    with open('database.json', 'r') as file:
-        database = file.read()
-
-    licenses = json.loads(database)
-
-    for license in licenses:
-        license['clean'] = clean_text(license['text'])
-        ngrams = []
-
-        ngramrange = [3, 7, 8]
-
-        if license['shortname'] in ['Artistic-1.0', 'BSD-3-Clause']:
-            ngramrange = range(2, 35)
-
-        for x in ngramrange:
-            ngrams = ngrams + find_ngrams(license['clean'].split(), x)
-        license['ngrams'] = ngrams
-
-    return licenses
-
-
 def build_database():
     license_dir = './license-list-data/json/details/'
 
