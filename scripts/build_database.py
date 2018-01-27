@@ -12,7 +12,6 @@ from os.path import isfile, join
 Parses based on the SPDX uploaded licenses in github https://github.com/spdx/license-list-data
 
 Running this takes a while so be prepared to wait a long time while it churns away
-Might be worth running using pypy which might be a little faster
 '''
 
 def clean_text(text):
