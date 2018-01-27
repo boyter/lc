@@ -228,21 +228,7 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 		fileResults = append(fileResults, fileResult)
 
 		if strings.ToLower(Format) == "progress" {
-			license := ""
-			confidence := ""
-
-			if len(licenseGuesses) != 0 {
-				license = licenseGuesses[0].LicenseId
-				confidence = fmt.Sprintf("%.2f%%", licenseGuesses[0].Percentage*100)
-			}
-
-			rootLicenseString := ""
-			for _, v := range rootLicenses {
-				rootLicenseString += fmt.Sprintf("%s,", v.LicenseId)
-			}
-			rootLicenseString = strings.TrimRight(rootLicenseString, ", ")
-
-			fmt.Println(directory, file, license, confidence, rootLicenseString, bytefmt.ByteSize(uint64(len(content))))
+			toProgress(directory, file, content, rootLicenses, licenseGuesses)
 		}
 
 	}
