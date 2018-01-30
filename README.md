@@ -9,7 +9,7 @@ Would be nice to have the following output styles,
 	CSV
 	SPDX
 
-command line options include, deep guess, confidence, path, database file, short licence name to classify everything under by default
+command line options include, deep guess, confidence, path
 
 Probably want to have something that allows you to specify which extensions to look for explicitly to speed things up
 Having the SPDX version would be nice although currently just targetting 2.1

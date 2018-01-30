@@ -21,7 +21,7 @@ import (
 var confidence = 0.85
 var Confidence = "0.85"
 var PossibleLicenceFiles = "license,copying,readme"
-var DirPath = "/home/bboyter/Projects/hyperfine/"
+var DirPath = "./"
 var PathBlacklist = ".git,.hg,.svn"
 var deepGuess = true
 var DeepGuess = "true"
@@ -241,7 +241,7 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 	return fileResults
 }
 
-func Process() {
+func processArguments() {
 	conf, err := strconv.ParseFloat(Confidence, 64)
 
 	if err == nil {
@@ -250,6 +250,17 @@ func Process() {
 		fmt.Println("Using default confidence value")
 	}
 
+	deep, err := strconv.ParseBool(DeepGuess)
+
+	if err == nil {
+		deepGuess = deep
+	} else {
+		fmt.Println("Using default deepguess value")
+	}
+
+}
+
+func Process() {
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 	s.Writer = os.Stderr
 	s.Suffix = " processing"
