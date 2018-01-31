@@ -23,7 +23,7 @@ import (
 var confidence = 0.85
 var Confidence = "0.85"
 var PossibleLicenceFiles = "license,copying,readme"
-var DirPath = "./"
+var DirPath = "."
 var PathBlacklist = ".git,.hg,.svn"
 var deepGuess = true
 var DeepGuess = "true"

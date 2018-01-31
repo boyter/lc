@@ -118,9 +118,15 @@ func toProgress(directory string, file string, content []byte, rootLicenses []Li
 
 	rootLicenseString := ""
 	for _, v := range rootLicenses {
-		rootLicenseString += fmt.Sprintf("%s,", v.LicenseId)
+		rootLicenseString += fmt.Sprintf("%s, ", v.LicenseId)
 	}
 	rootLicenseString = strings.TrimRight(rootLicenseString, ", ")
 
-	fmt.Println(directory, file, license, confidence, rootLicenseString, bytefmt.ByteSize(uint64(len(content))))
+	fmt.Println("Directory:", directory, "Filename:", file)
+	fmt.Println("License:", license, confidence)
+	fmt.Println("Root License(s):", rootLicenseString)
+	fmt.Println("Size:", bytefmt.ByteSize(uint64(len(content))))
+	fmt.Println("MD5:", getMd5Hash(content), "SHA1:", getSha1Hash(content))
+	fmt.Println("--------------")
+	// fmt.Println(directory, file, license, confidence, rootLicenseString, bytefmt.ByteSize(uint64(len(content))))
 }
