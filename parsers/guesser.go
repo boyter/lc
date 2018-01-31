@@ -310,6 +310,11 @@ func Process() {
 	}
 
 	fileResults := []FileResult{}
+
+	if DirPath == "" {
+		DirPath = "."
+	}
+
 	if info, err := os.Stat(DirPath); err == nil && info.IsDir() {
 		fileResults = walkDirectory(DirPath, []LicenseMatch{})
 	} else {
