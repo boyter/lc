@@ -1,5 +1,6 @@
 #!/usr/local/bin/python
 # -*- coding: utf-8 -*-
+# SPDX-License-Identifier: GPL-3.0
 
 import os
 import json
