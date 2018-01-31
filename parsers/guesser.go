@@ -42,8 +42,7 @@ func cleanText(content string) string {
 	return content
 }
 
-// Identify licenses in the text which is using the SPDX indicator like below
-// SPDX-License-Identifier: GPL-3.0+
+// Identify licenses in the text which is using the SPDX indicator
 // Can return multiple license matches
 func identifierGuessLicence(content string, licenses []License) []LicenseMatch {
 

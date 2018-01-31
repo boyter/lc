@@ -55,6 +55,12 @@ func main() {
 			Value:       "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf",
 			Destination: &parsers.ExtentionBlacklist,
 		},
+		cli.StringFlag{
+			Name:        "licensefiles, plf",
+			Usage:       "Possible license files to inspect for over-arching license as comma seperated list `license,copying,readme`",
+			Value:       "license,copying,readme",
+			Destination: &parsers.PossibleLicenceFiles,
+		},
 	}
 	app.Action = func(c *cli.Context) error {
 		parsers.DirPath = c.Args().Get(0)
