@@ -1,22 +1,56 @@
-# README #
+licensechecker (lc)
+-------------------
+`lc` is a command line tool that recursively iterates over a supplied directory
+attempting to identify what software license each file is under using the list
+of licenses supplied by the SPDX (Software Package Data Exchange) Project.
 
-A reimplementation of http://www.boyter.org/2017/05/identify-software-licenses-python-vector-space-search-ngram-keywords/ using Go while I attempt to nut out the nuances of the language. Will this turn into a full blown SPDX parser of some description in the future? That depends on how sucessful I am writing Go and how much I enjoy it :)
+SPDX-License-Identifier: GPL-3.0-only
 
-Would be nice to have the following output styles,
+In a nutshell this project is  reimplementation of http://www.boyter.org/2017/05/identify-software-licenses-python-vector-space-search-ngram-keywords/ using Go while I attempt to nut out the nuances of the language. 
 
-	formatted IE CLI viewable
-	JSON
-	CSV
-	SPDX
+The plan is to eventually turn this into a full blown SPDX formatter using version 2.1. However that depends on how sucessful I am writing Go and how much I enjoy writing it :)
 
-command line options include, deep guess, confidence, path
+### Installation
 
-Probably want to have something that allows you to specify which extensions to look for explicitly to speed things up
-Having the SPDX version would be nice although currently just targetting 2.1
+The binary name for `licencechecker` is `lc`.
 
-Example output running against itself ignoring the examples directory
+Binary files will be distributed at some point in the future probably. Currently to install you need to have Go setup with your GOPATH working and your go binary path exported like so,
 
-	$ go run main.go --pbl .git,examples -f cli .
+```
+export PATH=$PATH:$(go env GOPATH)/bin
+```
+
+then to install
+
+```
+$ go install
+```
+
+
+### Usage
+
+Command line usage of `licensechecker` is designed to be as simple as possible.
+Full details can be found in `lc --help`.
+
+Probably the most useful functionality is the `-f` modifier which specifies the output format.
+By default `licencechecker` will print out results as it processes files. However as it was designed
+to run at the end of CI tasks you may want to get a nicer output which can be done like so.
+
+```
+$ lc -f cli .
+```
+
+The above will process starting in the current directory and print out a formatted list of results when finished.
+
+Command line options include, deep guess, confidence, path
+
+```
+$ lc [global options] DIRECTORY
+```
+
+Example output of `licencechecker` running against itself ignoring the .git and examples directories
+
+	$ lc --pbl .git,examples -f cli .
 	Directory  File                      License       Confidence  Root Licenses  Size
 	.          .gitignore                                          GPL-3.0-only   275B
 	.          LICENSE                   GPL-3.0-only  99.68%      GPL-3.0-only   34.3K
@@ -31,3 +65,20 @@ Example output running against itself ignoring the examples directory
 	parsers    structs.go                GPL-3.0-only  100.00%     GPL-3.0-only   692B
 	scripts    build_database.py         GPL-3.0-only  100.00%     GPL-3.0-only   4.7K
 	scripts    include.go                GPL-3.0-only  100.00%     GPL-3.0-only   1008B
+
+
+Or to write out the results to a CSV file
+
+```
+$ lc --format csv -output licences.csv --pathblacklist .git,examples .
+```
+
+
+### TODO
+
+Would be nice to have the following output styles,
+
+	formatted IE CLI viewable
+	JSON
+	CSV
+	SPDX

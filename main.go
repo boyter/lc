@@ -3,7 +3,7 @@
 package main
 
 import (
-	"github.com/boyter/licensechecker/parsers"
+	"github.com/boyter/lc/parsers"
 	// "github.com/pkg/profile"
 	"github.com/urfave/cli"
 	"os"
@@ -18,7 +18,7 @@ func main() {
 	app.Name = "licensechecker"
 	app.Version = "1.0"
 	app.Usage = "Check directory for licenses and list what license(s) a file is under"
-	app.UsageText = "licencechecker [global options] DIRECTORY"
+	app.UsageText = "lc [global options] DIRECTORY"
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
