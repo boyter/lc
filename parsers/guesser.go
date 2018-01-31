@@ -26,21 +26,39 @@ var PathBlacklist = ".git,.hg,.svn"
 var deepGuess = true
 var DeepGuess = "true"
 var Format = "cli"
-var FileOutput = ""
-
-// Will not attempt tp process but will still list under
+var FileOutput = "output"
 var ExtentionBlacklist = "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf"
+
+var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]`)
+var alphaNumericRegex = regexp.MustCompile("[^a-zA-Z0-9 ]")
+var multipleSpacesRegex = regexp.MustCompile("\\s+")
 
 func cleanText(content string) string {
 	content = strings.ToLower(content)
 
-	alphaNumeric := regexp.MustCompile("[^a-zA-Z0-9 ]")
-	multipleSpaces := regexp.MustCompile("\\s+")
-
-	content = alphaNumeric.ReplaceAllString(content, " ")
-	content = multipleSpaces.ReplaceAllString(content, " ")
+	content = alphaNumericRegex.ReplaceAllString(content, " ")
+	content = multipleSpacesRegex.ReplaceAllString(content, " ")
 
 	return content
+}
+
+// Identify licenses in the text which is using the SPDX indicator like below
+// SPDX-License-Identifier: GPL-3.0+
+// Can return multiple license matches
+func identifierGuessLicence(content string, licenses []License) []LicenseMatch {
+
+	matchingLicenses := []LicenseMatch{}
+	matches := spdxLicenceRegex.FindAllStringSubmatch(content, -1)
+
+	for _, val := range matches {
+		for _, license := range licenses {
+			if license.LicenseId == strings.TrimSpace(val[1]) {
+				matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: 1})
+			}
+		}
+	}
+
+	return matchingLicenses
 }
 
 // Fast method of checking if supplied content contains a licence using
@@ -212,6 +230,7 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 		licenseGuesses := []LicenseMatch{}
 		if process == true {
 			licenseGuesses = guessLicense(string(content), deepGuess, loadDatabase())
+			licenseGuesses = append(licenseGuesses, identifierGuessLicence(string(content), loadDatabase())...)
 		}
 
 		fileResult := FileResult{
@@ -230,7 +249,6 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 		if strings.ToLower(Format) == "progress" {
 			toProgress(directory, file, content, rootLicenses, licenseGuesses)
 		}
-
 	}
 
 	for _, newdirectory := range directories {
@@ -263,7 +281,7 @@ func processArguments() {
 func Process() {
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 	s.Writer = os.Stderr
-	s.Suffix = " processing"
+	s.Prefix = "Processing... "
 
 	if strings.ToLower(Format) != "progress" {
 		s.Start()
