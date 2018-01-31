@@ -82,3 +82,49 @@ Would be nice to have the following output styles,
 	JSON
 	CSV
 	SPDX
+
+
+Investigate using zlib compression for databases
+
+```
+package main
+
+import (
+	"bytes"
+	"compress/zlib"
+	"fmt"
+	"io"
+	"io/ioutil"
+)
+
+func readFile(filepath string) []byte {
+	// TODO only read as deep into the file as we need
+	bytes, err := ioutil.ReadFile(filepath)
+
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	return bytes
+}
+
+func main() {
+
+	contents := readFile("database_keywords.json")
+	fmt.Println(len(contents))
+
+	var in bytes.Buffer
+	b := []byte(contents)
+	w := zlib.NewWriter(&in)
+	w.Write(b)
+	w.Close()
+
+	fmt.Println(len(in.String()))
+
+	var out bytes.Buffer
+	r, _ := zlib.NewReader(&in)
+	io.Copy(&out, r)
+	fmt.Println(len(out.String()))
+	// fmt.Println(len(out.String()))
+}
+```
