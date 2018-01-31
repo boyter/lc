@@ -6,7 +6,7 @@ of licenses supplied by the SPDX (Software Package Data Exchange) Project.
 
 SPDX-License-Identifier: GPL-3.0-only
 
-In a nutshell this project is  reimplementation of http://www.boyter.org/2017/05/identify-software-licenses-python-vector-space-search-ngram-keywords/ using Go while I attempt to nut out the nuances of the language. 
+In a nutshell this project is a reimplementation of http://www.boyter.org/2017/05/identify-software-licenses-python-vector-space-search-ngram-keywords/ using Go while I attempt to nut out the nuances of the language. 
 
 The plan is to eventually turn this into a full blown SPDX formatter using version 2.1. However that depends on how sucessful I am writing Go and how much I enjoy writing it :)
 
