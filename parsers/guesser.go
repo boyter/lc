@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0
+
 package parsers
 
 import (
@@ -51,6 +53,7 @@ func identifierGuessLicence(content string, licenses []License) []LicenseMatch {
 
 	for _, val := range matches {
 		for _, license := range licenses {
+
 			if license.LicenseId == strings.TrimSpace(val[1]) {
 				matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: 1})
 			}
@@ -219,7 +222,7 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 		process := true
 
 		for _, ext := range strings.Split(ExtentionBlacklist, ",") {
-			if strings.HasSuffix(file, ext) {
+			if strings.HasSuffix(file, "."+ext) {
 				// Needs to be smarter we should skip reading the contents but it should still be under the license in the root folders
 				process = false
 			}
@@ -227,6 +230,7 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 
 		content := readFile(filepath.Join(directory, file))
 		licenseGuesses := []LicenseMatch{}
+
 		if process == true {
 			licenseGuesses = guessLicense(string(content), deepGuess, loadDatabase())
 			licenseGuesses = append(licenseGuesses, identifierGuessLicence(string(content), loadDatabase())...)
