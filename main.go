@@ -46,6 +46,12 @@ func main() {
 			Destination: &parsers.DeepGuess,
 		},
 		cli.StringFlag{
+			Name:        "filesize, fs",
+			Usage:       "How large a file in bytes should be processed `50000`",
+			Value:       "50000",
+			Destination: &parsers.MaxSize,
+		},
+		cli.StringFlag{
 			Name:        "licensefiles, lf",
 			Usage:       "Possible license files to inspect for over-arching license as comma seperated list `copying,readme`",
 			Value:       "license,copying,readme",
