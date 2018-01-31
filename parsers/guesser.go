@@ -158,8 +158,13 @@ func findPossibleLicenseFiles(fileList []string) []string {
 		possible := false
 
 		for _, indicator := range strings.Split(PossibleLicenceFiles, ",") {
-
 			if strings.Contains(strings.ToLower(filename), indicator) {
+				possible = true
+			}
+		}
+
+		for _, license := range loadDatabase() {
+			if strings.Contains(strings.ToLower(filename), strings.ToLower(license.LicenseId)) {
 				possible = true
 			}
 		}
@@ -172,6 +177,7 @@ func findPossibleLicenseFiles(fileList []string) []string {
 	return possibleList
 }
 
+// TODO make this cache the result
 func loadDatabase() []License {
 	var database []License
 	data, _ := base64.StdEncoding.DecodeString(database_keywords)
