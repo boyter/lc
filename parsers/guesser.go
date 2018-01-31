@@ -20,18 +20,19 @@ import (
 	"unicode/utf8"
 )
 
-var confidence = 0.85
-var Confidence = "0.85"
-var PossibleLicenceFiles = "license,copying,readme"
+// Set by user as command line arguments
+var confidence = 0.0
+var Confidence = ""
+var PossibleLicenceFiles = ""
 var DirPath = "."
-var PathBlacklist = ".git,.hg,.svn"
+var PathBlacklist = ""
 var deepGuess = true
-var DeepGuess = "true"
-var Format = "cli"
-var FileOutput = "output"
-var ExtentionBlacklist = "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf"
-var maxSize = 50000
-var MaxSize = "50000"
+var DeepGuess = ""
+var Format = ""
+var FileOutput = ""
+var ExtentionBlacklist = ""
+var maxSize = 0
+var MaxSize = ""
 
 var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]`)
 var alphaNumericRegex = regexp.MustCompile("[^a-zA-Z0-9 ]")
@@ -220,6 +221,7 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 		}
 	}
 
+	// TODO fan this out to many GoRoutines and process in parallel
 	for _, file := range files {
 		process := true
 
@@ -292,6 +294,7 @@ func processArguments() {
 }
 
 func Process() {
+	processArguments()
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 	s.Writer = os.Stderr
 	s.Prefix = "Processing... "
