@@ -3,7 +3,6 @@
 package parsers
 
 import (
-	"code.cloudfoundry.org/bytefmt"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -107,7 +106,7 @@ func toCli(fileResults []FileResult) {
 	fmt.Println(result)
 }
 
-func toProgress(directory string, file string, content []byte, rootLicenses []LicenseMatch, licenseGuesses []LicenseMatch) {
+func toProgress(directory string, file string, rootLicenses []LicenseMatch, licenseGuesses []LicenseMatch) {
 	license := ""
 	confidence := ""
 
@@ -122,11 +121,9 @@ func toProgress(directory string, file string, content []byte, rootLicenses []Li
 	}
 	rootLicenseString = strings.TrimRight(rootLicenseString, ", ")
 
-	fmt.Println("Directory:", directory, "Filename:", file)
+	fmt.Println("Filename:", file)
+	fmt.Println("Directory:", directory)
 	fmt.Println("License:", license, confidence)
 	fmt.Println("Root License(s):", rootLicenseString)
-	fmt.Println("Size:", bytefmt.ByteSize(uint64(len(content))))
-	fmt.Println("MD5:", getMd5Hash(content), "SHA1:", getSha1Hash(content))
-	fmt.Println("--------------")
-	// fmt.Println(directory, file, license, confidence, rootLicenseString, bytefmt.ByteSize(uint64(len(content))))
+	fmt.Println("----------------------------")
 }

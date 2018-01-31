@@ -223,42 +223,12 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 
 	// TODO fan this out to many GoRoutines and process in parallel
 	for _, file := range files {
-		process := true
 
-		for _, ext := range strings.Split(ExtentionBlacklist, ",") {
-			if strings.HasSuffix(file, "."+ext) {
-				// Needs to be smarter we should skip reading the contents but it should still be under the license in the root folders
-				process = false
-			}
-		}
-
-		content := readFile(filepath.Join(directory, file))
-		licenseGuesses := []LicenseMatch{}
-
-		if len(content) > maxSize {
-			process = false
-		}
-
-		if process == true {
-			licenseGuesses = guessLicense(string(content), deepGuess, loadDatabase())
-			licenseGuesses = append(licenseGuesses, identifierGuessLicence(string(content), loadDatabase())...)
-		}
-
-		fileResult := FileResult{
-			Directory:      directory,
-			Filename:       file,
-			LicenseGuesses: licenseGuesses,
-			LicenseRoots:   rootLicenses,
-			Md5Hash:        getMd5Hash(content),
-			Sha1Hash:       getSha1Hash(content),
-			Sha256Hash:     getSha256Hash(content),
-			BytesHuman:     bytefmt.ByteSize(uint64(len(content))),
-			Bytes:          len(content)}
-
+		fileResult := processFile(directory, file, rootLicenses)
 		fileResults = append(fileResults, fileResult)
 
 		if strings.ToLower(Format) == "progress" {
-			toProgress(directory, file, content, rootLicenses, licenseGuesses)
+			toProgress(directory, file, rootLicenses, fileResult.LicenseGuesses)
 		}
 	}
 
@@ -268,6 +238,42 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 	}
 
 	return fileResults
+}
+
+func processFile(directory string, file string, rootLicenses []LicenseMatch) FileResult {
+	process := true
+
+	for _, ext := range strings.Split(ExtentionBlacklist, ",") {
+		if strings.HasSuffix(file, "."+ext) {
+			// Needs to be smarter we should skip reading the contents but it should still be under the license in the root folders
+			process = false
+		}
+	}
+
+	content := readFile(filepath.Join(directory, file))
+	licenseGuesses := []LicenseMatch{}
+
+	if len(content) > maxSize {
+		process = false
+	}
+
+	if process == true {
+		licenseGuesses = guessLicense(string(content), deepGuess, loadDatabase())
+		licenseGuesses = append(licenseGuesses, identifierGuessLicence(string(content), loadDatabase())...)
+	}
+
+	fileResult := FileResult{
+		Directory:      directory,
+		Filename:       file,
+		LicenseGuesses: licenseGuesses,
+		LicenseRoots:   rootLicenses,
+		Md5Hash:        getMd5Hash(content),
+		Sha1Hash:       getSha1Hash(content),
+		Sha256Hash:     getSha256Hash(content),
+		BytesHuman:     bytefmt.ByteSize(uint64(len(content))),
+		Bytes:          len(content)}
+
+	return fileResult
 }
 
 func processArguments() {
