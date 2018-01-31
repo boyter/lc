@@ -14,7 +14,7 @@ command line options include, deep guess, confidence, path
 Probably want to have something that allows you to specify which extensions to look for explicitly to speed things up
 Having the SPDX version would be nice although currently just targetting 2.1
 
-Example output running against itself currently
+Example output running against itself
 
 	$ go run main.go --pbl .git,.hg,.svn,examples -f cli .
 	Directory  File                      License       Confidence  Root Licenses  Size
