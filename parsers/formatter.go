@@ -165,14 +165,10 @@ func toSPDX21(fileResults []FileResult) {
 	fmt.Println("PackageLicenseDeclared:", packageLicenseDeclared)
 	fmt.Println("")
 
-	for _, result := range fileResults {
+	// Loop over all files and get a list of all unique licenses and print below
+	// PackageLicenseInfoFromFiles: GPL-2.0
 
-		// SPDXVersion: SPDX-2.0
-		// DataLicense: CC0-1.0
-		// PackageName: Foo
-		// PackageOriginator: David A. Wheeler
-		// PackageHomePage: https://github.com/david-a-wheeler/spdx-tutorial/
-		// PackageLicenseDeclared: MIT
+	for _, result := range fileResults {
 
 		// TODO this needs to possibly be NOASSERTION if unsure
 		licenseConcluded := "NONE"
