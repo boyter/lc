@@ -2,9 +2,9 @@ licensechecker (lc)
 -------------------
 `lc` is a command line tool that recursively iterates over a supplied directory
 attempting to identify what software license each file is under using the list
-of licenses supplied by the SPDX (Software Package Data Exchange) Project.
+of licenses supplied by the SPDX (Software Package Data Exchange) Project. Such as the below
 
-SPDX-License-Identifier: GPL-3.0-only
+`SPDX-License-Identifier: GPL-3.0-only`
 
 In a nutshell this project is a reimplementation of http://www.boyter.org/2017/05/identify-software-licenses-python-vector-space-search-ngram-keywords/ using Go while I attempt to nut out the nuances of the language. 
 
