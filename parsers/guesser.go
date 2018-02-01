@@ -164,7 +164,7 @@ func findPossibleLicenseFiles(fileList []string) []string {
 		}
 
 		for _, license := range loadDatabase() {
-			if strings.Contains(strings.ToLower(filename), strings.ToLower(license.LicenseId)) {
+			if strings.Split(filename, ".")[0] == strings.ToLower(license.LicenseId) {
 				possible = true
 			}
 		}
