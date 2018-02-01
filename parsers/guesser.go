@@ -53,13 +53,11 @@ func cleanText(content string) string {
 // Identify licenses in the text which is using the SPDX indicator
 // Can return multiple license matches
 func identifierGuessLicence(content string, licenses []License) []LicenseMatch {
-
 	matchingLicenses := []LicenseMatch{}
 	matches := spdxLicenceRegex.FindAllStringSubmatch(content, -1)
 
 	for _, val := range matches {
 		for _, license := range licenses {
-
 			if license.LicenseId == strings.TrimSpace(val[1]) {
 				matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: 1})
 			}
@@ -261,6 +259,7 @@ func processFile(directory string, file string, rootLicenses []LicenseMatch) Fil
 
 	content := readFile(filepath.Join(directory, file))
 	licenseGuesses := []LicenseMatch{}
+	licenseIdentified := []LicenseMatch{}
 
 	if len(content) > maxSize {
 		process = false
@@ -268,19 +267,20 @@ func processFile(directory string, file string, rootLicenses []LicenseMatch) Fil
 
 	if process == true {
 		licenseGuesses = guessLicense(string(content), deepGuess, loadDatabase())
-		licenseGuesses = append(licenseGuesses, identifierGuessLicence(string(content), loadDatabase())...)
+		licenseIdentified = identifierGuessLicence(string(content), loadDatabase())
 	}
 
 	fileResult := FileResult{
-		Directory:      directory,
-		Filename:       file,
-		LicenseGuesses: licenseGuesses,
-		LicenseRoots:   rootLicenses,
-		Md5Hash:        getMd5Hash(content),
-		Sha1Hash:       getSha1Hash(content),
-		Sha256Hash:     getSha256Hash(content),
-		BytesHuman:     bytesToHuman(len(content)),
-		Bytes:          len(content)}
+		Directory:         directory,
+		Filename:          file,
+		LicenseGuesses:    licenseGuesses,
+		LicenseRoots:      rootLicenses,
+		LicenseIdentified: licenseIdentified,
+		Md5Hash:           getMd5Hash(content),
+		Sha1Hash:          getSha1Hash(content),
+		Sha256Hash:        getSha256Hash(content),
+		BytesHuman:        bytesToHuman(len(content)),
+		Bytes:             len(content)}
 
 	return fileResult
 }

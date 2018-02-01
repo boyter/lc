@@ -41,12 +41,16 @@ func readFile(filepath string) []byte {
 	return bytes
 }
 
-const TERABYTE = 1099511627776
-const GIGABYTE = 1073741824
-const MEGABYTE = 1048576
-const KILOBYTE = 1024
-
+// Borrowed from https://github.com/cloudfoundry/bytefmt
+// Apache-2.0 is compatible with GPL-3.0-only
+// See https://apache.org/licenses/GPL-compatibility.html
+// SPDX-License-Identifier: Apache-2.0
 func bytesToHuman(bytes int) string {
+
+	const TERABYTE = 1099511627776
+	const GIGABYTE = 1073741824
+	const MEGABYTE = 1048576
+	const KILOBYTE = 1024
 
 	unit := ""
 	value := float64(bytes)

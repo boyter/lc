@@ -20,13 +20,14 @@ type LicenseMatch struct {
 }
 
 type FileResult struct {
-	Directory      string
-	Filename       string
-	LicenseGuesses []LicenseMatch
-	LicenseRoots   []LicenseMatch
-	Md5Hash        string
-	Sha1Hash       string
-	Sha256Hash     string
-	BytesHuman     string
-	Bytes          int
+	Directory         string
+	Filename          string
+	LicenseGuesses    []LicenseMatch
+	LicenseRoots      []LicenseMatch
+	LicenseIdentified []LicenseMatch
+	Md5Hash           string
+	Sha1Hash          string
+	Sha256Hash        string
+	BytesHuman        string
+	Bytes             int
 }

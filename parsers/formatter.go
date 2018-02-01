@@ -79,6 +79,22 @@ func toJSON(fileResults []FileResult) {
 	fmt.Println("Results written to " + FileOutput)
 }
 
+func joinLicenseList(licenseList []LicenseMatch, operator string) string {
+	licenseDeclared := ""
+
+	if len(licenseList) == 1 {
+		licenseDeclared = licenseList[0].LicenseId
+	} else if len(licenseList) >= 2 {
+		licenseNames := []string{}
+		for _, v := range licenseList {
+			licenseNames = append(licenseNames, v.LicenseId)
+		}
+		licenseDeclared = "(" + strings.Join(licenseNames, operator) + ")"
+	}
+
+	return licenseDeclared
+}
+
 func toCli(fileResults []FileResult) {
 
 	output := []string{
@@ -89,7 +105,10 @@ func toCli(fileResults []FileResult) {
 		license := ""
 		confidence := ""
 
-		if len(result.LicenseGuesses) != 0 {
+		if len(result.LicenseIdentified) != 0 {
+			license = joinLicenseList(result.LicenseIdentified, " AND ")
+			confidence = fmt.Sprintf("%.2f%%", 100.00)
+		} else if len(result.LicenseGuesses) != 0 {
 			license = result.LicenseGuesses[0].LicenseId
 			confidence = fmt.Sprintf("%.2f%%", result.LicenseGuesses[0].Percentage*100)
 		}
@@ -136,15 +155,7 @@ func toSPDX21(fileResults []FileResult) {
 	packageLicenseDeclared := "NONE"
 
 	if len(fileResults) != 0 {
-		if len(fileResults[0].LicenseRoots) == 1 {
-			packageLicenseDeclared = fileResults[0].LicenseRoots[0].LicenseId
-		} else if len(fileResults) >= 2 {
-			rootLicenseNames := []string{}
-			for _, v := range fileResults[0].LicenseRoots {
-				rootLicenseNames = append(rootLicenseNames, v.LicenseId)
-			}
-			packageLicenseDeclared = "(" + strings.Join(rootLicenseNames, " OR ") + ")"
-		}
+		packageLicenseDeclared = joinLicenseList(fileResults[0].LicenseRoots, " OR ")
 	}
 
 	fmt.Println("SPDXVersion: SPDX-2.1")
