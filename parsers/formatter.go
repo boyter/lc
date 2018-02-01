@@ -163,6 +163,7 @@ func toSPDX21(fileResults []FileResult) {
 	fmt.Println("FilesAnalyzed: true")
 	fmt.Println("PackageVerificationCode: TODO") // TODO https://spdx.org/spdx-specification-21-web-version#h.2p2csry
 	fmt.Println("PackageLicenseDeclared:", packageLicenseDeclared)
+	fmt.Println("PackageCopyrightText: NOASSERTION")
 	fmt.Println("")
 
 	// Loop over all files and get a list of all unique licenses and print below
@@ -175,6 +176,8 @@ func toSPDX21(fileResults []FileResult) {
 
 		if len(result.LicenseGuesses) != 0 {
 			licenseConcluded = result.LicenseGuesses[0].LicenseId
+		} else if len(result.LicenseRoots) != 0 {
+			licenseConcluded = result.LicenseRoots[0].LicenseId
 		}
 
 		fmt.Println("FileName:", filepath.Join(result.Directory, result.Filename))
