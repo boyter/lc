@@ -49,27 +49,26 @@ Command line options include, deep guess, confidence, path
 $ lc [global options] DIRECTORY
 ```
 
-Example output of `licencechecker` running against itself ignoring the .git and examples directories
+Example output of `licencechecker` running against itself ignoring the .git, examples and vendor directories
 
 ```
 $ lc --pbl .git,examples,vendor -f cli .
-Directory  File                      License       Confidence  Root Licenses  Size
-.          .gitignore                                          GPL-3.0-only   275B
-.          Gopkg.lock                                          GPL-3.0-only   1.6K
-.          Gopkg.toml                                          GPL-3.0-only   1K
-.          LICENSE                   GPL-3.0-only  99.68%      GPL-3.0-only   34.3K
-.          README.md                 GPL-3.0-only  100.00%     GPL-3.0-only   4K
-.          classifier_database.json                            GPL-3.0-only   158.5K
-.          database_keywords.json                              GPL-3.0-only   3.6M
-.          main.go                   GPL-3.0-only  100.00%     GPL-3.0-only   2.8K
-.          output.csv                                          GPL-3.0-only   1.5M
-parsers    constants.go                                        GPL-3.0-only   5M
-parsers    formatter.go              GPL-3.0-only  100.00%     GPL-3.0-only   3.1K
-parsers    guesser.go                GPL-3.0-only  100.00%     GPL-3.0-only   9.1K
-parsers    helpers.go                GPL-3.0-only  100.00%     GPL-3.0-only   786B
-parsers    structs.go                GPL-3.0-only  100.00%     GPL-3.0-only   692B
-scripts    build_database.py         GPL-3.0-only  100.00%     GPL-3.0-only   4.7K
-scripts    include.go                GPL-3.0-only  100.00%     GPL-3.0-only   1008B
+Directory  File                      License                        Confidence  Root Licenses  Size
+.          .gitignore                                                           GPL-3.0-only   275B
+.          Gopkg.lock                                                           GPL-3.0-only   1.4K
+.          Gopkg.toml                                                           GPL-3.0-only   972B
+.          LICENSE                   GPL-3.0-only                   99.68%      GPL-3.0-only   34.3K
+.          README.md                                                            GPL-3.0-only   4.6K
+.          classifier_database.json                                             GPL-3.0-only   158.5K
+.          database_keywords.json                                               GPL-3.0-only   3.6M
+.          main.go                   GPL-3.0-only                   100.00%     GPL-3.0-only   2.8K
+parsers    constants.go                                                         GPL-3.0-only   5M
+parsers    formatter.go              GPL-3.0-only                   100.00%     GPL-3.0-only   5.9K
+parsers    guesser.go                GPL-3.0-only                   100.00%     GPL-3.0-only   9.3K
+parsers    helpers.go                (GPL-3.0-only AND Apache-2.0)  100.00%     GPL-3.0-only   1.7K
+parsers    structs.go                GPL-3.0-only                   100.00%     GPL-3.0-only   754B
+scripts    build_database.py         GPL-3.0-only                   100.00%     GPL-3.0-only   4.7K
+scripts    include.go                GPL-3.0-only                   100.00%     GPL-3.0-only   1008B
 ```
 
 Or to write out the results to a CSV file
@@ -80,6 +79,10 @@ $ lc --format csv -output licences.csv --pathblacklist .git,examples,vendor .
 
 
 ### TODO
+
+Add error handling for all the file operations and just in general. Most are currently ignored
+
+Add unit and integration tests
 
 Would be nice to have the following output styles,
 
