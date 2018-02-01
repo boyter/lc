@@ -31,7 +31,6 @@ func main() {
 			Name:        "output, o",
 			Usage:       "Set output file `FILE`",
 			Destination: &parsers.FileOutput,
-			Value:       "output",
 		},
 		cli.StringFlag{
 			Name:        "confidence, c",

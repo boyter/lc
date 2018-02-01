@@ -59,24 +59,34 @@ func toCSV(fileResults []FileResult) {
 			result.BytesHuman})
 	}
 
-	csvfile, _ := os.OpenFile(FileOutput, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0755)
-	defer csvfile.Close()
+	if FileOutput == "" {
+		w := csv.NewWriter(os.Stdout)
+		w.WriteAll(records) // calls Flush internally
+		w.Flush()
+	} else {
+		csvfile, _ := os.OpenFile(FileOutput, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0755)
+		defer csvfile.Close()
 
-	w := csv.NewWriter(csvfile)
-	w.WriteAll(records) // calls Flush internally
+		w := csv.NewWriter(csvfile)
+		w.WriteAll(records) // calls Flush internally
 
-	if err := w.Error(); err != nil {
-		log.Fatalln("error writing csv:", err)
+		if err := w.Error(); err != nil {
+			log.Fatalln("error writing csv:", err)
+		}
+
+		fmt.Println("Results written to " + FileOutput)
 	}
-
-	fmt.Println("Results written to " + FileOutput)
 }
 
 func toJSON(fileResults []FileResult) {
 	t, _ := json.Marshal(fileResults)
-	ioutil.WriteFile(FileOutput, t, 0600)
 
-	fmt.Println("Results written to " + FileOutput)
+	if FileOutput == "" {
+		fmt.Println(string(t))
+	} else {
+		ioutil.WriteFile(FileOutput, t, 0600)
+		fmt.Println("Results written to " + FileOutput)
+	}
 }
 
 func joinLicenseList(licenseList []LicenseMatch, operator string) string {
