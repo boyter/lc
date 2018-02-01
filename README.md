@@ -74,7 +74,7 @@ scripts    include.go                GPL-3.0-only  100.00%     GPL-3.0-only   10
 Or to write out the results to a CSV file
 
 ```
-$ lc --format csv -output licences.csv --pathblacklist .git,examples .
+$ lc --format csv -output licences.csv --pathblacklist .git,examples,vendor .
 ```
 
 
