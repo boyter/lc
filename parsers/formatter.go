@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -126,4 +127,26 @@ func toProgress(directory string, file string, rootLicenses []LicenseMatch, lice
 	fmt.Println("License:", license, confidence)
 	fmt.Println("Root License(s):", rootLicenseString)
 	fmt.Println("----------------------------")
+}
+
+func toSPDX21(fileResults []FileResult) {
+
+	for _, result := range fileResults {
+
+		fmt.Println("")
+		fmt.Println("FileName:", filepath.Join(result.Directory, result.Filename))
+		fmt.Println("FileType: OTHER")
+		fmt.Println("FileChecksum: SHA1:", result.Sha1Hash)
+		fmt.Println("FileChecksum: SHA256:", result.Sha256Hash)
+		fmt.Println("FileChecksum: MD5:", result.Md5Hash)
+		fmt.Println("FileSize:", result.BytesHuman, "("+strconv.Itoa(result.Bytes)+" bytes)")
+
+		// FileName: ./setproctitle.xs
+		// FileType: OTHER
+		// FileChecksum: SHA1: cc2d0d110e6a621f110a8bfb2fcf37499f99c2f3
+		// FileChecksum: SHA256: f5c6e27f69ec93ffe803df83f18337aa341f56f388328444c022bad7c13ecb7c
+		// FileChecksum: MD5: c0210487bec6a2997243e92694d77cee
+		// FileChecksum: SSDEEP: 24:RS35k3ZJZutfhaVrEs7ahBrrrGsThM30IAzj8sRkm00csj2MdlwsWzGS3L:k8J6hqrr7krr6se30z9zdjh7oB3L
+		// FileSize: 1 Kb (1178 bytes)
+	}
 }

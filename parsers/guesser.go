@@ -338,6 +338,10 @@ func Process() {
 		toJSON(fileResults)
 	case "cli":
 		toCli(fileResults)
+	case "spdx21":
+		toSPDX21(fileResults)
+	case "spdx":
+		toSPDX21(fileResults)
 	default:
 		fmt.Println("")
 	}
