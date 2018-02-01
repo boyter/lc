@@ -24,11 +24,6 @@
 #   go-tests = true
 #   unused-packages = true
 
-
-[[constraint]]
-  branch = "master"
-  name = "code.cloudfoundry.org/bytefmt"
-
 [[constraint]]
   branch = "master"
   name = "github.com/boyter/golangvectorspace"

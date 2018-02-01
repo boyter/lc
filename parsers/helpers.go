@@ -9,6 +9,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
+	"strings"
 )
 
 func getMd5Hash(content []byte) string {
@@ -38,4 +39,38 @@ func readFile(filepath string) []byte {
 	}
 
 	return bytes
+}
+
+const TERABYTE = 1099511627776
+const GIGABYTE = 1073741824
+const MEGABYTE = 1048576
+const KILOBYTE = 1024
+
+func bytesToHuman(bytes int) string {
+
+	unit := ""
+	value := float64(bytes)
+
+	switch {
+	case bytes >= TERABYTE:
+		unit = "T"
+		value = value / TERABYTE
+	case bytes >= GIGABYTE:
+		unit = "G"
+		value = value / GIGABYTE
+	case bytes >= MEGABYTE:
+		unit = "M"
+		value = value / MEGABYTE
+	case bytes >= KILOBYTE:
+		unit = "K"
+		value = value / KILOBYTE
+	case bytes >= 1:
+		unit = "B"
+	case bytes == 0:
+		return "0"
+	}
+
+	stringValue := fmt.Sprintf("%.1f", value)
+	stringValue = strings.TrimSuffix(stringValue, ".0")
+	return fmt.Sprintf("%s%s", stringValue, unit)
 }

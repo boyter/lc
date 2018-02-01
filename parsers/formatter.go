@@ -143,7 +143,7 @@ func toSPDX21(fileResults []FileResult) {
 			for _, v := range fileResults[0].LicenseRoots {
 				rootLicenseNames = append(rootLicenseNames, v.LicenseId)
 			}
-			packageLicenseDeclared = "(" + strings.Join(rootLicenseNames, " AND ") + ")"
+			packageLicenseDeclared = "(" + strings.Join(rootLicenseNames, " OR ") + ")"
 		}
 	}
 

@@ -3,7 +3,6 @@
 package parsers
 
 import (
-	"code.cloudfoundry.org/bytefmt"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -280,7 +279,7 @@ func processFile(directory string, file string, rootLicenses []LicenseMatch) Fil
 		Md5Hash:        getMd5Hash(content),
 		Sha1Hash:       getSha1Hash(content),
 		Sha256Hash:     getSha256Hash(content),
-		BytesHuman:     bytefmt.ByteSize(uint64(len(content))),
+		BytesHuman:     bytesToHuman(len(content)),
 		Bytes:          len(content)}
 
 	return fileResult
