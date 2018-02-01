@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func toCSV(fileResults []FileResult) {
@@ -131,22 +132,63 @@ func toProgress(directory string, file string, rootLicenses []LicenseMatch, lice
 
 func toSPDX21(fileResults []FileResult) {
 
+	// Determine the package licenses
+	packageLicenseDeclared := "NONE"
+
+	if len(fileResults) != 0 {
+		if len(fileResults[0].LicenseRoots) == 1 {
+			packageLicenseDeclared = fileResults[0].LicenseRoots[0].LicenseId
+		} else if len(fileResults) >= 2 {
+			rootLicenseNames := []string{}
+			for _, v := range fileResults[0].LicenseRoots {
+				rootLicenseNames = append(rootLicenseNames, v.LicenseId)
+			}
+			packageLicenseDeclared = "(" + strings.Join(rootLicenseNames, " AND ") + ")"
+		}
+	}
+
+	fmt.Println("SPDXVersion: SPDX-2.1")
+	fmt.Println("DataLicense: CC0-1.0")
+	fmt.Println("SPDXID: SPDXRef-DOCUMENT")
+	fmt.Println("DocumentName: DOCUMENTNAMEHEREFROMCLI")                                                         // TODO
+	fmt.Println("DocumentNamespace:http://spdx.org/spdxdocs/spdx-tools-v1.2-3F2504E0-4F89-41D3-9A0C-0305E82...") // TODO
+	fmt.Println("LicenseListVersion: 3.0")
+	fmt.Println("Creator: Tool:", ToolName, ToolVersion)
+	fmt.Println("Created:", time.Now().UTC().Format(time.RFC3339))
+
+	fmt.Println("")
+	fmt.Println("PackageName: TODO")             // TODO
+	fmt.Println("SPDXID: SPDXRef-1")             // TODO
+	fmt.Println("PackageDownloadLocation: NONE") // TODO pass in from CLI https://spdx.org/spdx-specification-21-web-version#h.49x2ik5
+	fmt.Println("FilesAnalyzed: true")
+	fmt.Println("PackageVerificationCode: TODO") // TODO https://spdx.org/spdx-specification-21-web-version#h.2p2csry
+	fmt.Println("PackageLicenseDeclared:", packageLicenseDeclared)
+	fmt.Println("")
+
 	for _, result := range fileResults {
 
-		fmt.Println("")
+		// SPDXVersion: SPDX-2.0
+		// DataLicense: CC0-1.0
+		// PackageName: Foo
+		// PackageOriginator: David A. Wheeler
+		// PackageHomePage: https://github.com/david-a-wheeler/spdx-tutorial/
+		// PackageLicenseDeclared: MIT
+
+		// TODO this needs to possibly be NOASSERTION if unsure
+		licenseConcluded := "NONE"
+
+		if len(result.LicenseGuesses) != 0 {
+			licenseConcluded = result.LicenseGuesses[0].LicenseId
+		}
+
 		fmt.Println("FileName:", filepath.Join(result.Directory, result.Filename))
 		fmt.Println("FileType: OTHER")
 		fmt.Println("FileChecksum: SHA1:", result.Sha1Hash)
 		fmt.Println("FileChecksum: SHA256:", result.Sha256Hash)
 		fmt.Println("FileChecksum: MD5:", result.Md5Hash)
+		fmt.Println("LicenseConcluded:", licenseConcluded)
+		fmt.Println("FileCopyrightText: NOASSERTION")
 		fmt.Println("FileSize:", result.BytesHuman, "("+strconv.Itoa(result.Bytes)+" bytes)")
-
-		// FileName: ./setproctitle.xs
-		// FileType: OTHER
-		// FileChecksum: SHA1: cc2d0d110e6a621f110a8bfb2fcf37499f99c2f3
-		// FileChecksum: SHA256: f5c6e27f69ec93ffe803df83f18337aa341f56f388328444c022bad7c13ecb7c
-		// FileChecksum: MD5: c0210487bec6a2997243e92694d77cee
-		// FileChecksum: SSDEEP: 24:RS35k3ZJZutfhaVrEs7ahBrrrGsThM30IAzj8sRkm00csj2MdlwsWzGS3L:k8J6hqrr7krr6se30z9zdjh7oB3L
-		// FileSize: 1 Kb (1178 bytes)
+		fmt.Println("")
 	}
 }

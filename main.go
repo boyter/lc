@@ -15,8 +15,8 @@ func main() {
 
 	app := cli.NewApp()
 	app.EnableBashCompletion = true
-	app.Name = "licensechecker"
-	app.Version = "0.0.1"
+	app.Name = parsers.ToolName
+	app.Version = parsers.ToolVersion
 	app.Usage = "Check directory for licenses and list what license(s) a file is under"
 	app.UsageText = "lc [global options] [DIRECTORY]"
 

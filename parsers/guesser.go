@@ -20,6 +20,10 @@ import (
 	"unicode/utf8"
 )
 
+// Shared all over the place
+var ToolName = "licensechecker"
+var ToolVersion = "0.0.1"
+
 // Set by user as command line arguments
 var confidence = 0.0
 var Confidence = ""
