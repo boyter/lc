@@ -126,11 +126,14 @@ func toTabular(fileResults []FileResult) {
 	fmt.Println(result)
 }
 
-func toProgress(directory string, file string, rootLicenses []LicenseMatch, licenseGuesses []LicenseMatch) {
+func toProgress(directory string, file string, rootLicenses []LicenseMatch, licenseGuesses []LicenseMatch, licenseIdentified []LicenseMatch) {
 	license := ""
 	confidence := ""
 
-	if len(licenseGuesses) != 0 {
+	if len(licenseIdentified) != 0 {
+		license = joinLicenseList(licenseIdentified, " AND ")
+		confidence = fmt.Sprintf("%.2f%%", 100.00)
+	} else if len(licenseGuesses) != 0 {
 		license = licenseGuesses[0].LicenseId
 		confidence = fmt.Sprintf("%.2f%%", licenseGuesses[0].Percentage*100)
 	}
@@ -184,10 +187,10 @@ func toSPDX21(fileResults []FileResult) {
 		// TODO this needs to possibly be NOASSERTION if unsure
 		licenseConcluded := "NONE"
 
-		if len(result.LicenseGuesses) != 0 {
+		if len(result.LicenseIdentified) != 0 {
+			licenseConcluded = joinLicenseList(result.LicenseIdentified, " AND ")
+		} else if len(result.LicenseGuesses) != 0 {
 			licenseConcluded = result.LicenseGuesses[0].LicenseId
-		} else if len(result.LicenseRoots) != 0 {
-			licenseConcluded = result.LicenseRoots[0].LicenseId
 		}
 
 		fmt.Println("FileName:", filepath.Join(result.Directory, result.Filename))

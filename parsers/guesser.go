@@ -235,7 +235,7 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 		fileResults = append(fileResults, fileResult)
 
 		if strings.ToLower(Format) == "progress" {
-			toProgress(directory, file, rootLicenses, fileResult.LicenseGuesses)
+			toProgress(directory, file, rootLicenses, fileResult.LicenseGuesses, fileResult.LicenseIdentified)
 		}
 	}
 
