@@ -339,8 +339,8 @@ func Process() {
 		toCSV(fileResults)
 	case "json":
 		toJSON(fileResults)
-	case "cli":
-		toCli(fileResults)
+	case "tabular":
+		toTabular(fileResults)
 	case "spdx21":
 		toSPDX21(fileResults)
 	case "spdx":

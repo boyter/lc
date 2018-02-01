@@ -49,16 +49,16 @@ Command line options include, deep guess, confidence, path
 $ lc [global options] DIRECTORY
 ```
 
-Example output of `licencechecker` running against itself ignoring the .git, examples and vendor directories
+Example output of `licencechecker` running against itself in tabular format while ignoring the .git, examples and vendor directories
 
 ```
-$ lc --pbl .git,examples,vendor -f cli .
+$ lc --pbl .git,examples,vendor -f tabular .
 Directory  File                      License                        Confidence  Root Licenses  Size
 .          .gitignore                                                           GPL-3.0-only   275B
 .          Gopkg.lock                                                           GPL-3.0-only   1.4K
 .          Gopkg.toml                                                           GPL-3.0-only   972B
 .          LICENSE                   GPL-3.0-only                   99.68%      GPL-3.0-only   34.3K
-.          README.md                                                            GPL-3.0-only   4.6K
+.          README.md                                                            GPL-3.0-only   4.9K
 .          classifier_database.json                                             GPL-3.0-only   158.5K
 .          database_keywords.json                                               GPL-3.0-only   3.6M
 .          main.go                   GPL-3.0-only                   100.00%     GPL-3.0-only   2.8K
@@ -83,6 +83,8 @@ $ lc --format csv -output licences.csv --pathblacklist .git,examples,vendor .
 Add error handling for all the file operations and just in general. Most are currently ignored
 
 Add unit and integration tests
+
+Have output to cli the default if no file specified
 
 Would be nice to have the following output styles,
 

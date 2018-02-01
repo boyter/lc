@@ -95,8 +95,7 @@ func joinLicenseList(licenseList []LicenseMatch, operator string) string {
 	return licenseDeclared
 }
 
-func toCli(fileResults []FileResult) {
-
+func toTabular(fileResults []FileResult) {
 	output := []string{
 		"Directory | File | License | Confidence | Root Licenses | Size",
 	}
