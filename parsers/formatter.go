@@ -187,7 +187,7 @@ func toSPDX21(fileResults []FileResult) {
 		fmt.Println("FileChecksum: MD5:", result.Md5Hash)
 		fmt.Println("LicenseConcluded:", licenseConcluded)
 		fmt.Println("FileCopyrightText: NOASSERTION")
-		fmt.Println("FileSize:", result.BytesHuman, "("+strconv.Itoa(result.Bytes)+" bytes)")
+		// fmt.Println("FileSize:", result.BytesHuman, "("+strconv.Itoa(result.Bytes)+" bytes)")
 		fmt.Println("")
 	}
 }

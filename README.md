@@ -133,3 +133,9 @@ func main() {
 	// fmt.Println(len(out.String()))
 }
 ```
+
+For checking the spdx validity use the following built from https://github.com/spdx/tools
+
+```
+java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify spdx_example.spdx
+```
