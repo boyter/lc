@@ -172,7 +172,7 @@ func toSPDX21(fileResults []FileResult) {
 
 	fmt.Println("SPDXVersion: SPDX-2.1")
 	fmt.Println("DataLicense: CC0-1.0")
-	fmt.Println("SPDXID: SPDXRef-DOCUMENT")
+	fmt.Println("SPDXID: SPDXRef-" + getSha1Hash([]byte(randStringBytes(10)+time.Now().UTC().Format(time.RFC3339))))
 	fmt.Println("DocumentName: DOCUMENTNAMEHEREFROMCLI")                                                         // TODO
 	fmt.Println("DocumentNamespace:http://spdx.org/spdxdocs/spdx-tools-v1.2-3F2504E0-4F89-41D3-9A0C-0305E82...") // TODO
 	fmt.Println("LicenseListVersion: 3.0")
@@ -181,7 +181,6 @@ func toSPDX21(fileResults []FileResult) {
 
 	fmt.Println("")
 	fmt.Println("PackageName: TODO")             // TODO
-	fmt.Println("SPDXID: SPDXRef-1")             // TODO
 	fmt.Println("PackageDownloadLocation: NONE") // TODO pass in from CLI https://spdx.org/spdx-specification-21-web-version#h.49x2ik5
 	fmt.Println("FilesAnalyzed: true")
 	fmt.Println("PackageVerificationCode: TODO") // TODO https://spdx.org/spdx-specification-21-web-version#h.2p2csry
@@ -203,12 +202,27 @@ func toSPDX21(fileResults []FileResult) {
 			licenseConcluded = result.LicenseGuesses[0].LicenseId
 		}
 
-		fmt.Println("FileName:", filepath.Join(result.Directory, result.Filename))
+		filePath := filepath.Join(result.Directory, result.Filename)
+		if strings.HasPrefix(filePath, "./") == false {
+			filePath = "./" + filePath
+		}
+
+		fmt.Println("FileName:", filePath)
+		fmt.Println("SPDXID: SPDXRef-" + getSha1Hash([]byte(filePath)))
 		fmt.Println("FileType: OTHER")
 		fmt.Println("FileChecksum: SHA1:", result.Sha1Hash)
 		fmt.Println("FileChecksum: SHA256:", result.Sha256Hash)
 		fmt.Println("FileChecksum: MD5:", result.Md5Hash)
 		fmt.Println("LicenseConcluded:", licenseConcluded)
+
+		if len(result.LicenseIdentified) != 0 {
+			for _, license := range result.LicenseIdentified {
+				fmt.Println("LicenseInfoInFile:", license.LicenseId)
+			}
+		} else {
+			fmt.Println("LicenseInfoInFile: NONE")
+		}
+
 		fmt.Println("FileCopyrightText: NOASSERTION")
 		// fmt.Println("FileSize:", result.BytesHuman, "("+strconv.Itoa(result.Bytes)+" bytes)")
 		fmt.Println("")

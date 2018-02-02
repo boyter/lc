@@ -29,7 +29,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "output, o",
-			Usage:       "Set output file `FILE`",
+			Usage:       "Set output file if not set will print to stdout `FILE`",
 			Destination: &parsers.FileOutput,
 		},
 		cli.StringFlag{
