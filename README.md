@@ -84,15 +84,7 @@ Add error handling for all the file operations and just in general. Most are cur
 
 Add unit and integration tests
 
-Have output to cli the default if no file specified
-
-Would be nice to have the following output styles,
-
-	formatted IE CLI viewable
-	JSON
-	CSV
-	SPDX
-
+Investigate using "github.com/gosuri/uitable" for formatting https://github.com/gosuri/uitable
 
 Investigate using zlib compression for databases
 
