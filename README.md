@@ -38,7 +38,7 @@ By default `licencechecker` will print out results as it processes files. Howeve
 to run at the end of CI tasks you may want to get a nicer output which can be done like so.
 
 ```
-$ lc -f cli .
+$ lc -f tabular .
 ```
 
 The above will process starting in the current directory and print out a formatted list of results when finished.
