@@ -43,10 +43,10 @@ $ lc -f tabular .
 
 The above will process starting in the current directory and print out a formatted list of results when finished.
 
-Command line options include, deep guess, confidence, path
+To view all command line options
 
 ```
-$ lc [global options] DIRECTORY
+$ lc --help
 ```
 
 Example output of `licencechecker` running against itself in tabular format while ignoring the .git, examples and vendor directories
@@ -77,6 +77,18 @@ Or to write out the results to a CSV file
 $ lc --format csv -output licences.csv --pathblacklist .git,examples,vendor .
 ```
 
+
+### SPDX
+
+Running against itself to produce a SPDX file.
+
+```
+$ go run main.go --pbl .git,examples,vendor -f spdx . > ./spdx_example.spdx && java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify ./spdx_example.spdx
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console. Set system property 'log4j2.debug' to show Log4j2 internal initialization logging.
+03:49:29.479 [main] ERROR org.apache.jena.rdf.model.impl.RDFReaderFImpl - Rewired RDFReaderFImpl - configuration changes have no effect on reading
+03:49:29.482 [main] ERROR org.apache.jena.rdf.model.impl.RDFReaderFImpl - Rewired RDFReaderFImpl - configuration changes have no effect on reading
+This SPDX Document is valid.
+```
 
 ### TODO
 
@@ -142,3 +154,4 @@ java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify ./spdx_e
 
 go run main.go --pbl .git,examples,vendor -f spdx . > ./spdx_example.spdx && java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify ./spdx_example.spdx
 ```
+
