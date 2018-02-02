@@ -135,4 +135,10 @@ For checking the spdx validity use the following built from https://github.com/s
 
 ```
 java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify spdx_example.spdx
+java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar TagToRDF spdx_example.spdx TagToRDF.rdf
+
+lc --pbl .git,examples,vendor -f spdx . > ~/Projects/tools/target/spdx_example.spdx
+java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify ./spdx_example.spdx
+
+go run main.go --pbl .git,examples,vendor -f spdx . > ./spdx_example.spdx && java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify ./spdx_example.spdx
 ```

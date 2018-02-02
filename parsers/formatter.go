@@ -162,7 +162,6 @@ func toProgress(directory string, file string, rootLicenses []LicenseMatch, lice
 }
 
 func toSPDX21(fileResults []FileResult) {
-
 	// Determine the package licenses
 	packageLicenseDeclared := "NONE"
 
@@ -172,18 +171,29 @@ func toSPDX21(fileResults []FileResult) {
 
 	fmt.Println("SPDXVersion: SPDX-2.1")
 	fmt.Println("DataLicense: CC0-1.0")
-	fmt.Println("SPDXID: SPDXRef-" + getSha1Hash([]byte(randStringBytes(10)+time.Now().UTC().Format(time.RFC3339))))
+	//fmt.Println("SPDXID: SPDXRef-" + getSha1Hash([]byte(randStringBytes(10)+time.Now().UTC().Format(time.RFC3339))))
+	fmt.Println("SPDXID: SPDXRef-DOCUMENT")
 	fmt.Println("DocumentName: DOCUMENTNAMEHEREFROMCLI")                                                         // TODO
 	fmt.Println("DocumentNamespace:http://spdx.org/spdxdocs/spdx-tools-v1.2-3F2504E0-4F89-41D3-9A0C-0305E82...") // TODO
 	fmt.Println("LicenseListVersion: 3.0")
 	fmt.Println("Creator: Tool:", ToolName, ToolVersion)
 	fmt.Println("Created:", time.Now().UTC().Format(time.RFC3339))
 
+	// TODO needs to deal with if nothing and put NONE if so also needs to deal with duplicates
+	for _, result := range fileResults {
+		if len(result.LicenseIdentified) != 0 {
+			for _, license := range result.LicenseIdentified {
+				fmt.Println("PackageLicenseInfoFromFiles:", license.LicenseId)
+			}
+		}
+	}
+
 	fmt.Println("")
 	fmt.Println("PackageName: TODO")             // TODO
 	fmt.Println("PackageDownloadLocation: NONE") // TODO pass in from CLI https://spdx.org/spdx-specification-21-web-version#h.49x2ik5
 	fmt.Println("FilesAnalyzed: true")
-	fmt.Println("PackageVerificationCode: TODO") // TODO https://spdx.org/spdx-specification-21-web-version#h.2p2csry
+	fmt.Println("PackageVerificationCode: 8b0600e4db514d62d9e2f10945f9c63488db9965") // TODO https://spdx.org/spdx-specification-21-web-version#h.2p2csry
+	fmt.Println("PackageLicenseConcluded:", packageLicenseDeclared)
 	fmt.Println("PackageLicenseDeclared:", packageLicenseDeclared)
 	fmt.Println("PackageCopyrightText: NOASSERTION")
 	fmt.Println("")
