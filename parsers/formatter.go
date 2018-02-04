@@ -187,14 +187,23 @@ func toSPDX21(fileResults []FileResult) {
 	fmt.Println("PackageVerificationCode: 8b0600e4db514d62d9e2f10945f9c63488db9965") // TODO https://spdx.org/spdx-specification-21-web-version#h.2p2csry
 	fmt.Println("PackageLicenseDeclared:", packageLicenseDeclared)
 	fmt.Println("PackageLicenseConcluded:", packageLicenseDeclared)
-	// TODO needs to deal with if nothing and put NONE if so also needs to deal with duplicates
+
+	duplicateLicenseMatch := []LicenseMatch{}
 	for _, result := range fileResults {
 		if len(result.LicenseIdentified) != 0 {
 			for _, license := range result.LicenseIdentified {
-				fmt.Println("PackageLicenseInfoFromFiles:", license.LicenseId)
+				duplicateLicenseMatch = append(duplicateLicenseMatch, license)
 			}
 		}
 	}
+	if len(duplicateLicenseMatch) != 0 {
+		for _, license := range uniqLicenseMatch(duplicateLicenseMatch) {
+			fmt.Println("PackageLicenseInfoFromFiles:", license.LicenseId)
+		}
+	} else {
+		fmt.Println("PackageLicenseInfoFromFiles: NONE")
+	}
+
 	fmt.Println("PackageCopyrightText: NOASSERTION")
 	fmt.Println("")
 

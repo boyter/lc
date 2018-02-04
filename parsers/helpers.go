@@ -52,6 +52,18 @@ func randStringBytes(n int) string {
 	return string(b)
 }
 
+func uniqLicenseMatch(l []LicenseMatch) []LicenseMatch {
+	m := make(map[LicenseMatch]bool)
+	for _, s := range l {
+		m[s] = true
+	}
+	result := make([]LicenseMatch, 0, len(m))
+	for s := range m {
+		result = append(result, s)
+	}
+	return result
+}
+
 // Borrowed from https://github.com/cloudfoundry/bytefmt
 // Apache-2.0 is compatible with GPL-3.0-only
 // See https://apache.org/licenses/GPL-compatibility.html
