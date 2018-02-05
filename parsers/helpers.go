@@ -52,6 +52,7 @@ func randStringBytes(n int) string {
 	return string(b)
 }
 
+// Given a list of license matches return a new list containing no duplicates
 func uniqLicenseMatch(l []LicenseMatch) []LicenseMatch {
 	m := make(map[LicenseMatch]bool)
 	for _, s := range l {

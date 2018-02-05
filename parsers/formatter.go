@@ -173,16 +173,15 @@ func toSPDX21(fileResults []FileResult) {
 	fmt.Println("DataLicense: CC0-1.0")
 	fmt.Println("DocumentNamespace:http://spdx.org/spdxdocs/spdx-tools-v1.2-3F2504E0-4F89-41D3-9A0C-0305E82...") // TODO
 	fmt.Println("DocumentName: DOCUMENTNAMEHEREFROMCLI")                                                         // TODO
-	//fmt.Println("SPDXID: SPDXRef-" + getSha1Hash([]byte(randStringBytes(10)+time.Now().UTC().Format(time.RFC3339))))
 	fmt.Println("SPDXID: SPDXRef-DOCUMENT")
 	fmt.Println("Creator: Tool:", ToolName, ToolVersion)
 	fmt.Println("Created:", time.Now().UTC().Format(time.RFC3339))
 	fmt.Println("LicenseListVersion: 3.0")
 
 	fmt.Println("")
-	fmt.Println("PackageName: TODO") // TODO
+	fmt.Println("PackageName: TODO") // TODO pass in from command line
 	fmt.Println("SPDXID: SPDXRef-Package")
-	fmt.Println("PackageDownloadLocation: NONE") // TODO pass in from CLI https://spdx.org/spdx-specification-21-web-version#h.49x2ik5
+	fmt.Println("PackageDownloadLocation: NONE")
 	fmt.Println("FilesAnalyzed: true")
 	fmt.Println("PackageVerificationCode: 8b0600e4db514d62d9e2f10945f9c63488db9965") // TODO https://spdx.org/spdx-specification-21-web-version#h.2p2csry
 	fmt.Println("PackageLicenseDeclared:", packageLicenseDeclared)
@@ -245,8 +244,9 @@ func toSPDX21(fileResults []FileResult) {
 			fmt.Println("LicenseInfoInFile: NONE")
 		}
 
+		// fmt.Println("LicenseComments: The concluded license was taken from the package level that the file was included in")
+
 		fmt.Println("FileCopyrightText: NOASSERTION")
-		// fmt.Println("FileSize:", result.BytesHuman, "("+strconv.Itoa(result.Bytes)+" bytes)")
 		fmt.Println("")
 	}
 }
