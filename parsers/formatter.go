@@ -105,7 +105,12 @@ func joinLicenseList(licenseList []LicenseMatch, ignore []LicenseMatch, operator
 		if len(licenseNames) == 1 {
 			licenseDeclared = licenseNames[0]
 		} else if len(licenseNames) != 0 {
-			licenseDeclared = "(" + strings.Join(licenseNames, operator) + ")"
+
+			licenseDeclared = strings.Join(licenseNames, operator)
+
+			if operator == " OR " {
+				licenseDeclared = "(" + licenseDeclared + ")"
+			}
 		}
 	}
 
@@ -113,32 +118,33 @@ func joinLicenseList(licenseList []LicenseMatch, ignore []LicenseMatch, operator
 }
 
 func determineLicense(result FileResult) (string, string) {
-	// TODO this needs to possibly be NOASSERTION if unsure
-	license := "NONE"
-	confidence := "100.00%"
-	licensesUsed := []LicenseMatch{}
+	license := ""
+	confidence := 100.00
+	licenseMatches := []LicenseMatch{}
 
 	if len(result.LicenseIdentified) != 0 {
-		license = joinLicenseList(result.LicenseIdentified, licensesUsed, " AND ")
-		confidence = fmt.Sprintf("%.2f%%", 100.00)
-		licensesUsed = result.LicenseIdentified
+		license = joinLicenseList(result.LicenseIdentified, result.LicenseRoots, " AND ")
+		confidence = 100.00
 	} else if len(result.LicenseGuesses) != 0 {
 		license = result.LicenseGuesses[0].LicenseId
-		confidence = fmt.Sprintf("%.2f%%", result.LicenseGuesses[0].Percentage*100)
-		licensesUsed = append(licensesUsed, result.LicenseGuesses[0])
-	} else if len(result.LicenseRoots) != 0 {
-		license = result.LicenseRoots[0].LicenseId
-		confidence = fmt.Sprintf("%.2f%%", result.LicenseRoots[0].Percentage*100)
-		licensesUsed = append(licensesUsed, result.LicenseRoots[0])
+		confidence = result.LicenseGuesses[0].Percentage * 100
+		licenseMatches = append(licenseMatches, result.LicenseGuesses[0])
 	}
 
-	// Need to OR these
-	rootLicenses := joinLicenseList(result.LicenseRoots, licensesUsed, " OR ")
+	rootLicenses := joinLicenseList(result.LicenseRoots, licenseMatches, " OR ")
 	if rootLicenses != "" {
-		license = rootLicenses + " AND " + license
+		if license == "" {
+			license = rootLicenses
+		} else {
+			license = rootLicenses + " AND " + license
+		}
 	}
 
-	return license, confidence
+	if license == "" {
+		license = "NOASSERTION"
+	}
+
+	return license, fmt.Sprintf("%.2f%%", confidence)
 }
 
 func toTabular(fileResults []FileResult) {
