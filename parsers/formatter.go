@@ -87,17 +87,26 @@ func toJSON(fileResults []FileResult) {
 	}
 }
 
-func joinLicenseList(licenseList []LicenseMatch, operator string) string {
+func joinLicenseList(licenseList []LicenseMatch, ignore []LicenseMatch, operator string) string {
 	licenseDeclared := ""
 
 	if len(licenseList) == 1 {
-		licenseDeclared = licenseList[0].LicenseId
+		if licenceListHasLicense(licenseList[0], ignore) == false {
+			licenseDeclared = licenseList[0].LicenseId
+		}
 	} else if len(licenseList) >= 2 {
 		licenseNames := []string{}
 		for _, v := range licenseList {
-			licenseNames = append(licenseNames, v.LicenseId)
+			if licenceListHasLicense(v, ignore) == false {
+				licenseNames = append(licenseNames, v.LicenseId)
+			}
 		}
-		licenseDeclared = "(" + strings.Join(licenseNames, operator) + ")"
+
+		if len(licenseNames) == 1 {
+			licenseDeclared = licenseNames[0]
+		} else if len(licenseNames) != 0 {
+			licenseDeclared = "(" + strings.Join(licenseNames, operator) + ")"
+		}
 	}
 
 	return licenseDeclared
@@ -107,20 +116,24 @@ func determineLicense(result FileResult) (string, string) {
 	// TODO this needs to possibly be NOASSERTION if unsure
 	license := "NONE"
 	confidence := "100.00%"
+	licensesUsed := []LicenseMatch{}
 
 	if len(result.LicenseIdentified) != 0 {
-		license = joinLicenseList(result.LicenseIdentified, " AND ")
+		license = joinLicenseList(result.LicenseIdentified, licensesUsed, " AND ")
 		confidence = fmt.Sprintf("%.2f%%", 100.00)
+		licensesUsed = result.LicenseIdentified
 	} else if len(result.LicenseGuesses) != 0 {
 		license = result.LicenseGuesses[0].LicenseId
 		confidence = fmt.Sprintf("%.2f%%", result.LicenseGuesses[0].Percentage*100)
+		licensesUsed = append(licensesUsed, result.LicenseGuesses[0])
 	} else if len(result.LicenseRoots) != 0 {
 		license = result.LicenseRoots[0].LicenseId
 		confidence = fmt.Sprintf("%.2f%%", result.LicenseRoots[0].Percentage*100)
+		licensesUsed = append(licensesUsed, result.LicenseRoots[0])
 	}
 
 	// Need to OR these
-	rootLicenses := joinLicenseList(result.LicenseRoots, " OR ")
+	rootLicenses := joinLicenseList(result.LicenseRoots, licensesUsed, " OR ")
 	if rootLicenses != "" {
 		license = rootLicenses + " AND " + license
 	}
@@ -155,7 +168,7 @@ func toProgress(directory string, file string, rootLicenses []LicenseMatch, lice
 	confidence := ""
 
 	if len(licenseIdentified) != 0 {
-		license = joinLicenseList(licenseIdentified, " AND ")
+		license = joinLicenseList(licenseIdentified, []LicenseMatch{}, " AND ")
 		confidence = fmt.Sprintf("%.2f%%", 100.00)
 	} else if len(licenseGuesses) != 0 {
 		license = licenseGuesses[0].LicenseId
@@ -180,7 +193,7 @@ func toSPDX21(fileResults []FileResult) {
 	packageLicenseDeclared := "NONE"
 
 	if len(fileResults) != 0 {
-		packageLicenseDeclared = joinLicenseList(fileResults[0].LicenseRoots, " OR ")
+		packageLicenseDeclared = joinLicenseList(fileResults[0].LicenseRoots, []LicenseMatch{}, " OR ")
 	}
 
 	fmt.Println("SPDXVersion: SPDX-2.1")

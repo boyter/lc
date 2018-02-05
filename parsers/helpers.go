@@ -65,6 +65,17 @@ func uniqLicenseMatch(l []LicenseMatch) []LicenseMatch {
 	return result
 }
 
+// Returns true if a license list contains the license
+func licenceListHasLicense(license LicenseMatch, licenseList []LicenseMatch) bool {
+	for _, v := range licenseList {
+		if v.LicenseId == license.LicenseId {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Borrowed from https://github.com/cloudfoundry/bytefmt
 // Apache-2.0 is compatible with GPL-3.0-only
 // See https://apache.org/licenses/GPL-compatibility.html
