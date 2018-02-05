@@ -62,9 +62,6 @@ Directory            File                                                  Licen
 .                    classifier_database.json                                                                         GPL-3.0-only   158.5K
 .                    database_keywords.json                                                                           GPL-3.0-only   3.6M
 .                    main.go                                               GPL-3.0-only                   100.00%     GPL-3.0-only   2.8K
-.                    spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar                                             GPL-3.0-only   43.1M
-.                    spdx_example.spdx                                                                                GPL-3.0-only   7.9K
-.                    spdx_sample.spdx                                      Net-SNMP                       85.77%      GPL-3.0-only   17.1K
 examples/identifier  LICENSE                                               MIT                            95.40%      MIT            1K
 examples/identifier  has_identifier.py                                     (GPL-2.0 AND GPL-3.0+)         100.00%     MIT            428B
 parsers              constants.go                                                                                     GPL-3.0-only   5M
