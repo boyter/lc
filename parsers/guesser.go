@@ -191,7 +191,7 @@ func loadDatabase() []License {
 	return database
 }
 
-func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
+func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult {
 	fileResults := []FileResult{}
 	all, _ := ioutil.ReadDir(directory)
 
@@ -219,23 +219,28 @@ func walkDirectory(directory string, rootLicenses []LicenseMatch) []FileResult {
 
 	// Determine any possible licence files which would classify everything else
 	possibleLicenses := findPossibleLicenseFiles(files)
+	identifiedRootLicense := []LicenseMatch{}
 	for _, possibleLicense := range possibleLicenses {
 		content := string(readFile(filepath.Join(directory, possibleLicense)))
 		guessLicenses := guessLicense(content, deepGuess, loadDatabase())
 
 		if len(guessLicenses) != 0 {
-			rootLicenses = append(rootLicenses, guessLicenses[0])
+			identifiedRootLicense = append(identifiedRootLicense, guessLicenses[0])
 		}
+	}
+
+	if len(identifiedRootLicense) != 0 {
+		rootLicenses = append(rootLicenses, identifiedRootLicense)
 	}
 
 	// TODO fan this out to many GoRoutines and process in parallel
 	for _, file := range files {
 
-		fileResult := processFile(directory, file, rootLicenses)
+		fileResult := processFile(directory, file, rootLicenses[len(rootLicenses)-1])
 		fileResults = append(fileResults, fileResult)
 
 		if strings.ToLower(Format) == "progress" {
-			toProgress(directory, file, rootLicenses, fileResult.LicenseGuesses, fileResult.LicenseIdentified)
+			toProgress(directory, file, rootLicenses[len(rootLicenses)-1], fileResult.LicenseGuesses, fileResult.LicenseIdentified)
 		}
 	}
 
@@ -325,7 +330,7 @@ func Process() {
 	}
 
 	if info, err := os.Stat(DirPath); err == nil && info.IsDir() {
-		fileResults = walkDirectory(DirPath, []LicenseMatch{})
+		fileResults = walkDirectory(DirPath, [][]LicenseMatch{})
 	} else {
 		content := string(readFile(DirPath))
 		guessLicenses := guessLicense(content, deepGuess, loadDatabase())
