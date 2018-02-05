@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: GPL-3.0-only
-
 package parsers
 
 import (
@@ -120,6 +118,9 @@ func toTabular(fileResults []FileResult) {
 		} else if len(result.LicenseGuesses) != 0 {
 			license = result.LicenseGuesses[0].LicenseId
 			confidence = fmt.Sprintf("%.2f%%", result.LicenseGuesses[0].Percentage*100)
+		} else if len(result.LicenseRoots) != 0 {
+			license = result.LicenseRoots[0].LicenseId
+			confidence = fmt.Sprintf("%.2f%%", result.LicenseRoots[0].Percentage*100)
 		}
 
 		rootLicenseString := ""
@@ -244,7 +245,7 @@ func toSPDX21(fileResults []FileResult) {
 			fmt.Println("LicenseInfoInFile: NONE")
 		}
 
-		// fmt.Println("LicenseComments: The concluded license was taken from the package level that the file was included in")
+		// fmt.Println("FileComment: The concluded license was taken from the package level that the file was included in")
 
 		fmt.Println("FileCopyrightText: NOASSERTION")
 		fmt.Println("")
