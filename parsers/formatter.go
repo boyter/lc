@@ -103,25 +103,38 @@ func joinLicenseList(licenseList []LicenseMatch, operator string) string {
 	return licenseDeclared
 }
 
+func determineLicense(result FileResult) (string, string) {
+	// TODO this needs to possibly be NOASSERTION if unsure
+	license := "NONE"
+	confidence := "100.00%"
+
+	if len(result.LicenseIdentified) != 0 {
+		license = joinLicenseList(result.LicenseIdentified, " AND ")
+		confidence = fmt.Sprintf("%.2f%%", 100.00)
+	} else if len(result.LicenseGuesses) != 0 {
+		license = result.LicenseGuesses[0].LicenseId
+		confidence = fmt.Sprintf("%.2f%%", result.LicenseGuesses[0].Percentage*100)
+	} else if len(result.LicenseRoots) != 0 {
+		license = result.LicenseRoots[0].LicenseId
+		confidence = fmt.Sprintf("%.2f%%", result.LicenseRoots[0].Percentage*100)
+	}
+
+	// Need to OR these
+	rootLicenses := joinLicenseList(result.LicenseRoots, " OR ")
+	if rootLicenses != "" {
+		license = rootLicenses + " AND " + license
+	}
+
+	return license, confidence
+}
+
 func toTabular(fileResults []FileResult) {
 	output := []string{
 		"Directory | File | License | Confidence | Root Licenses | Size",
 	}
 
 	for _, result := range fileResults {
-		license := ""
-		confidence := ""
-
-		if len(result.LicenseIdentified) != 0 {
-			license = joinLicenseList(result.LicenseIdentified, " AND ")
-			confidence = fmt.Sprintf("%.2f%%", 100.00)
-		} else if len(result.LicenseGuesses) != 0 {
-			license = result.LicenseGuesses[0].LicenseId
-			confidence = fmt.Sprintf("%.2f%%", result.LicenseGuesses[0].Percentage*100)
-		} else if len(result.LicenseRoots) != 0 {
-			license = result.LicenseRoots[0].LicenseId
-			confidence = fmt.Sprintf("%.2f%%", result.LicenseRoots[0].Percentage*100)
-		}
+		license, confidence := determineLicense(result)
 
 		rootLicenseString := ""
 		for _, v := range result.LicenseRoots {
@@ -211,15 +224,7 @@ func toSPDX21(fileResults []FileResult) {
 	// PackageLicenseInfoFromFiles: GPL-2.0
 
 	for _, result := range fileResults {
-
-		// TODO this needs to possibly be NOASSERTION if unsure
-		licenseConcluded := "NONE"
-
-		if len(result.LicenseIdentified) != 0 {
-			licenseConcluded = joinLicenseList(result.LicenseIdentified, " AND ")
-		} else if len(result.LicenseGuesses) != 0 {
-			licenseConcluded = result.LicenseGuesses[0].LicenseId
-		}
+		licenseConcluded, _ := determineLicense(result)
 
 		filePath := filepath.Join(result.Directory, result.Filename)
 		if strings.HasPrefix(filePath, "./") == false {
