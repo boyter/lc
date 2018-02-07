@@ -91,7 +91,7 @@ $ lc --format csv -output licences.csv --pathblacklist .git,licenses,vendor .
 Or to a SPDX 2.1 file
 
 ```
-$lc -f spdx -o spdx_example.spdx --pbl .git,examples,vendor .
+$lc -f spdx -o spdx_example.spdx --pbl .git,vendor,licenses -dn licensechecker -pn licensechecker .
 ```
 
 
@@ -100,7 +100,7 @@ $lc -f spdx -o spdx_example.spdx --pbl .git,examples,vendor .
 Running against itself to produce a SPDX file.
 
 ```
-$ go run main.go --pbl .git,examples,vendor -f spdx -o spdx_example.spdx . && java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify ./spdx_example.spdx
+$ go run main.go  -f spdx -o spdx_example.spdx --pbl .git,vendor,licenses -dn licensechecker -pn licensechecker . && java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify ./spdx_example.spdx
 ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console. Set system property 'log4j2.debug' to show Log4j2 internal initialization logging.
 03:49:29.479 [main] ERROR org.apache.jena.rdf.model.impl.RDFReaderFImpl - Rewired RDFReaderFImpl - configuration changes have no effect on reading
 03:49:29.482 [main] ERROR org.apache.jena.rdf.model.impl.RDFReaderFImpl - Rewired RDFReaderFImpl - configuration changes have no effect on reading

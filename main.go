@@ -68,15 +68,20 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "documentname, dn",
-			Usage:       "Only used if you specify SPDX as an output `gif,jpg,png`",
+			Usage:       "Only used if you specify SPDX as an output sets DocumentName `LicenseChecker`",
 			Value:       "Unknown",
 			Destination: &parsers.DocumentName,
 		},
 		cli.StringFlag{
 			Name:        "packagename, pn",
-			Usage:       "Only used if you specify SPDX as an output should be the",
+			Usage:       "Only used if you specify SPDX as an output sets PackageName `LicenseChecker`",
 			Value:       "Unknown",
 			Destination: &parsers.PackageName,
+		},
+		cli.StringFlag{
+			Name:        "documentnamespace, dns",
+			Usage:       "Only used if you specify SPDX as an output sets DocumentNamespace, if not set will default to http://spdx.org/spdxdocs/[packagename]-[HASH] `YourURL`",
+			Destination: &parsers.DocumentNamespace,
 		},
 	}
 	app.Action = func(c *cli.Context) error {

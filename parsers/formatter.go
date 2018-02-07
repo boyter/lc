@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -187,20 +188,38 @@ func toProgress(directory string, file string, rootLicenses []LicenseMatch, lice
 	fmt.Println("----------------------------")
 }
 
+func generatePackageVerificationCode(fileResults []FileResult) string {
+	// Based on https://github.com/spdx/tools-python/blob/a48022e65a8897d0e4f2e93d8e53695d2c13ea23/spdx/package.py#L233
+	hashes := []string{}
+
+	for _, result := range fileResults {
+		hashes = append(hashes, result.Sha1Hash)
+	}
+
+	sort.Strings(hashes)
+	return getSha1Hash([]byte(strings.Join(hashes, "")))
+}
+
+func generateDocumentNamespace() string {
+	if DocumentNamespace == "" {
+		return "http://spdx.org/spdxdocs/" + PackageName + "-" + getSha1Hash([]byte(time.Now().UTC().Format(time.RFC3339)))
+	}
+
+	return DocumentNamespace
+}
+
 func toSPDX21(fileResults []FileResult) {
 
 	lines := []string{}
 
-	// Determine the package licenses
 	packageLicenseDeclared := "NONE"
-
 	if len(fileResults) != 0 {
 		packageLicenseDeclared = joinLicenseList(fileResults[0].LicenseRoots, []LicenseMatch{}, " OR ")
 	}
 
 	lines = append(lines, "SPDXVersion: SPDX-2.1")
 	lines = append(lines, "DataLicense: CC0-1.0")
-	lines = append(lines, "DocumentNamespace:http://spdx.org/spdxdocs/spdx-tools-v1.2-3F2504E0-4F89-41D3-9A0C-0305E82...") // TODO
+	lines = append(lines, "DocumentNamespace: "+generateDocumentNamespace())
 	lines = append(lines, "DocumentName: "+DocumentName)
 	lines = append(lines, "SPDXID: SPDXRef-DOCUMENT")
 	lines = append(lines, "Creator: Tool: "+ToolName+" "+ToolVersion)
@@ -212,7 +231,7 @@ func toSPDX21(fileResults []FileResult) {
 	lines = append(lines, "SPDXID: SPDXRef-Package")
 	lines = append(lines, "PackageDownloadLocation: NONE")
 	lines = append(lines, "FilesAnalyzed: true")
-	lines = append(lines, "PackageVerificationCode: 0000000000000000000000000000000000000000") // TODO
+	lines = append(lines, "PackageVerificationCode: "+generatePackageVerificationCode(fileResults))
 	lines = append(lines, "PackageLicenseDeclared: "+packageLicenseDeclared)
 	lines = append(lines, "PackageLicenseConcluded: "+packageLicenseDeclared)
 
