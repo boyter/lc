@@ -271,7 +271,11 @@ func toSPDX21(fileResults []FileResult) {
 		lines = append(lines, "")
 	}
 
-	for _, line := range lines {
-		fmt.Println(line)
+	if FileOutput == "" {
+		for _, line := range lines {
+			fmt.Println(line)
+		}
+	} else {
+		ioutil.WriteFile(FileOutput, []byte(strings.Join(lines, "\n")), 0600)
 	}
 }
