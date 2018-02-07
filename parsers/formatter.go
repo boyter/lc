@@ -29,14 +29,7 @@ func toCSV(fileResults []FileResult) {
 	}
 
 	for _, result := range fileResults {
-
-		license := ""
-		confidence := ""
-
-		if len(result.LicenseGuesses) != 0 {
-			license = result.LicenseGuesses[0].LicenseId
-			confidence = fmt.Sprintf("%.3f", result.LicenseGuesses[0].Percentage*100)
-		}
+		licenseConcluded, confidence := determineLicense(result)
 
 		rootLicenseString := ""
 		for _, v := range result.LicenseRoots {
@@ -47,7 +40,7 @@ func toCSV(fileResults []FileResult) {
 		records = append(records, []string{
 			result.Filename,
 			result.Directory,
-			license,
+			licenseConcluded,
 			confidence,
 			rootLicenseString,
 			result.Md5Hash,
@@ -195,6 +188,9 @@ func toProgress(directory string, file string, rootLicenses []LicenseMatch, lice
 }
 
 func toSPDX21(fileResults []FileResult) {
+
+	lines := []string{}
+
 	// Determine the package licenses
 	packageLicenseDeclared := "NONE"
 
@@ -202,23 +198,23 @@ func toSPDX21(fileResults []FileResult) {
 		packageLicenseDeclared = joinLicenseList(fileResults[0].LicenseRoots, []LicenseMatch{}, " OR ")
 	}
 
-	fmt.Println("SPDXVersion: SPDX-2.1")
-	fmt.Println("DataLicense: CC0-1.0")
-	fmt.Println("DocumentNamespace:http://spdx.org/spdxdocs/spdx-tools-v1.2-3F2504E0-4F89-41D3-9A0C-0305E82...") // TODO
-	fmt.Println("DocumentName: DOCUMENTNAMEHEREFROMCLI")                                                         // TODO
-	fmt.Println("SPDXID: SPDXRef-DOCUMENT")
-	fmt.Println("Creator: Tool:", ToolName, ToolVersion)
-	fmt.Println("Created:", time.Now().UTC().Format(time.RFC3339))
-	fmt.Println("LicenseListVersion: 3.0")
+	lines = append(lines, "SPDXVersion: SPDX-2.1")
+	lines = append(lines, "DataLicense: CC0-1.0")
+	lines = append(lines, "DocumentNamespace:http://spdx.org/spdxdocs/spdx-tools-v1.2-3F2504E0-4F89-41D3-9A0C-0305E82...") // TODO
+	lines = append(lines, "DocumentName: DOCUMENTNAMEHEREFROMCLI")                                                         // TODO
+	lines = append(lines, "SPDXID: SPDXRef-DOCUMENT")
+	lines = append(lines, "Creator: Tool: "+ToolName+ToolVersion)
+	lines = append(lines, "Created: "+time.Now().UTC().Format(time.RFC3339))
+	lines = append(lines, "LicenseListVersion: 3.0")
 
-	fmt.Println("")
-	fmt.Println("PackageName: TODO") // TODO pass in from command line
-	fmt.Println("SPDXID: SPDXRef-Package")
-	fmt.Println("PackageDownloadLocation: NONE")
-	fmt.Println("FilesAnalyzed: true")
-	fmt.Println("PackageVerificationCode: 8b0600e4db514d62d9e2f10945f9c63488db9965") // TODO https://spdx.org/spdx-specification-21-web-version#h.2p2csry
-	fmt.Println("PackageLicenseDeclared:", packageLicenseDeclared)
-	fmt.Println("PackageLicenseConcluded:", packageLicenseDeclared)
+	lines = append(lines, "")
+	lines = append(lines, "PackageName: TODO") // TODO pass in from command line
+	lines = append(lines, "SPDXID: SPDXRef-Package")
+	lines = append(lines, "PackageDownloadLocation: NONE")
+	lines = append(lines, "FilesAnalyzed: true")
+	lines = append(lines, "PackageVerificationCode: 8b0600e4db514d62d9e2f10945f9c63488db9965") // TODO https://spdx.org/spdx-specification-21-web-version#h.2p2csry
+	lines = append(lines, "PackageLicenseDeclared: "+packageLicenseDeclared)
+	lines = append(lines, "PackageLicenseConcluded: "+packageLicenseDeclared)
 
 	duplicateLicenseMatch := []LicenseMatch{}
 	for _, result := range fileResults {
@@ -230,14 +226,14 @@ func toSPDX21(fileResults []FileResult) {
 	}
 	if len(duplicateLicenseMatch) != 0 {
 		for _, license := range uniqLicenseMatch(duplicateLicenseMatch) {
-			fmt.Println("PackageLicenseInfoFromFiles:", license.LicenseId)
+			lines = append(lines, "PackageLicenseInfoFromFiles: "+license.LicenseId)
 		}
 	} else {
-		fmt.Println("PackageLicenseInfoFromFiles: NONE")
+		lines = append(lines, "PackageLicenseInfoFromFiles: NONE")
 	}
 
-	fmt.Println("PackageCopyrightText: NOASSERTION")
-	fmt.Println("")
+	lines = append(lines, "PackageCopyrightText: NOASSERTION")
+	lines = append(lines, "")
 
 	// Loop over all files and get a list of all unique licenses and print below
 	// PackageLicenseInfoFromFiles: GPL-2.0
@@ -250,28 +246,32 @@ func toSPDX21(fileResults []FileResult) {
 			filePath = "./" + filePath
 		}
 
-		fmt.Println("FileName:", filePath)
-		fmt.Println("SPDXID: SPDXRef-" + getSha1Hash([]byte(filePath)))
-		fmt.Println("FileType: OTHER")
-		fmt.Println("FileChecksum: SHA1:", result.Sha1Hash)
-		fmt.Println("FileChecksum: SHA256:", result.Sha256Hash)
-		fmt.Println("FileChecksum: MD5:", result.Md5Hash)
-		fmt.Println("LicenseConcluded:", licenseConcluded)
+		lines = append(lines, "FileName: "+filePath)
+		lines = append(lines, "SPDXID: SPDXRef-"+getSha1Hash([]byte(filePath)))
+		lines = append(lines, "FileType: OTHER")
+		lines = append(lines, "FileChecksum: SHA1: "+result.Sha1Hash)
+		lines = append(lines, "FileChecksum: SHA256: "+result.Sha256Hash)
+		lines = append(lines, "FileChecksum: MD5: "+result.Md5Hash)
+		lines = append(lines, "LicenseConcluded: "+licenseConcluded)
 
 		// FileComment: <text>The concluded license was taken from the package level that the file was included in.
 		// This information was found in the COPYING.txt file in the xyz directory.</text>
 
 		if len(result.LicenseIdentified) != 0 {
 			for _, license := range result.LicenseIdentified {
-				fmt.Println("LicenseInfoInFile:", license.LicenseId)
+				lines = append(lines, "LicenseInfoInFile:"+license.LicenseId)
 			}
 		} else {
-			fmt.Println("LicenseInfoInFile: NONE")
+			lines = append(lines, "LicenseInfoInFile: NONE")
 		}
 
 		// fmt.Println("FileComment: The concluded license was taken from the package level that the file was included in")
 
-		fmt.Println("FileCopyrightText: NOASSERTION")
-		fmt.Println("")
+		lines = append(lines, "FileCopyrightText: NOASSERTION")
+		lines = append(lines, "")
+	}
+
+	for _, line := range lines {
+		fmt.Println(line)
 	}
 }

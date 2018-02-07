@@ -9,7 +9,15 @@ license files named appropiateld or inline licenses such as the below in source 
 
 In a nutshell this project is a reimplementation of http://www.boyter.org/2017/05/identify-software-licenses-python-vector-space-search-ngram-keywords/ using Go while I attempt to nut out the nuances of the language. 
 
-It can produce report outputs as valid SDPX, CSV, and CLI formatted. It has been designed to work inside CI systems that capture either stdout or file artifacts.
+It can produce report outputs as valid SDPX, CSV, JSON and CLI formatted. It has been designed to work inside CI systems that capture either stdout or file artifacts.
+
+### Why
+
+Why should you care about what licenses your code runs under? See http://www.openlogic.com/resources/enterprise-blog/archive/use-spdx-for-open-source-license-compliance https://thenewstack.io/spdx-open-source-cheap-compliance-license-can-expensive/ https://www.infoworld.com/article/2839560/open-source-software/sticking-a-license-on-everything.html
+
+TL/DR
+
+
 
 ### Installation
 
