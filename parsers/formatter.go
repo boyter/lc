@@ -201,18 +201,18 @@ func toSPDX21(fileResults []FileResult) {
 	lines = append(lines, "SPDXVersion: SPDX-2.1")
 	lines = append(lines, "DataLicense: CC0-1.0")
 	lines = append(lines, "DocumentNamespace:http://spdx.org/spdxdocs/spdx-tools-v1.2-3F2504E0-4F89-41D3-9A0C-0305E82...") // TODO
-	lines = append(lines, "DocumentName: DOCUMENTNAMEHEREFROMCLI")                                                         // TODO
+	lines = append(lines, "DocumentName: "+DocumentName)
 	lines = append(lines, "SPDXID: SPDXRef-DOCUMENT")
-	lines = append(lines, "Creator: Tool: "+ToolName+ToolVersion)
+	lines = append(lines, "Creator: Tool: "+ToolName+" "+ToolVersion)
 	lines = append(lines, "Created: "+time.Now().UTC().Format(time.RFC3339))
 	lines = append(lines, "LicenseListVersion: 3.0")
 
 	lines = append(lines, "")
-	lines = append(lines, "PackageName: TODO") // TODO pass in from command line
+	lines = append(lines, "PackageName: "+PackageName)
 	lines = append(lines, "SPDXID: SPDXRef-Package")
 	lines = append(lines, "PackageDownloadLocation: NONE")
 	lines = append(lines, "FilesAnalyzed: true")
-	lines = append(lines, "PackageVerificationCode: 8b0600e4db514d62d9e2f10945f9c63488db9965") // TODO https://spdx.org/spdx-specification-21-web-version#h.2p2csry
+	lines = append(lines, "PackageVerificationCode: 0000000000000000000000000000000000000000") // TODO
 	lines = append(lines, "PackageLicenseDeclared: "+packageLicenseDeclared)
 	lines = append(lines, "PackageLicenseConcluded: "+packageLicenseDeclared)
 

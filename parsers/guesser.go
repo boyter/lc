@@ -19,7 +19,7 @@ import (
 
 // Shared all over the place
 var ToolName = "licensechecker"
-var ToolVersion = "0.1.0"
+var ToolVersion = "0.3.0"
 
 // Set by user as command line arguments
 var confidence = 0.0
@@ -34,6 +34,8 @@ var FileOutput = ""
 var ExtentionBlacklist = ""
 var maxSize = 0
 var MaxSize = ""
+var DocumentName = ""
+var PackageName = ""
 
 var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]`)
 var alphaNumericRegex = regexp.MustCompile("[^a-zA-Z0-9 ]")
