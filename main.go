@@ -32,7 +32,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "confidence, c",
-			Usage:       "Set required confidence level for licence matching between 0 and 1 `0.85`",
+			Usage:       "Set required confidence level for licence matching between 0 and 1 E.G. `0.95`",
 			Value:       "0.85",
 			Destination: &parsers.Confidence,
 		},
@@ -62,25 +62,25 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "extblacklist, xbl",
-			Usage:       "Which file extensions should be ignored as comma seperated list `gif,jpg,png`",
+			Usage:       "Which file extensions should be ignored for deep analysis as comma seperated list E.G. `gif,jpg,png`",
 			Value:       "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf",
 			Destination: &parsers.ExtentionBlacklist,
 		},
 		cli.StringFlag{
 			Name:        "documentname, dn",
-			Usage:       "Only used if you specify SPDX as an output sets DocumentName `LicenseChecker`",
+			Usage:       "SPDX only. Sets DocumentName E.G. `LicenseChecker`",
 			Value:       "Unknown",
 			Destination: &parsers.DocumentName,
 		},
 		cli.StringFlag{
 			Name:        "packagename, pn",
-			Usage:       "Only used if you specify SPDX as an output sets PackageName `LicenseChecker`",
+			Usage:       "SPDX only. Sets PackageName E.G. `LicenseChecker`",
 			Value:       "Unknown",
 			Destination: &parsers.PackageName,
 		},
 		cli.StringFlag{
 			Name:        "documentnamespace, dns",
-			Usage:       "Only used if you specify SPDX as an output sets DocumentNamespace, if not set will default to http://spdx.org/spdxdocs/[packagename]-[HASH] `YourURL`",
+			Usage:       "SPDX only. Sets DocumentNamespace, if not set will default to http://spdx.org/spdxdocs/[packagename]-[HASH]",
 			Destination: &parsers.DocumentNamespace,
 		},
 	}
