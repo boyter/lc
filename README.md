@@ -15,10 +15,6 @@ It can produce report outputs as valid SDPX, CSV, JSON and CLI formatted. It has
 
 Why should you care about what licenses your code runs under? See http://www.openlogic.com/resources/enterprise-blog/archive/use-spdx-for-open-source-license-compliance https://thenewstack.io/spdx-open-source-cheap-compliance-license-can-expensive/ https://www.infoworld.com/article/2839560/open-source-software/sticking-a-license-on-everything.html
 
-TL/DR
-
-
-
 ### Installation
 
 The binary name for `licencechecker` is `lc`.
