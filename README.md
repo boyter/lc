@@ -11,6 +11,8 @@ In a nutshell this project is a reimplementation of http://www.boyter.org/2017/0
 
 It can produce report outputs as valid SDPX, CSV, JSON and CLI formatted. It has been designed to work inside CI systems that capture either stdout or file artifacts.
 
+[![Build Status](https://travis-ci.org/boyter/lc.svg?branch=master)](https://travis-ci.org/boyter/lc)
+
 ### Why
 
 Why should you care about what licenses your code runs under? See http://www.openlogic.com/resources/enterprise-blog/archive/use-spdx-for-open-source-license-compliance https://thenewstack.io/spdx-open-source-cheap-compliance-license-can-expensive/ https://www.infoworld.com/article/2839560/open-source-software/sticking-a-license-on-everything.html
