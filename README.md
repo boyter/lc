@@ -59,25 +59,31 @@ Example output of `licencechecker` running against itself in tabular format whil
 
 ```
 $ lc -pbl .git,vendor,licenses -f tabular .
-Directory            File                      License                        Confidence  Root Licenses  Size
-.                    .gitignore                GPL-3.0-only                   100.00%     GPL-3.0-only   275B
-.                    Gopkg.lock                GPL-3.0-only                   100.00%     GPL-3.0-only   1.4K
-.                    Gopkg.toml                GPL-3.0-only                   100.00%     GPL-3.0-only   972B
-.                    LICENSE                   GPL-3.0-only                   99.68%      GPL-3.0-only   34.3K
-.                    README.md                 GPL-3.0-only                   100.00%     GPL-3.0-only   6.9K
-.                    classifier_database.json  GPL-3.0-only                   100.00%     GPL-3.0-only   158.5K
-.                    database_keywords.json    GPL-3.0-only                   100.00%     GPL-3.0-only   3.6M
-.                    main.go                   GPL-3.0-only                   100.00%     GPL-3.0-only   2.8K
-examples/identifier  LICENSE                   GPL-3.0+ AND MIT               95.40%      MIT,GPL-3.0+   1K
-examples/identifier  LICENSE2                  MIT AND GPL-3.0+               99.65%      MIT,GPL-3.0+   35K
-examples/identifier  has_identifier.py         (MIT OR GPL-3.0+) AND GPL-2.0  100.00%     MIT,GPL-3.0+   428B
-parsers              constants.go              GPL-3.0-only                   100.00%     GPL-3.0-only   5M
-parsers              formatter.go              GPL-3.0-only                   100.00%     GPL-3.0-only   8.1K
-parsers              guesser.go                GPL-3.0-only                   100.00%     GPL-3.0-only   9.5K
-parsers              helpers.go                GPL-3.0-only AND Apache-2.0    100.00%     GPL-3.0-only   2.5K
-parsers              structs.go                GPL-3.0-only                   100.00%     GPL-3.0-only   710B
-scripts              build_database.py         GPL-3.0-only                   100.00%     GPL-3.0-only   4.7K
-scripts              include.go                GPL-3.0-only                   100.00%     GPL-3.0-only   1008B
+Directory            File                                                  License                        Confidence  Size
+.                    .gitignore                                            GPL-3.0-only                   100.00%     275B
+.                    .travis.yml                                           GPL-3.0-only                   100.00%     26B
+.                    Gopkg.lock                                            GPL-3.0-only                   100.00%     1.4K
+.                    Gopkg.toml                                            GPL-3.0-only                   100.00%     972B
+.                    LICENSE                                               GPL-3.0-only                   99.68%      34.3K
+.                    README.md                                             GPL-3.0-only                   100.00%     6.6K
+.                    classifier_database.json                              GPL-3.0-only                   100.00%     158.5K
+.                    database_keywords.json                                GPL-3.0-only                   100.00%     3.6M
+.                    lc.exe                                                GPL-3.0-only                   100.00%     9M
+.                    main.go                                               GPL-3.0-only                   100.00%     3.4K
+.                    spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar  GPL-3.0-only                   100.00%     43.1M
+.                    spdx_example.spdx                                     GPL-3.0-only                   100.00%     9.3K
+examples/identifier  LICENSE                                               GPL-3.0+ AND MIT               95.40%      1K
+examples/identifier  LICENSE2                                              MIT AND GPL-3.0+               99.65%      35K
+examples/identifier  has_identifier.py                                     (MIT OR GPL-3.0+) AND GPL-2.0  100.00%     428B
+parsers              constants.go                                          GPL-3.0-only                   100.00%     5M
+parsers              formatter.go                                          GPL-3.0-only                   100.00%     8.5K
+parsers              formatter_test.go                                     GPL-3.0-only                   100.00%     976B
+parsers              guesser.go                                            GPL-3.0-only                   100.00%     9.7K
+parsers              guesser_test.go                                       GPL-3.0-only                   100.00%     610B
+parsers              helpers.go                                            GPL-3.0-only AND Apache-2.0    100.00%     2.5K
+parsers              structs.go                                            GPL-3.0-only                   100.00%     863B
+scripts              build_database.py                                     GPL-3.0-only                   100.00%     4.7K
+scripts              include.go                                            GPL-3.0-only                   100.00%     1008B
 ```
 
 Or to write out the results to a CSV file
