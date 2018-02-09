@@ -347,8 +347,7 @@ func Process() {
 	if info, err := os.Stat(DirPath); err == nil && info.IsDir() {
 		fileResults = walkDirectory(DirPath, [][]LicenseMatch{})
 	} else {
-		content := string(readFile(DirPath))
-		guessLicenses := guessLicense(content, deepGuess, loadDatabase())
+		fmt.Println("Argument " + DirPath + " should be a directory not a file")
 	}
 
 	s.Stop()
