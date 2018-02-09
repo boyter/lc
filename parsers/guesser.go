@@ -246,11 +246,16 @@ func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult
 	// TODO fan this out to many GoRoutines and process in parallel
 	for _, file := range files {
 
-		fileResult := processFile(directory, file, rootLicenses[len(rootLicenses)-1])
+		rootLicense := []LicenseMatch{}
+		if len(rootLicenses) != 0 {
+			rootLicense = rootLicenses[len(rootLicenses)-1]
+		}
+
+		fileResult := processFile(directory, file, rootLicense)
 		fileResults = append(fileResults, fileResult)
 
 		if strings.ToLower(Format) == "progress" {
-			toProgress(directory, file, rootLicenses[len(rootLicenses)-1], fileResult.LicenseGuesses, fileResult.LicenseIdentified)
+			toProgress(directory, file, rootLicense, fileResult.LicenseGuesses, fileResult.LicenseIdentified)
 		}
 	}
 
