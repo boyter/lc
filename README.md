@@ -117,7 +117,7 @@ Add error handling for all the file operations and just in general. Most are cur
 
 Add logic to guess the file type for SPDX value FileType
 
-Add unit and integration tests
+Add addtional unit and integration tests
 
 Investigate using "github.com/gosuri/uitable" for formatting https://github.com/gosuri/uitable
 

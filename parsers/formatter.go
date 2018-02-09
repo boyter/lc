@@ -247,9 +247,6 @@ func toSPDX21(fileResults []FileResult) {
 	lines = append(lines, "PackageCopyrightText: NOASSERTION")
 	lines = append(lines, "")
 
-	// Loop over all files and get a list of all unique licenses and print below
-	// PackageLicenseInfoFromFiles: GPL-2.0
-
 	for _, result := range fileResults {
 		licenseConcluded, _ := determineLicense(result)
 
@@ -260,14 +257,10 @@ func toSPDX21(fileResults []FileResult) {
 
 		lines = append(lines, "FileName: "+filePath)
 		lines = append(lines, "SPDXID: SPDXRef-"+getSha1Hash([]byte(filePath)))
-		lines = append(lines, "FileType: OTHER")
 		lines = append(lines, "FileChecksum: SHA1: "+result.Sha1Hash)
 		lines = append(lines, "FileChecksum: SHA256: "+result.Sha256Hash)
 		lines = append(lines, "FileChecksum: MD5: "+result.Md5Hash)
 		lines = append(lines, "LicenseConcluded: "+licenseConcluded)
-
-		// FileComment: <text>The concluded license was taken from the package level that the file was included in.
-		// This information was found in the COPYING.txt file in the xyz directory.</text>
 
 		if len(result.LicenseIdentified) != 0 {
 			for _, license := range result.LicenseIdentified {
@@ -276,8 +269,6 @@ func toSPDX21(fileResults []FileResult) {
 		} else {
 			lines = append(lines, "LicenseInfoInFile: NONE")
 		}
-
-		// fmt.Println("FileComment: The concluded license was taken from the package level that the file was included in")
 
 		lines = append(lines, "FileCopyrightText: NOASSERTION")
 		lines = append(lines, "")

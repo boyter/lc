@@ -19,7 +19,7 @@ import (
 
 // Shared all over the place
 var ToolName = "licensechecker"
-var ToolVersion = "0.3.0"
+var ToolVersion = "1.0.0"
 
 // Set by user as command line arguments
 var confidence = 0.0
@@ -183,7 +183,6 @@ func findPossibleLicenseFiles(fileList []string) []string {
 var Database = []License{}
 
 func loadDatabase() []License {
-
 	if len(Database) != 0 {
 		return Database
 	}
@@ -197,6 +196,14 @@ func loadDatabase() []License {
 	}
 
 	Database = database
+
+	return database
+}
+
+func loadClassifier() []Classifier {
+	var database []Classifier
+	data, _ := base64.StdEncoding.DecodeString(classifier_database)
+	_ = json.Unmarshal(data, &database)
 
 	return database
 }
