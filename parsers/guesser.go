@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -328,7 +329,7 @@ func Process() {
 	s.Writer = os.Stderr
 	s.Prefix = "Processing... "
 
-	if strings.ToLower(Format) != "progress" {
+	if strings.ToLower(Format) != "progress" && runtime.GOOS != "windows" {
 		s.Start()
 	}
 
