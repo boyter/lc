@@ -95,7 +95,7 @@ $lc -f spdx -o spdx_example.spdx --pbl .git,vendor,licenses -dn licensechecker -
 
 ### SPDX
 
-Running against itself to produce a SPDX file.
+Running against itself to produce a SPDX file using tools from https://github.com/spdx/tools
 
 ```
 $ go run main.go  -f spdx -o spdx_example.spdx --pbl .git,vendor,licenses -dn licensechecker -pn licensechecker . && java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify ./spdx_example.spdx
@@ -109,11 +109,13 @@ This SPDX Document is valid.
 
 Add error handling for all the file operations and just in general. Most are currently ignored
 
+Add logic to guess the file type for SPDX value FileType
+
 Add unit and integration tests
 
 Investigate using "github.com/gosuri/uitable" for formatting https://github.com/gosuri/uitable
 
-Investigate using zlib compression for databases
+Investigate using zlib compression for databases as per the below
 
 ```
 package main
@@ -157,16 +159,3 @@ func main() {
 	// fmt.Println(len(out.String()))
 }
 ```
-
-For checking the spdx validity use the following built from https://github.com/spdx/tools
-
-```
-java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify spdx_example.spdx
-java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar TagToRDF spdx_example.spdx TagToRDF.rdf
-
-lc --pbl .git,examples,vendor -f spdx . > ~/Projects/tools/target/spdx_example.spdx
-java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify ./spdx_example.spdx
-
-go run main.go --pbl .git,examples,vendor -f spdx . > ./spdx_example.spdx && java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify ./spdx_example.spdx
-```
-
