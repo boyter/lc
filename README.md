@@ -9,7 +9,7 @@ license files named appropiateld or inline licenses such as the below in source 
 
 In a nutshell this project is a reimplementation of http://www.boyter.org/2017/05/identify-software-licenses-python-vector-space-search-ngram-keywords/ using Go while I attempt to nut out the nuances of the language. 
 
-It can produce report outputs as valid SDPX, CSV, JSON and CLI formatted. It has been designed to work inside CI systems that capture either stdout or file artifacts.
+It can produce report outputs as valid [SPDX](https://spdx.org/), CSV, JSON and CLI formatted. It has been designed to work inside CI systems that capture either stdout or file artifacts.
 
 [![Build Status](https://travis-ci.org/boyter/lc.svg?branch=master)](https://travis-ci.org/boyter/lc)
 
