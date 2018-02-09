@@ -21,7 +21,7 @@ Why should you care about what licenses your code runs under? See http://www.ope
 
 The binary name for `licencechecker` is `lc`.
 
-Binary files will be distributed at some point in the future probably. Currently to install you need to have Go setup with your GOPATH working and your go binary path exported like so,
+For binary files see releases. To build from source you need to have Go setup with your GOPATH working and your go binary path exported like so,
 
 ```
 export PATH=$PATH:$(go env GOPATH)/bin
@@ -110,6 +110,15 @@ ERROR StatusLogger No log4j2 configuration file found. Using default configurati
 03:49:29.482 [main] ERROR org.apache.jena.rdf.model.impl.RDFReaderFImpl - Rewired RDFReaderFImpl - configuration changes have no effect on reading
 This SPDX Document is valid.
 ```
+
+### Package
+
+Run go build for windows and linux then the following in linux
+
+```
+zip -r9 lc-1.0.0-x86_64-pc-windows.zip lc.exe && zip -r9 lc-1.0.0-x86_64-unknown-linux.zip lc
+```
+
 
 ### TODO
 
