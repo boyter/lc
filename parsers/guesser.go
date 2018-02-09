@@ -349,7 +349,6 @@ func Process() {
 	} else {
 		content := string(readFile(DirPath))
 		guessLicenses := guessLicense(content, deepGuess, loadDatabase())
-		fmt.Println(guessLicenses)
 	}
 
 	s.Stop()
