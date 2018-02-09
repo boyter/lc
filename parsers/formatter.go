@@ -143,19 +143,12 @@ func determineLicense(result FileResult) (string, string) {
 
 func toTabular(fileResults []FileResult) {
 	output := []string{
-		"Directory | File | License | Confidence | Root Licenses | Size",
+		"Directory | File | License | Confidence | Size",
 	}
 
 	for _, result := range fileResults {
 		license, confidence := determineLicense(result)
-
-		rootLicenseString := ""
-		for _, v := range result.LicenseRoots {
-			rootLicenseString += fmt.Sprintf("%s,", v.LicenseId)
-		}
-		rootLicenseString = strings.TrimRight(rootLicenseString, ", ")
-
-		output = append(output, fmt.Sprintf("%s | %s | %s | %s | %s | %s", result.Directory, result.Filename, license, confidence, rootLicenseString, result.BytesHuman))
+		output = append(output, fmt.Sprintf("%s | %s | %s | %s | %s", result.Directory, result.Filename, license, confidence, result.BytesHuman))
 	}
 
 	result := columnize.SimpleFormat(output)
