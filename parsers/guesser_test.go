@@ -31,11 +31,3 @@ func TestLoadDatabase(t *testing.T) {
 		t.Errorf("Expected database to not be empty")
 	}
 }
-
-func TestLoadClassifier(t *testing.T) {
-	actual := loadClassifier()
-
-	if len(actual) == 0 {
-		t.Errorf("Expected database to not be empty")
-	}
-}

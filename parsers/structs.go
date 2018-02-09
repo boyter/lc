@@ -29,9 +29,3 @@ type FileResult struct {
 	BytesHuman        string
 	Bytes             int
 }
-
-type Classifier struct {
-	Language   string   `json:"language"`
-	Extensions []string `json:"extensions"`
-	Keywords   []string `json:"keywords"`
-}

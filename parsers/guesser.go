@@ -200,14 +200,6 @@ func loadDatabase() []License {
 	return database
 }
 
-func loadClassifier() []Classifier {
-	var database []Classifier
-	data, _ := base64.StdEncoding.DecodeString(classifier_database)
-	_ = json.Unmarshal(data, &database)
-
-	return database
-}
-
 func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult {
 	fileResults := []FileResult{}
 	all, _ := ioutil.ReadDir(directory)
