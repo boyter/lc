@@ -15,7 +15,17 @@ It can produce report outputs as valid [SPDX](https://spdx.org/), CSV, JSON and 
 
 ### Why
 
-Why should you care about what licenses your code runs under? See http://www.openlogic.com/resources/enterprise-blog/archive/use-spdx-for-open-source-license-compliance https://thenewstack.io/spdx-open-source-cheap-compliance-license-can-expensive/ https://www.infoworld.com/article/2839560/open-source-software/sticking-a-license-on-everything.html
+In short taken from, http://ben.balter.com/licensee/
+
+ * You've got an open source project. How do you know what you can and can't do with the software?
+ * You've got a bunch of open source projects, how do you know what their licenses are?
+ * You've got a project with a license file, but which license is it? Has it been modified?
+
+Why should you care about what licenses your code runs under? See 
+
+ * http://www.openlogic.com/resources/enterprise-blog/archive/use-spdx-for-open-source-license-compliance 
+ * https://thenewstack.io/spdx-open-source-cheap-compliance-license-can-expensive/
+ * https://www.infoworld.com/article/2839560/open-source-software/sticking-a-license-on-everything.html
 
 ### Installation
 
