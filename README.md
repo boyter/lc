@@ -1,9 +1,9 @@
 licensechecker (lc)
 -------------------
-`lc` is a command line tool that recursively iterates over a supplied directory
+`lc` is a command line tool that recursively iterates over a supplied directory or file 
 attempting to identify what software license each file is under using the list
 of licenses supplied by the SPDX (Software Package Data Exchange) Project. It will pick up 
-license files named appropiateld or inline licenses such as the below in source files
+license files named appropiately or inline licenses such as the below in source files
 
 `SPDX-License-Identifier: GPL-3.0-only`
 
@@ -98,6 +98,23 @@ Or to a SPDX 2.1 file
 $lc -f spdx -o spdx_example.spdx --pbl .git,vendor,licenses -dn licensechecker -pn licensechecker .
 ```
 
+You can specify multiple directories as additional arguments and all results will be merged into a single output
+
+```
+$ lc -f tabular ./examples/identifier ./scripts
+```
+
+You can also specify files and directories as additional arguments 
+
+```
+$ lc -f tabular README.md LICENSE ./examples/identifier
+Directory              File               License                        Confidence  Size
+                       README.md          NOASSERTION                    100.00%     8K
+                       LICENSE            GPL-3.0-only                   99.68%      34.3K
+./examples/identifier  LICENSE            GPL-3.0+ AND MIT               95.40%      1K
+./examples/identifier  LICENSE2           MIT AND GPL-3.0+               99.65%      35K
+./examples/identifier  has_identifier.py  (MIT OR GPL-3.0+) AND GPL-2.0  100.00%     428B
+```
 
 ### SPDX
 
@@ -113,7 +130,7 @@ This SPDX Document is valid.
 
 ### Package
 
-Run go build for windows and linux then the following in linux
+Run go build for windows and linux then the following in linux, keep in mind need to update the version
 
 ```
 zip -r9 lc-1.0.0-x86_64-pc-windows.zip lc.exe && zip -r9 lc-1.0.0-x86_64-unknown-linux.zip lc

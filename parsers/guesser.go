@@ -20,13 +20,13 @@ import (
 
 // Shared all over the place
 var ToolName = "licensechecker"
-var ToolVersion = "1.0.1"
+var ToolVersion = "1.0.2"
 
 // Set by user as command line arguments
 var confidence = 0.0
 var Confidence = ""
 var PossibleLicenceFiles = ""
-var DirPath = "."
+var DirFilePaths = []string{}
 var PathBlacklist = ""
 var deepGuess = true
 var DeepGuess = ""
@@ -340,16 +340,23 @@ func Process() {
 
 	fileResults := []FileResult{}
 
-	if DirPath == "" {
-		DirPath = "."
+	if len(DirFilePaths) == 0 {
+		DirFilePaths = append(DirFilePaths, ".")
 	}
 
-	if info, err := os.Stat(DirPath); err == nil && info.IsDir() {
-		fileResults = walkDirectory(DirPath, [][]LicenseMatch{})
-	} else {
-		fmt.Println("Argument " + DirPath + " should be a directory not a file")
-	}
+	for _, fileDirectory := range DirFilePaths {
+		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
+			fileResults = append(fileResults, walkDirectory(fileDirectory, [][]LicenseMatch{})...)
+		} else {
+			directory, file := filepath.Split(fileDirectory)
+			fileResult := processFile(directory, file, []LicenseMatch{})
+			fileResults = append(fileResults, fileResult)
 
+			if strings.ToLower(Format) == "progress" {
+				toProgress(directory, file, []LicenseMatch{}, fileResult.LicenseGuesses, fileResult.LicenseIdentified)
+			}
+		}
+	}
 	s.Stop()
 
 	switch strings.ToLower(Format) {

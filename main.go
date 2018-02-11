@@ -16,7 +16,7 @@ func main() {
 	app.Name = parsers.ToolName
 	app.Version = parsers.ToolVersion
 	app.Usage = "Check directory for licenses and list what license(s) a file is under"
-	app.UsageText = "lc [global options] [DIRECTORY]"
+	app.UsageText = "lc [global options] [DIRECTORY|FILE] [DIRECTORY|FILE]"
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
@@ -85,7 +85,7 @@ func main() {
 		},
 	}
 	app.Action = func(c *cli.Context) error {
-		parsers.DirPath = c.Args().Get(0)
+		parsers.DirFilePaths = c.Args()
 		parsers.Process()
 		return nil
 	}
