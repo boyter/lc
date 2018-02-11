@@ -31,7 +31,7 @@ Why should you care about what licenses your code runs under? See
 
 The binary name for `licencechecker` is `lc`.
 
-For binary files see releases. To build from source you need to have Go setup with your GOPATH working and your go binary path exported like so,
+For binary files see releases https://github.com/boyter/lc/releases To build from source you need to have Go setup with your GOPATH working and your go binary path exported like so,
 
 ```
 export PATH=$PATH:$(go env GOPATH)/bin
