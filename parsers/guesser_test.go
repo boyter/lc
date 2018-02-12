@@ -43,15 +43,15 @@ func TestWalkDirectory(t *testing.T) {
 func TestProcessFile(t *testing.T) {
 	actual := processFile("../examples/identifier/", "has_identifier.py", []LicenseMatch{})
 
-	if actual.Md5Hash != "0ad2e6786423fa6933a49ae4f97ae79e" {
+	if actual.Md5Hash != "fc7d75e0bc0275841de8426b18791fa4" {
 		t.Errorf("Expected MD5 to match")
 	}
 
-	if actual.Sha1Hash != "64904ca8a945009f95734d19198aaacd5e2db959" {
+	if actual.Sha1Hash != "03a614cc51e9a783a695bcf99ec4adcdac34e1cc" {
 		t.Errorf("Expected SHA1 to match")
 	}
 
-	if actual.Sha256Hash != "bf201f35c6a8504b4d956b4403ff5a7fef490889d5166a34f01b653e4ce08a06" {
+	if actual.Sha256Hash != "5b6bf8d45b25a0dab4f0817324618e425037f156b67cdc7503da01e6d9beb652" {
 		t.Errorf("Expected SHA256 to match")
 	}
 
