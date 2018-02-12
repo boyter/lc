@@ -13,6 +13,8 @@ It can produce report outputs as valid [SPDX](https://spdx.org/), CSV, JSON and 
 
 [![Build Status](https://travis-ci.org/boyter/lc.svg?branch=master)](https://travis-ci.org/boyter/lc)
 
+Dual-licensed under MIT or the [UNLICENSE](http://unlicense.org).
+
 ### Why
 
 In short taken from, http://ben.balter.com/licensee/
@@ -69,27 +71,29 @@ Example output of `licencechecker` running against itself in tabular format whil
 
 ```
 $ lc -pbl .git,vendor,licenses -f tabular .
-Directory            File                    License                        Confidence  Size
-.                    .gitignore              GPL-3.0-only                   100.00%     275B
-.                    .travis.yml             GPL-3.0-only                   100.00%     26B
-.                    Gopkg.lock              GPL-3.0-only                   100.00%     1.4K
-.                    Gopkg.toml              GPL-3.0-only                   100.00%     972B
-.                    LICENSE                 GPL-3.0-only                   99.68%      34.3K
-.                    README.md               GPL-3.0-only                   100.00%     9K
-.                    database_keywords.json  GPL-3.0-only                   100.00%     3.6M
-.                    main.go                 GPL-3.0-only                   100.00%     3.4K
-examples/identifier  LICENSE                 GPL-3.0+ AND MIT               95.40%      1K
-examples/identifier  LICENSE2                MIT AND GPL-3.0+               99.65%      35K
-examples/identifier  has_identifier.py       (MIT OR GPL-3.0+) AND GPL-2.0  100.00%     428B
-parsers              constants.go            GPL-3.0-only                   100.00%     4.8M
-parsers              formatter.go            GPL-3.0-only                   100.00%     8.1K
-parsers              formatter_test.go       GPL-3.0-only                   100.00%     976B
-parsers              guesser.go              GPL-3.0-only                   100.00%     10.2K
-parsers              guesser_test.go         GPL-3.0-only                   100.00%     610B
-parsers              helpers.go              GPL-3.0-only AND Apache-2.0    100.00%     2.5K
-parsers              structs.go              GPL-3.0-only                   100.00%     710B
-scripts              build_database.py       GPL-3.0-only                   100.00%     4.7K
-scripts              include.go              GPL-3.0-only                   100.00%     1008B
+Directory            File                    License                            Confidence  Size
+.                    .gitignore              (MIT OR Unlicense)                 100.00%     275B
+.                    .travis.yml             (MIT OR Unlicense)                 100.00%     74B
+.                    CONTRIBUTING.md         (MIT OR Unlicense)                 100.00%     1.2K
+.                    Gopkg.lock              (MIT OR Unlicense)                 100.00%     1.4K
+.                    Gopkg.toml              (MIT OR Unlicense)                 100.00%     972B
+.                    LICENSE                 Unlicense AND MIT                  94.83%      1.1K
+.                    README.md               (MIT OR Unlicense)                 100.00%     7.3K
+.                    UNLICENSE               MIT AND Unlicense                  95.16%      1.2K
+.                    database_keywords.json  (MIT OR Unlicense)                 100.00%     3.6M
+.                    main.go                 (MIT OR Unlicense)                 100.00%     3.4K
+examples/identifier  LICENSE                 GPL-3.0+ AND MIT                   95.40%      1K
+examples/identifier  LICENSE2                MIT AND GPL-3.0+                   99.65%      35K
+examples/identifier  has_identifier.py       (MIT OR GPL-3.0+) AND GPL-2.0      100.00%     428B
+parsers              constants.go            (MIT OR Unlicense)                 100.00%     4.8M
+parsers              formatter.go            (MIT OR Unlicense)                 100.00%     8.1K
+parsers              formatter_test.go       (MIT OR Unlicense)                 100.00%     976B
+parsers              guesser.go              (MIT OR Unlicense)                 100.00%     10.2K
+parsers              guesser_test.go         (MIT OR Unlicense)                 100.00%     1.6K
+parsers              helpers.go              (MIT OR Unlicense) AND Apache-2.0  100.00%     2.5K
+parsers              structs.go              (MIT OR Unlicense)                 100.00%     710B
+scripts              build_database.py       (MIT OR Unlicense)                 100.00%     4.7K
+scripts              include.go              (MIT OR Unlicense)                 100.00%     999B
 ```
 
 Or to write out the results to a CSV file
@@ -115,8 +119,8 @@ You can also specify files and directories as additional arguments
 ```
 $ lc -f tabular README.md LICENSE ./examples/identifier
 Directory              File               License                        Confidence  Size
-                       README.md          NOASSERTION                    100.00%     8K
-                       LICENSE            GPL-3.0-only                   99.68%      34.3K
+                       README.md          NOASSERTION                    100.00%     7.5K
+                       LICENSE            MIT                            94.83%      1.1K
 ./examples/identifier  LICENSE            GPL-3.0+ AND MIT               95.40%      1K
 ./examples/identifier  LICENSE2           MIT AND GPL-3.0+               99.65%      35K
 ./examples/identifier  has_identifier.py  (MIT OR GPL-3.0+) AND GPL-2.0  100.00%     428B
