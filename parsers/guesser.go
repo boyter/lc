@@ -299,7 +299,7 @@ func processFile(directory string, file string, rootLicenses []LicenseMatch) Fil
 		Md5Hash:           getMd5Hash(content),
 		Sha1Hash:          getSha1Hash(content),
 		Sha256Hash:        getSha256Hash(content),
-		BytesHuman:        bytesToHuman(len(content)),
+		BytesHuman:        bytesToHuman(int64(len(content))),
 		Bytes:             len(content)}
 
 	return fileResult
