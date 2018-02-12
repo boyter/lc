@@ -145,55 +145,7 @@ zip -r9 lc-1.0.0-x86_64-pc-windows.zip lc.exe && zip -r9 lc-1.0.0-x86_64-unknown
 
 ### TODO
 
-Add error handling for all the file operations and just in general. Most are currently ignored
-
-Add logic to guess the file type for SPDX value FileType
-
-Add addtional unit and integration tests
-
-Investigate using "github.com/gosuri/uitable" for formatting https://github.com/gosuri/uitable
-
-Investigate using zlib compression for databases as per the below
-
-```
-package main
-
-import (
-	"bytes"
-	"compress/zlib"
-	"fmt"
-	"io"
-	"io/ioutil"
-)
-
-func readFile(filepath string) []byte {
-	// TODO only read as deep into the file as we need
-	bytes, err := ioutil.ReadFile(filepath)
-
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	return bytes
-}
-
-func main() {
-
-	contents := readFile("database_keywords.json")
-	fmt.Println(len(contents))
-
-	var in bytes.Buffer
-	b := []byte(contents)
-	w := zlib.NewWriter(&in)
-	w.Write(b)
-	w.Close()
-
-	fmt.Println(len(in.String()))
-
-	var out bytes.Buffer
-	r, _ := zlib.NewReader(&in)
-	io.Copy(&out, r)
-	fmt.Println(len(out.String()))
-	// fmt.Println(len(out.String()))
-}
-```
+* Add error handling for all the file operations and just in general. Most are currently ignored
+* Add logic to guess the file type for SPDX value FileType
+* Add addtional unit and integration tests
+* Investigate using "github.com/gosuri/uitable" for formatting https://github.com/gosuri/uitable
