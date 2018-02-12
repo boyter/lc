@@ -22,7 +22,7 @@ func readFile(filepath string) []byte {
 }
 
 // Reads all .json files in the current folder
-// and encodes them as strings literals in textfiles.go
+// and encodes them as strings literals in constants.go
 func main() {
 	files, _ := ioutil.ReadDir(".")
 	out, _ := os.Create("./parsers/constants.go")
