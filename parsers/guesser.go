@@ -20,10 +20,10 @@ import (
 
 // Shared all over the place
 var ToolName = "licensechecker"
-var ToolVersion = "1.0.2"
+var ToolVersion = "1.1.1"
 
 // Set by user as command line arguments
-var confidence = 0.0
+var confidence = 0.85
 var Confidence = ""
 var PossibleLicenceFiles = ""
 var DirFilePaths = []string{}
@@ -33,7 +33,7 @@ var DeepGuess = ""
 var Format = ""
 var FileOutput = ""
 var ExtentionBlacklist = ""
-var maxSize = 0
+var maxSize = 50000
 var MaxSize = ""
 var DocumentName = ""
 var PackageName = ""
