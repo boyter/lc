@@ -27,8 +27,9 @@ func TestCleanText(t *testing.T) {
 func TestLoadDatabase(t *testing.T) {
 	actual := loadDatabase()
 
-	if len(actual) == 0 {
-		t.Errorf("Expected database to not be empty")
+	if len(actual) != 370 {
+		t.Log(len(actual))
+		t.Errorf("Expected database to have 370 elements")
 	}
 }
 

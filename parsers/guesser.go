@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 	"unicode/utf8"
 )
@@ -81,6 +82,7 @@ func keywordGuessLicense(content string, licenses []License) []LicenseMatch {
 		keywordmatch := 0
 		contains := false
 
+		// Tried adding goroutines here to process the contains, it slowed things down
 		for _, keyword := range license.Keywords {
 			contains = strings.Contains(content, strings.ToLower(keyword))
 
@@ -180,7 +182,7 @@ func findPossibleLicenseFiles(fileList []string) []string {
 	return possibleList
 }
 
-// Caching the database load result reduces processing time by about 3x for this repository
+// Caching the database load result speeds things up about 3 times for this repository 4s vs 15s
 var Database = []License{}
 
 func loadDatabase() []License {
@@ -192,13 +194,19 @@ func loadDatabase() []License {
 	data, _ := base64.StdEncoding.DecodeString(database_keywords)
 	_ = json.Unmarshal(data, &database)
 
+	// 700ms startup time with the below in place
+	var wg sync.WaitGroup
 	for i, v := range database {
-		database[i].Concordance = vectorspace.BuildConcordance(strings.ToLower(v.LicenseText))
+		wg.Add(1)
+		go func(i int, database *[]License, v *License) {
+			defer wg.Done()
+			(*database)[i].Concordance = vectorspace.BuildConcordance(strings.ToLower(v.LicenseText))
+		}(i, &database, &v)
 	}
+	wg.Wait()
 
 	Database = database
-
-	return database
+	return Database
 }
 
 func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult {
