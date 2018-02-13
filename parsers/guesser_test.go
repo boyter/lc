@@ -1,9 +1,9 @@
 package parsers
 
 import (
-	// "io/ioutil"
+	"io/ioutil"
 	"path/filepath"
-	// "strings"
+	"strings"
 	"testing"
 )
 
