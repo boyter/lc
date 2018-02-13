@@ -75,27 +75,30 @@ Example output of `licencechecker` running against itself in tabular format whil
 $ lc -pbl .git,vendor,licenses -f tabular .
 Directory            File                    License                            Confidence  Size
 .                    .gitignore              (MIT OR Unlicense)                 100.00%     275B
-.                    .travis.yml             (MIT OR Unlicense)                 100.00%     74B
+.                    .travis.yml             (MIT OR Unlicense)                 100.00%     188B
+.                    CODE_OF_CONDUCT.md      (MIT OR Unlicense)                 100.00%     3.1K
 .                    CONTRIBUTING.md         (MIT OR Unlicense)                 100.00%     1.2K
 .                    Gopkg.lock              (MIT OR Unlicense)                 100.00%     1.4K
 .                    Gopkg.toml              (MIT OR Unlicense)                 100.00%     972B
 .                    LICENSE                 Unlicense AND MIT                  94.83%      1.1K
-.                    README.md               (MIT OR Unlicense)                 100.00%     7.3K
+.                    README.md               (MIT OR Unlicense)                 100.00%     7.5K
 .                    UNLICENSE               MIT AND Unlicense                  95.16%      1.2K
 .                    database_keywords.json  (MIT OR Unlicense)                 100.00%     3.6M
 .                    main.go                 (MIT OR Unlicense)                 100.00%     3.4K
+.                    what-we-look-at.md      (MIT OR Unlicense)                 100.00%     3.2K
 examples/identifier  LICENSE                 GPL-3.0+ AND MIT                   95.40%      1K
 examples/identifier  LICENSE2                MIT AND GPL-3.0+                   99.65%      35K
-examples/identifier  has_identifier.py       (MIT OR GPL-3.0+) AND GPL-2.0      100.00%     428B
+examples/identifier  has_identifier.py       (MIT OR GPL-3.0+) AND GPL-2.0      100.00%     409B
 parsers              constants.go            (MIT OR Unlicense)                 100.00%     4.8M
-parsers              formatter.go            (MIT OR Unlicense)                 100.00%     8.1K
-parsers              formatter_test.go       (MIT OR Unlicense)                 100.00%     976B
-parsers              guesser.go              (MIT OR Unlicense)                 100.00%     10.2K
-parsers              guesser_test.go         (MIT OR Unlicense)                 100.00%     1.6K
-parsers              helpers.go              (MIT OR Unlicense) AND Apache-2.0  100.00%     2.5K
-parsers              structs.go              (MIT OR Unlicense)                 100.00%     710B
-scripts              build_database.py       (MIT OR Unlicense)                 100.00%     4.7K
-scripts              include.go              (MIT OR Unlicense)                 100.00%     999B
+parsers              formatter.go            (MIT OR Unlicense)                 100.00%     7.8K
+parsers              formatter_test.go       (MIT OR Unlicense)                 100.00%     944B
+parsers              guesser.go              (MIT OR Unlicense)                 100.00%     9.8K
+parsers              guesser_test.go         (MIT OR Unlicense)                 100.00%     3.4K
+parsers              helpers.go              (MIT OR Unlicense) AND Apache-2.0  100.00%     2.4K
+parsers              helpers_test.go         (MIT OR Unlicense)                 100.00%     1.5K
+parsers              structs.go              (MIT OR Unlicense)                 100.00%     679B
+scripts              build_database.py       (MIT OR Unlicense)                 100.00%     4.6K
+scripts              include.go              (MIT OR Unlicense)                 100.00%     951B
 ```
 
 Or to write out the results to a CSV file
