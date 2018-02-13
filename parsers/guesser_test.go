@@ -1,15 +1,11 @@
 package parsers
 
 import (
-	"io/ioutil"
+	// "io/ioutil"
 	"path/filepath"
-	"strings"
+	// "strings"
 	"testing"
 )
-
-func expect(t *testing.T, expected string, actual string) {
-
-}
 
 func TestCleanText(t *testing.T) {
 	actual := cleanText("ToLower")
@@ -75,42 +71,35 @@ func TestProcessFile(t *testing.T) {
 func TestProcessFileLicensesFuzzy(t *testing.T) {
 	files, _ := ioutil.ReadDir("../examples/licenses/")
 
-	correct := float64(0.00)
-	for _, f := range files {
-		actual := processFile("../examples/licenses/", f.Name(), []LicenseMatch{})
-
-		if len(actual.LicenseGuesses) != 0 {
-			if strings.Replace(f.Name(), ".json", "", 1) == actual.LicenseGuesses[0].LicenseId {
-				correct++
-			}
-		}
-	}
-
-	totalPercentage := (correct / float64(len(files))) * 100
-	if totalPercentage < 0.95 {
-		t.Errorf("Not enough guesses correct", correct, len(files), totalPercentage)
-	}
-}
-
-// This is slow but ensures that things work as we expect for keyword matching
-func TestProcessFileLicensesKeywords(t *testing.T) {
-	files, _ := ioutil.ReadDir("../examples/licenses/")
-
-	correct := float64(0.00)
+	correctFuzzy := float64(0.00)
+	correctKeywords := float64(0.00)
 	for _, file := range files {
-		content := readFile(filepath.Join("../examples/licenses/", file.Name()))
-		actual := keywordGuessLicense(string(content), loadDatabase())
+		actualFuzzy := processFile("../examples/licenses/", file.Name(), []LicenseMatch{})
 
-		if len(actual) != 0 {
-			if strings.Replace(file.Name(), ".json", "", 1) == actual[0].LicenseId {
-				correct++
+		if len(actualFuzzy.LicenseGuesses) != 0 {
+			if strings.Replace(file.Name(), ".json", "", 1) == actualFuzzy.LicenseGuesses[0].LicenseId {
+				correctFuzzy++
+			}
+		}
+
+		content := readFile(filepath.Join("../examples/licenses/", file.Name()))
+		actualKeywords := keywordGuessLicense(string(content), loadDatabase())
+
+		if len(actualKeywords) != 0 {
+			if strings.Replace(file.Name(), ".json", "", 1) == actualKeywords[0].LicenseId {
+				correctKeywords++
 			}
 		}
 	}
 
-	totalPercentage := (correct / float64(len(files))) * 100
-	if totalPercentage < 0.95 {
-		t.Errorf("Not enough guesses correct", correct, len(files), totalPercentage)
+	totalPercentageFuzzy := (correctFuzzy / float64(len(files))) * 100
+	if totalPercentageFuzzy < 0.95 {
+		t.Errorf("Not enough guesses correct fuzzy", correctFuzzy, len(files), totalPercentageFuzzy)
+	}
+
+	totalPercentageKeywords := (correctKeywords / float64(len(files))) * 100
+	if totalPercentageKeywords < 0.95 {
+		t.Errorf("Not enough guesses correct keywords", correctKeywords, len(files), totalPercentageKeywords)
 	}
 }
 
