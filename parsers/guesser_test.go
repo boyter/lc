@@ -1,6 +1,9 @@
 package parsers
 
 import (
+	"io/ioutil"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -65,5 +68,73 @@ func TestProcessFile(t *testing.T) {
 
 	if actual.LicenseIdentified[1].LicenseId != "GPL-3.0+" {
 		t.Errorf("Expected license not identified")
+	}
+}
+
+// This is slow but ensures that things work as we expect for fuzzy matching
+func TestProcessFileLicensesFuzzy(t *testing.T) {
+	files, _ := ioutil.ReadDir("../examples/licenses/")
+
+	correct := float64(0.00)
+	for _, f := range files {
+		actual := processFile("../examples/licenses/", f.Name(), []LicenseMatch{})
+
+		if len(actual.LicenseGuesses) != 0 {
+			if strings.Replace(f.Name(), ".json", "", 1) == actual.LicenseGuesses[0].LicenseId {
+				correct++
+			}
+		}
+	}
+
+	totalPercentage := (correct / float64(len(files))) * 100
+	if totalPercentage < 0.95 {
+		t.Errorf("Not enough guesses correct", correct, len(files), totalPercentage)
+	}
+}
+
+// This is slow but ensures that things work as we expect for keyword matching
+func TestProcessFileLicensesKeywords(t *testing.T) {
+	files, _ := ioutil.ReadDir("../examples/licenses/")
+
+	correct := float64(0.00)
+	for _, file := range files {
+		content := readFile(filepath.Join("../examples/licenses/", file.Name()))
+		actual := keywordGuessLicense(string(content), loadDatabase())
+
+		if len(actual) != 0 {
+			if strings.Replace(file.Name(), ".json", "", 1) == actual[0].LicenseId {
+				correct++
+			}
+		}
+	}
+
+	totalPercentage := (correct / float64(len(files))) * 100
+	if totalPercentage < 0.95 {
+		t.Errorf("Not enough guesses correct", correct, len(files), totalPercentage)
+	}
+}
+
+func TestProcessFileLicensesTop10(t *testing.T) {
+	// https://www.blackducksoftware.com/top-open-source-licenses
+	files := []string{"MIT", "GPL-2.0", "Apache-2.0", "GPL-3.0-only", "ISC", "Artistic-2.0", "LGPL-2.1", "LGPL-3.0", "EPL-2.0", "MS-PL"}
+
+	for _, file := range files {
+		content := readFile(filepath.Join("../examples/licenses/", file+".json"))
+		actual := keywordGuessLicense(string(content), loadDatabase())
+
+		if len(actual) == 0 {
+			t.Errorf("Expected some guesses for ", file)
+		}
+
+		found := false
+		for _, license := range actual {
+			if license.LicenseId == file {
+				found = true
+			}
+		}
+
+		if found == false {
+			t.Errorf("Expected license to be found", file)
+		}
 	}
 }
