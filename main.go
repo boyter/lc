@@ -23,7 +23,7 @@ func main() {
 			Name:        "format, f",
 			Usage:       "Set output format, supports progress, tabular, json, spdx or `csv`",
 			Destination: &parsers.Format,
-			Value:       "progress",
+			Value:       "tabular",
 		},
 		cli.StringFlag{
 			Name:        "output, o",
