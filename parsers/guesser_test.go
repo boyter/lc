@@ -73,6 +73,7 @@ func TestProcessFileLicensesFuzzy(t *testing.T) {
 
 	correctFuzzy := float64(0.00)
 	correctKeywords := float64(0.00)
+
 	for _, file := range files {
 		actualFuzzy := processFile("../examples/licenses/", file.Name(), []LicenseMatch{})
 
