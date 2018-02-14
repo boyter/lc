@@ -53,4 +53,4 @@ Currently licencechecker (lc) does not indicate if a project may be in breech of
 ### Known Issues
 
 License's are fuzzy matched so its possible someone could fork an existing license and have it be a false positive match.
-The license matches are based on licenses from [SPDX](https://spdx.org/) and as such may miss some licenses.icense.com).
+The license matches are based on licenses from [SPDX](https://spdx.org/) and as such may miss some licenses.
