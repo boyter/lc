@@ -128,3 +128,28 @@ func TestProcessFileLicensesTop10(t *testing.T) {
 		}
 	}
 }
+
+func TestIdentifierGuessLicence(t *testing.T) {
+	actual := identifierGuessLicence("test", loadDatabase())
+	if len(actual) != 0 {
+		t.Errorf("Should be no matches")
+	}
+
+	actual = identifierGuessLicence("# SPDX-License-Identifier: GPL-2.0", loadDatabase())
+	if actual[0].LicenseId != "GPL-2.0" {
+		t.Errorf("Should match GPL-2.0")
+	}
+
+	actual = identifierGuessLicence("# SPDX-License-Identifier: GPL-2.0 ", loadDatabase())
+	if actual[0].LicenseId != "GPL-2.0" {
+		t.Errorf("Should match GPL-2.0")
+	}
+
+	actual = identifierGuessLicence("# SPDX-License-Identifier: GPL-2.0 \n # SPDX-License-Identifier: GPL-3.0+", loadDatabase())
+	if actual[0].LicenseId != "GPL-2.0" {
+		t.Errorf("Should match GPL-2.0")
+	}
+	if actual[1].LicenseId != "GPL-3.0+" {
+		t.Errorf("Should match GPL-3.0+")
+	}
+}

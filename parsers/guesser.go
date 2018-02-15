@@ -39,7 +39,7 @@ var DocumentName = ""
 var PackageName = ""
 var DocumentNamespace = ""
 
-var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]`)
+var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
 var alphaNumericRegex = regexp.MustCompile("[^a-zA-Z0-9 ]")
 var multipleSpacesRegex = regexp.MustCompile("\\s+")
 
