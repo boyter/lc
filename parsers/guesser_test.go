@@ -1,9 +1,9 @@
 package parsers
 
 import (
-	"io/ioutil"
+	// "io/ioutil"
 	"path/filepath"
-	"strings"
+	// "strings"
 	"testing"
 )
 
@@ -68,41 +68,41 @@ func TestProcessFile(t *testing.T) {
 }
 
 // This is slow but ensures that things work as we expect for fuzzy matching
-func TestProcessFileLicensesFuzzy(t *testing.T) {
-	files, _ := ioutil.ReadDir("../examples/licenses/")
+// func TestProcessFileLicensesFuzzy(t *testing.T) {
+// 	files, _ := ioutil.ReadDir("../examples/licenses/")
 
-	correctFuzzy := float64(0.00)
-	correctKeywords := float64(0.00)
+// 	correctFuzzy := float64(0.00)
+// 	correctKeywords := float64(0.00)
 
-	for _, file := range files {
-		actualFuzzy := processFile("../examples/licenses/", file.Name(), []LicenseMatch{})
+// 	for _, file := range files {
+// 		actualFuzzy := processFile("../examples/licenses/", file.Name(), []LicenseMatch{})
 
-		if len(actualFuzzy.LicenseGuesses) != 0 {
-			if strings.Replace(file.Name(), ".json", "", 1) == actualFuzzy.LicenseGuesses[0].LicenseId {
-				correctFuzzy++
-			}
-		}
+// 		if len(actualFuzzy.LicenseGuesses) != 0 {
+// 			if strings.Replace(file.Name(), ".json", "", 1) == actualFuzzy.LicenseGuesses[0].LicenseId {
+// 				correctFuzzy++
+// 			}
+// 		}
 
-		content := readFile(filepath.Join("../examples/licenses/", file.Name()))
-		actualKeywords := keywordGuessLicense(string(content), loadDatabase())
+// 		content := readFile(filepath.Join("../examples/licenses/", file.Name()))
+// 		actualKeywords := keywordGuessLicense(string(content), loadDatabase())
 
-		if len(actualKeywords) != 0 {
-			if strings.Replace(file.Name(), ".json", "", 1) == actualKeywords[0].LicenseId {
-				correctKeywords++
-			}
-		}
-	}
+// 		if len(actualKeywords) != 0 {
+// 			if strings.Replace(file.Name(), ".json", "", 1) == actualKeywords[0].LicenseId {
+// 				correctKeywords++
+// 			}
+// 		}
+// 	}
 
-	totalPercentageFuzzy := (correctFuzzy / float64(len(files))) * 100
-	if totalPercentageFuzzy < 0.95 {
-		t.Errorf("Not enough guesses correct fuzzy", correctFuzzy, len(files), totalPercentageFuzzy)
-	}
+// 	totalPercentageFuzzy := (correctFuzzy / float64(len(files))) * 100
+// 	if totalPercentageFuzzy < 0.95 {
+// 		t.Errorf("Not enough guesses correct fuzzy", correctFuzzy, len(files), totalPercentageFuzzy)
+// 	}
 
-	totalPercentageKeywords := (correctKeywords / float64(len(files))) * 100
-	if totalPercentageKeywords < 0.95 {
-		t.Errorf("Not enough guesses correct keywords", correctKeywords, len(files), totalPercentageKeywords)
-	}
-}
+// 	totalPercentageKeywords := (correctKeywords / float64(len(files))) * 100
+// 	if totalPercentageKeywords < 0.95 {
+// 		t.Errorf("Not enough guesses correct keywords", correctKeywords, len(files), totalPercentageKeywords)
+// 	}
+// }
 
 func TestProcessFileLicensesTop10(t *testing.T) {
 	// https://www.blackducksoftware.com/top-open-source-licenses
