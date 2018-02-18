@@ -54,11 +54,14 @@ Full details can be found in `lc --help`.
 More information about [what licensechecker looks at and how it works](what-we-look-at.md)
 
 Probably the most useful functionality is the `-f` modifier which specifies the output format.
-By default `licencechecker` will print out results as it processes files. However as it was designed
-to run at the end of CI tasks you may want to get a nicer output which can be done like so.
+By default `licencechecker` will print out results in a tabular CLI format. However as it was designed
+to run at the end of CI tasks you may want to change which can be done like so.
 
 ```
 $ lc -f tabular .
+$ lc -f progress .
+$ lc -f spdx .
+$ lc -f csv .
 ```
 
 The above will process starting in the current directory and print out a formatted list of results when finished.

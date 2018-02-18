@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/boyter/golangvectorspace"
   packages = ["."]
-  revision = "96aeba5a50de924f8828c3d7ce2219e6c67df799"
+  revision = "466a786b1f01779dcc7dcfb654bddaef059badd3"
 
 [[projects]]
   name = "github.com/briandowns/spinner"
@@ -16,8 +16,8 @@
 [[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
-  revision = "570b54cabe6b8eb0bc2dfce68d964677d63b5260"
-  version = "v1.5.0"
+  revision = "507f6050b8568533fb3f5504de8e5205fa62a114"
+  version = "v1.6.0"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -47,11 +47,11 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "3dbebcf8efb6a5011a60c2b4591c1022a759af8a"
+  revision = "37707fdb30a5b38865cfb95e5aab41707daec7fd"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "895d24e48141f88ea5ea9db806100b9cd9f6a05162e1eb8f4258a609c0e8b197"
+  inputs-digest = "9aca4b061bcfb3883e57d087666ba442ddc795a1b43a0f7f915e06b8db7c9159"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -2,6 +2,8 @@
 
 An implementation of the VectorSpace model in Golang. Pass in two strings and get back a number indicating how similar they are.
 
+[![Build Status](https://travis-ci.org/boyter/golangvectorspace.svg?branch=master)](https://travis-ci.org/boyter/golangvectorspace)
+
 Usage like so,
 
 ```
