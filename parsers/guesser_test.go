@@ -113,7 +113,7 @@ func TestProcessFileLicensesTop10(t *testing.T) {
 		actual := keywordGuessLicense(string(content), loadDatabase())
 
 		if len(actual) == 0 {
-			t.Errorf("Expected some guesses for ", file)
+			t.Errorf("Expected some guesses for %s", file)
 		}
 
 		found := false
@@ -124,7 +124,7 @@ func TestProcessFileLicensesTop10(t *testing.T) {
 		}
 
 		if found == false {
-			t.Errorf("Expected license to be found", file)
+			t.Errorf("Expected license to be found %s", file)
 		}
 	}
 }

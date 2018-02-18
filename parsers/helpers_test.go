@@ -35,13 +35,13 @@ func TestRandStringBytes(t *testing.T) {
 	actual := randStringBytes(5)
 
 	if len(actual) != 5 {
-		t.Errorf("Expected length of 5", actual)
+		t.Errorf("Expected length of 5 %s", actual)
 	}
 
 	actual = randStringBytes(10)
 
 	if len(actual) != 10 {
-		t.Errorf("Expected length of 10", actual)
+		t.Errorf("Expected length of 10 %s", actual)
 	}
 }
 
