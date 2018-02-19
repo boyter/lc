@@ -31,6 +31,25 @@ func TestGetSha256Hash(t *testing.T) {
 	}
 }
 
+func TestLicenceListHasLicense(t *testing.T) {
+	licenseList := []LicenseMatch{}
+	licenseMatch := LicenseMatch{LicenseId: "test", Percentage: 0.0}
+
+	actual := licenceListHasLicense(licenseMatch, licenseList)
+
+	if actual != false {
+		t.Errorf("Expected false but got true")
+	}
+
+	licenseList = append(licenseList, licenseMatch)
+
+	actual = licenceListHasLicense(licenseMatch, licenseList)
+
+	if actual != true {
+		t.Errorf("Expected true but got false")
+	}
+}
+
 func TestRandStringBytes(t *testing.T) {
 	actual := randStringBytes(5)
 
