@@ -50,6 +50,34 @@ func TestLicenceListHasLicense(t *testing.T) {
 	}
 }
 
+func TestUniqLicenseMatch(t *testing.T) {
+	licenseList := []LicenseMatch{}
+	licenseMatch1 := LicenseMatch{LicenseId: "test", Percentage: 0.0}
+	licenseMatch2 := LicenseMatch{LicenseId: "test", Percentage: 0.0}
+
+	licenseList = append(licenseList, licenseMatch1)
+	licenseList = append(licenseList, licenseMatch2)
+
+	actual := uniqLicenseMatch(licenseList)
+
+	if len(actual) != 1 {
+		t.Errorf("Expected single result")
+	}
+
+	// if even one portion changes then it should be included
+	licenseMatch3 := LicenseMatch{LicenseId: "test", Percentage: 0.1}
+	licenseMatch4 := LicenseMatch{LicenseId: "test2", Percentage: 0.0}
+
+	licenseList = append(licenseList, licenseMatch3)
+	licenseList = append(licenseList, licenseMatch4)
+
+	actual = uniqLicenseMatch(licenseList)
+
+	if len(actual) != 3 {
+		t.Errorf("Expected three results")
+	}
+}
+
 func TestRandStringBytes(t *testing.T) {
 	actual := randStringBytes(5)
 
