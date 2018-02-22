@@ -89,7 +89,7 @@ More information about [what licensechecker looks at and how it works](what-we-l
 
 Probably the most useful functionality is the `-f` modifier which specifies the output format.
 By default `licencechecker` will print out results in a tabular CLI format. However as it was designed
-to run at the end of CI tasks you may want to change which can be done like so.
+to run at the end of CI tasks you may want to change it. This can be done like so.
 
 ```
 $ lc -f tabular .
@@ -98,13 +98,7 @@ $ lc -f spdx .
 $ lc -f csv .
 ```
 
-The above will process starting in the current directory and print out a formatted list of results when finished.
-
-To view all command line options
-
-```
-$ lc --help
-```
+The above will process starting in the current directory and print out a formatted list of results to the CLI when finished.
 
 Example output of `licencechecker` running against itself in tabular format while ignoring the .git, licenses and vendor directories
 
@@ -138,7 +132,7 @@ scripts              build_database.py       (MIT OR Unlicense)                 
 scripts              include.go              (MIT OR Unlicense)                 100.00%     951B
 ```
 
-Or to write out the results to a CSV file
+To write out the results to a CSV file
 
 ```
 $ lc --format csv -output licences.csv --pathblacklist .git,licenses,vendor .
@@ -170,7 +164,8 @@ Directory              File               License                        Confide
 
 ### SPDX
 
-Running against itself to produce a SPDX file using tools from https://github.com/spdx/tools
+The ouput of SPDX is a valid SPDX 2.1 document. Validation was checked against the tools supplied by the SPDX group.
+Running master against itself to produce a SPDX and the validating using the tools from https://github.com/spdx/tools
 
 ```
 $ go run main.go  -f spdx -o spdx_example.spdx --pbl .git,vendor,licenses -dn licensechecker -pn licensechecker . && java -jar ./spdx-tools-2.1.12-SNAPSHOT-jar-with-dependencies.jar Verify ./spdx_example.spdx
