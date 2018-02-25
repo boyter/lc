@@ -51,7 +51,7 @@ func main() {
 		cli.StringFlag{
 			Name:        "licensefiles, lf",
 			Usage:       "Possible license files to inspect for over-arching license as comma seperated list `copying,readme`",
-			Value:       "license,copying,readme",
+			Value:       "license,licence,copying,readme",
 			Destination: &parsers.PossibleLicenceFiles,
 		},
 		cli.StringFlag{
