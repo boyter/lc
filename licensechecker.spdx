@@ -1,17 +1,17 @@
 SPDXVersion: SPDX-2.1
 DataLicense: CC0-1.0
-DocumentNamespace: http://spdx.org/spdxdocs/Unknown-43e1ffb4452a9eded0edab1cb47f041f943fb7c7
+DocumentNamespace: http://spdx.org/spdxdocs/Unknown-6b754de11e1a155124d26d5e0ca45b1845433132
 DocumentName: Unknown
 SPDXID: SPDXRef-DOCUMENT
-Creator: Tool: licensechecker 1.2.1
-Created: 2018-02-18T23:02:45Z
+Creator: Tool: licensechecker 1.2.2
+Created: 2018-02-26T22:29:53Z
 LicenseListVersion: 3.0
 
 PackageName: Unknown
 SPDXID: SPDXRef-Package
 PackageDownloadLocation: NONE
 FilesAnalyzed: true
-PackageVerificationCode: e712d4e16bfd0d2e6e0f58a6844295fd4afd1a0d
+PackageVerificationCode: b462458d51a73a1c6cee07b0851c9f11a6245b4b
 PackageLicenseDeclared: (MIT OR Unlicense)
 PackageLicenseConcluded: (MIT OR Unlicense)
 PackageLicenseInfoFromFiles: GPL-2.0
@@ -23,18 +23,18 @@ PackageCopyrightText: NOASSERTION
 
 FileName: ./.gitignore
 SPDXID: SPDXRef-78a660a413585389afd32bcad518dd4a289d4b37
-FileChecksum: SHA1: 8b0600e4db514d62d9e2f10945f9c63488db9965
-FileChecksum: SHA256: faa0fc14baa7576a1cd78f4c460ef132df91d00038a5edbf1315ddc9156df8ee
-FileChecksum: MD5: d46ad5f2597ae46ccfe0840ed3ebf070
+FileChecksum: SHA1: 0b9d0a8233ef03aadca0473462943020c751d592
+FileChecksum: SHA256: b38920bfb5b20dcc6a18d713e1e16d889e468539f5ea1d3e5a1fb8be5703acbf
+FileChecksum: MD5: 3adad081470ef1081b2c432131343c07
 LicenseConcluded: (MIT OR Unlicense)
 LicenseInfoInFile: NONE
 FileCopyrightText: NOASSERTION
 
 FileName: ./.travis.yml
 SPDXID: SPDXRef-88e0c166693e62813910212bda44211f260b16e9
-FileChecksum: SHA1: 36721cf7c5546ee09aaa8b4448c89882dee78f1a
-FileChecksum: SHA256: 3b1911c74887bd6d8d68b03ff641ecaec963cac64eea546c453c5f8f4adc71b2
-FileChecksum: MD5: c9e4970d19f359a989fc224acd7676d7
+FileChecksum: SHA1: 418cd59cdaf971760890557ec7dadd51b64c2f31
+FileChecksum: SHA256: 119439b8451b544d6f6ae42a7d6104de445b726c74c14c431ec98aac7192b346
+FileChecksum: MD5: 29bae84bf4d0330672dbde9c0e2b68ee
 LicenseConcluded: (MIT OR Unlicense)
 LicenseInfoInFile: NONE
 FileCopyrightText: NOASSERTION
@@ -86,9 +86,9 @@ FileCopyrightText: NOASSERTION
 
 FileName: ./README.md
 SPDXID: SPDXRef-4254d49114abeeea0320ba657af96b73a970ba06
-FileChecksum: SHA1: 87a8d3e76a209f7d4939d15ddb3e38bc1bde2db9
-FileChecksum: SHA256: 89dcb1168174b298517c2e8c85a5cb6ddb509c9fe83b85ba2d3c25f6fa87e2aa
-FileChecksum: MD5: 7cb53f11e93118f0cc672d1d69734530
+FileChecksum: SHA1: 95e7ff1be2356dded6923704a1bf93a486260d0e
+FileChecksum: SHA256: 3c8314d3fc5ad17747c157045c90d966564babfee87053eb0aa8f133bf495100
+FileChecksum: MD5: 29ba1907913821fa81f71deb018f6e67
 LicenseConcluded: (MIT OR Unlicense)
 LicenseInfoInFile: NONE
 FileCopyrightText: NOASSERTION
@@ -113,9 +113,9 @@ FileCopyrightText: NOASSERTION
 
 FileName: ./main.go
 SPDXID: SPDXRef-179daedeab336ada48e62e98e85eca0ed20c2ce0
-FileChecksum: SHA1: cafe3c158c44da6f77c331742783b625e3018d0d
-FileChecksum: SHA256: 8d8b37c162f74e1fd685ad4e65fabb492308a0cca0a2b4978dff67250abd3cc7
-FileChecksum: MD5: dd1e1cc242359a9c9748bbd852ee08b7
+FileChecksum: SHA1: 76139cc5cfd88d389a4a82ba59fd0cc0771e45ff
+FileChecksum: SHA256: 9ab8a5289f01e27e8e0c1c58a90d2b24f9330396d925e0047cb7207f18b53910
+FileChecksum: MD5: 2e8727848d4ad00788bab715f6ce3dfa
 LicenseConcluded: (MIT OR Unlicense)
 LicenseInfoInFile: NONE
 FileCopyrightText: NOASSERTION
@@ -186,9 +186,9 @@ FileCopyrightText: NOASSERTION
 
 FileName: ./parsers/guesser.go
 SPDXID: SPDXRef-c0a0efc5874dee111b5418da6fa96ea81cbfdbc0
-FileChecksum: SHA1: 2f3066f79e56258f377e318d8d7b68b806e10244
-FileChecksum: SHA256: 721640d7494e196aee99ab7ba0d3a057affdc4f83b44f1600cd8015580a9ec8e
-FileChecksum: MD5: 343a79d0adea28039636b70fc4c87cfa
+FileChecksum: SHA1: af7af677c69fc9dbf4a0162b10d0dce0c5482f96
+FileChecksum: SHA256: 58b415b2ed74a4b6327100ea1c1d77b9e0a18bc1fd0165424ab4cbec722cb2c7
+FileChecksum: MD5: c49721ea2f5aba2b24137064d8d2d1d2
 LicenseConcluded: (MIT OR Unlicense)
 LicenseInfoInFile: NONE
 FileCopyrightText: NOASSERTION
@@ -216,9 +216,9 @@ FileCopyrightText: NOASSERTION
 
 FileName: ./parsers/helpers_test.go
 SPDXID: SPDXRef-19ab5c0894a0f8fe2465753b1b8652a1d74114b8
-FileChecksum: SHA1: 276d03270d492fcdb1de1c6b7d021886fc0865a4
-FileChecksum: SHA256: a02f2188dfcfa3ee1bddffefd1d96b4db3b4db77d96e47b33a3b25237e8c7d44
-FileChecksum: MD5: bd9d302580772ed2fa7bd0297e803017
+FileChecksum: SHA1: 4fa017e7afeb28aa27e5c55fc67815a6a1dcdcc3
+FileChecksum: SHA256: 1243cf7fafdbc10bf382f89af3771f92db2ad4609c9e1d4f5d893945983be989
+FileChecksum: MD5: 0afcd8a0fc64c2c389d6b6cdd2e0d0a6
 LicenseConcluded: (MIT OR Unlicense)
 LicenseInfoInFile: NONE
 FileCopyrightText: NOASSERTION
