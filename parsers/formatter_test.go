@@ -30,3 +30,19 @@ func TestGenerateDocumentNamespaceSomethingSpecified(t *testing.T) {
 		t.Errorf("Expect generateDocumentNamespace to have something but got %q", result)
 	}
 }
+
+func TestToSummary(t *testing.T) {
+	sample := []FileResult{}
+	toSummary(sample)
+
+	sample = append(sample, FileResult{})
+	toSummary(sample)
+}
+
+func TestToTabular(t *testing.T) {
+	sample := []FileResult{}
+	toTabular(sample)
+
+	sample = append(sample, FileResult{})
+	toTabular(sample)
+}
