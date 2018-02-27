@@ -1,24 +1,24 @@
 SPDXVersion: SPDX-2.1
 DataLicense: CC0-1.0
-DocumentNamespace: http://spdx.org/spdxdocs/Unknown-6b754de11e1a155124d26d5e0ca45b1845433132
+DocumentNamespace: http://spdx.org/spdxdocs/Unknown-4e930a626dd6d3add67629ff17930e073b45b855
 DocumentName: Unknown
 SPDXID: SPDXRef-DOCUMENT
-Creator: Tool: licensechecker 1.2.2
-Created: 2018-02-26T22:29:53Z
+Creator: Tool: licensechecker 1.3.0
+Created: 2018-02-27T06:34:28Z
 LicenseListVersion: 3.0
 
 PackageName: Unknown
 SPDXID: SPDXRef-Package
 PackageDownloadLocation: NONE
 FilesAnalyzed: true
-PackageVerificationCode: b462458d51a73a1c6cee07b0851c9f11a6245b4b
+PackageVerificationCode: aee991cbbca9eae2faca3b455c941c868f8d8cd3
 PackageLicenseDeclared: (MIT OR Unlicense)
 PackageLicenseConcluded: (MIT OR Unlicense)
-PackageLicenseInfoFromFiles: GPL-2.0
-PackageLicenseInfoFromFiles: GPL-3.0+
 PackageLicenseInfoFromFiles: MIT
 PackageLicenseInfoFromFiles: Unlicense
 PackageLicenseInfoFromFiles: Apache-2.0
+PackageLicenseInfoFromFiles: GPL-2.0
+PackageLicenseInfoFromFiles: GPL-3.0+
 PackageCopyrightText: NOASSERTION
 
 FileName: ./.gitignore
@@ -86,9 +86,9 @@ FileCopyrightText: NOASSERTION
 
 FileName: ./README.md
 SPDXID: SPDXRef-4254d49114abeeea0320ba657af96b73a970ba06
-FileChecksum: SHA1: 95e7ff1be2356dded6923704a1bf93a486260d0e
-FileChecksum: SHA256: 3c8314d3fc5ad17747c157045c90d966564babfee87053eb0aa8f133bf495100
-FileChecksum: MD5: 29ba1907913821fa81f71deb018f6e67
+FileChecksum: SHA1: 6852e36d5a0de7dbe1516f59ccdcde2a82661ae4
+FileChecksum: SHA256: 28c6c52b1cffe99bea579653fe8511a437042af8f16336480ea0850bbc44f6c9
+FileChecksum: MD5: d325a5b3cfd618a1d99a87845a511ffb
 LicenseConcluded: (MIT OR Unlicense)
 LicenseInfoInFile: NONE
 FileCopyrightText: NOASSERTION
@@ -111,11 +111,20 @@ LicenseConcluded: (MIT OR Unlicense)
 LicenseInfoInFile: NONE
 FileCopyrightText: NOASSERTION
 
+FileName: ./lc.exe
+SPDXID: SPDXRef-a17deacfceef6749d47b2e78acf0a77997a105b6
+FileChecksum: SHA1: ea1c8f7a8591f3c8a7a6aee3b3de26cfd9cac7f4
+FileChecksum: SHA256: bc3be06741b8cc8046599aa2e74bd0613e32a81dce5eaccedfe5fffb5bbaf24d
+FileChecksum: MD5: d699eff80b68f81b06f416927f9aeaf5
+LicenseConcluded: (MIT OR Unlicense)
+LicenseInfoInFile: NONE
+FileCopyrightText: NOASSERTION
+
 FileName: ./main.go
 SPDXID: SPDXRef-179daedeab336ada48e62e98e85eca0ed20c2ce0
-FileChecksum: SHA1: 76139cc5cfd88d389a4a82ba59fd0cc0771e45ff
-FileChecksum: SHA256: 9ab8a5289f01e27e8e0c1c58a90d2b24f9330396d925e0047cb7207f18b53910
-FileChecksum: MD5: 2e8727848d4ad00788bab715f6ce3dfa
+FileChecksum: SHA1: 1b65ac51dba94ca6a27f8312c6d2fc51d7527b6e
+FileChecksum: SHA256: ac7620a74d9e965478928f971ae59b79db7da1831ac492eb82d6164ea31f3505
+FileChecksum: MD5: b1b469f583cebc9319b1cd2aec9be312
 LicenseConcluded: (MIT OR Unlicense)
 LicenseInfoInFile: NONE
 FileCopyrightText: NOASSERTION
@@ -129,34 +138,6 @@ LicenseConcluded: (MIT OR Unlicense)
 LicenseInfoInFile: NONE
 FileCopyrightText: NOASSERTION
 
-FileName: ./examples/identifier/LICENSE
-SPDXID: SPDXRef-13a322d432dd8cb7bee08544a944bc80f1a527ae
-FileChecksum: SHA1: ed420a0ee1a06d392d519440ce5c0850ef0ceba1
-FileChecksum: SHA256: 7363fc7e2596998f3fc0109b6908575bf1cd8f6fa2fc97aff6bd9d17177f50bb
-FileChecksum: MD5: 83867d72088edaf99013308b393351d7
-LicenseConcluded: GPL-3.0+ AND MIT
-LicenseInfoInFile: NONE
-FileCopyrightText: NOASSERTION
-
-FileName: ./examples/identifier/LICENSE2
-SPDXID: SPDXRef-80ce79d09ae923daa3d02e701c15ba99b42ce82a
-FileChecksum: SHA1: b6a5bf31d55a76b5fa0d70db9969a43edc48b9f7
-FileChecksum: SHA256: b3d1eae7f524fc9ddd48562a4652efd2bcd848e38b03f05e388bcce943e73df2
-FileChecksum: MD5: fe06497acaf4f45999925d348c2605f9
-LicenseConcluded: MIT AND GPL-3.0+
-LicenseInfoInFile: NONE
-FileCopyrightText: NOASSERTION
-
-FileName: ./examples/identifier/has_identifier.py
-SPDXID: SPDXRef-b845c3939bf76b7879aae8e40a0ecf5e740fb8fd
-FileChecksum: SHA1: 03a614cc51e9a783a695bcf99ec4adcdac34e1cc
-FileChecksum: SHA256: 5b6bf8d45b25a0dab4f0817324618e425037f156b67cdc7503da01e6d9beb652
-FileChecksum: MD5: fc7d75e0bc0275841de8426b18791fa4
-LicenseConcluded: (MIT OR GPL-3.0+) AND GPL-2.0
-LicenseInfoInFile:GPL-2.0
-LicenseInfoInFile:GPL-3.0+
-FileCopyrightText: NOASSERTION
-
 FileName: ./parsers/constants.go
 SPDXID: SPDXRef-39161d8bc3aa640688e53e064a5ac3e127f5fe8f
 FileChecksum: SHA1: d6a6e9688d32bf545d5cfacd3a9a56c161239f91
@@ -168,9 +149,9 @@ FileCopyrightText: NOASSERTION
 
 FileName: ./parsers/formatter.go
 SPDXID: SPDXRef-abc6238a33e3e73bca9cf9efeab9966dec5798a2
-FileChecksum: SHA1: cc96a4b74e8fcc7eb858c8aab26ff9b7a274e8ea
-FileChecksum: SHA256: 5a37fb3b9fa118db874bf812f192e8c3965bdfb9bac81f81d95ac128d30b4205
-FileChecksum: MD5: 412b57b01b9a1b5354fe2d544dd2d705
+FileChecksum: SHA1: fd3808e2dc8830691e61338adf4cf5deaacf3978
+FileChecksum: SHA256: d39b01415e37d6e6cd2777bd1ccd94b347c55b8f1c81086de886885b9ee0c531
+FileChecksum: MD5: 4b6003472b822021b3bc4e5bcb5ca67e
 LicenseConcluded: (MIT OR Unlicense)
 LicenseInfoInFile: NONE
 FileCopyrightText: NOASSERTION
@@ -186,9 +167,9 @@ FileCopyrightText: NOASSERTION
 
 FileName: ./parsers/guesser.go
 SPDXID: SPDXRef-c0a0efc5874dee111b5418da6fa96ea81cbfdbc0
-FileChecksum: SHA1: af7af677c69fc9dbf4a0162b10d0dce0c5482f96
-FileChecksum: SHA256: 58b415b2ed74a4b6327100ea1c1d77b9e0a18bc1fd0165424ab4cbec722cb2c7
-FileChecksum: MD5: c49721ea2f5aba2b24137064d8d2d1d2
+FileChecksum: SHA1: 7d4427dbf39e5a0ba7ffd6416b8e1fd1e991fdab
+FileChecksum: SHA256: d3ca0ef5e2e8f4afbc2120a075a5c7c74d6b488413cb9ad3a6d17436195ab89f
+FileChecksum: MD5: df629bd22625032d5d923c1dfcec96ed
 LicenseConcluded: (MIT OR Unlicense)
 LicenseInfoInFile: NONE
 FileCopyrightText: NOASSERTION

@@ -20,7 +20,7 @@ import (
 
 // Shared all over the place
 var ToolName = "licensechecker"
-var ToolVersion = "1.2.2"
+var ToolVersion = "1.3.0"
 
 // Set by user as command line arguments
 var confidence = 0.85
@@ -366,6 +366,8 @@ func Process() {
 		toJSON(fileResults)
 	case "tabular":
 		toTabular(fileResults)
+	case "summary":
+		toSummary(fileResults)
 	case "spdx21":
 		toSPDX21(fileResults)
 	case "spdx":
