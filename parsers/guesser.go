@@ -366,6 +366,8 @@ func Process() {
 		toJSON(fileResults)
 	case "tabular":
 		toTabular(fileResults)
+	case "summary":
+		toSummary(fileResults)
 	case "spdx21":
 		toSPDX21(fileResults)
 	case "spdx":

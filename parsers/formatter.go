@@ -156,6 +156,34 @@ func toTabular(fileResults []FileResult) {
 	fmt.Println(result)
 }
 
+func toSummary(fileResults []FileResult) {
+	output := []string{
+		"License | Count",
+	}
+
+	total := map[string]int64{}
+
+	for _, result := range fileResults {
+		license, _ := determineLicense(result)
+
+		_, ok := total[license]
+
+		if ok {
+			total[license] = total[license] + 1
+		} else {
+			total[license] = 1
+		}
+	}
+
+	for name, count := range total {
+		output = append(output, fmt.Sprintf("%s | %d", name, count))
+	}
+
+	result := columnize.SimpleFormat(output)
+
+	fmt.Println(result)
+}
+
 func toProgress(directory string, file string, rootLicenses []LicenseMatch, licenseGuesses []LicenseMatch, licenseIdentified []LicenseMatch) {
 	license := ""
 	confidence := ""
