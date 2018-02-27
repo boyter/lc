@@ -175,8 +175,22 @@ func toSummary(fileResults []FileResult) {
 		}
 	}
 
-	for name, count := range total {
-		output = append(output, fmt.Sprintf("%s | %d", name, count))
+	type kv struct {
+		Key   string
+		Value int64
+	}
+
+	var ss []kv
+	for k, v := range total {
+		ss = append(ss, kv{k, v})
+	}
+
+	sort.Slice(ss, func(i, j int) bool {
+		return ss[i].Value > ss[j].Value
+	})
+
+	for _, value := range ss {
+		output = append(output, fmt.Sprintf("%s | %d", value.Key, value.Value))
 	}
 
 	result := columnize.SimpleFormat(output)
