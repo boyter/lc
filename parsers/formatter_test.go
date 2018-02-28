@@ -46,3 +46,11 @@ func TestToTabular(t *testing.T) {
 	sample = append(sample, FileResult{})
 	toTabular(sample)
 }
+
+func TestToCSV(t *testing.T) {
+	sample := []FileResult{}
+	toCSV(sample)
+
+	sample = append(sample, FileResult{})
+	toCSV(sample)
+}
