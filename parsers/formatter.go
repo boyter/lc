@@ -143,7 +143,9 @@ func determineLicense(result FileResult) (string, string) {
 
 func toTabular(fileResults []FileResult) {
 	output := []string{
+		"-----",
 		"Directory | File | License | Confidence | Size",
+		"-----",
 	}
 
 	for _, result := range fileResults {
@@ -151,6 +153,7 @@ func toTabular(fileResults []FileResult) {
 		output = append(output, fmt.Sprintf("%s | %s | %s | %s | %s", result.Directory, result.Filename, license, confidence, result.BytesHuman))
 	}
 
+	output = append(output, "-----")
 	result := columnize.SimpleFormat(output)
 
 	fmt.Println(result)
