@@ -158,12 +158,15 @@ You can also specify files and directories as additional arguments
 
 ```
 $ lc -f tabular README.md LICENSE ./examples/identifier
+------------------------------------------------------------------------------------------
 Directory              File               License                        Confidence  Size
-                       README.md          NOASSERTION                    100.00%     7.5K
+------------------------------------------------------------------------------------------
+                       README.md          NOASSERTION                    100.00%     11.3K
                        LICENSE            MIT                            94.83%      1.1K
 ./examples/identifier  LICENSE            GPL-3.0+ AND MIT               95.40%      1K
 ./examples/identifier  LICENSE2           MIT AND GPL-3.0+               99.65%      35K
-./examples/identifier  has_identifier.py  (MIT OR GPL-3.0+) AND GPL-2.0  100.00%     428B
+./examples/identifier  has_identifier.py  (MIT OR GPL-3.0+) AND GPL-2.0  100.00%     409B
+------------------------------------------------------------------------------------------
 ```
 
 ### SPDX
