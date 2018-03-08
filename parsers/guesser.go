@@ -151,6 +151,20 @@ func guessLicense(content string, deepguess bool, licenses []License) []LicenseM
 		return matchingLicenses[i].Percentage > matchingLicenses[j].Percentage
 	})
 
+	// Special cases such as MIT and JSON here
+	if len(matchingLicenses) > 2 && ((matchingLicenses[0].LicenseId == "JSON" && matchingLicenses[1].LicenseId == "MIT") ||
+		(matchingLicenses[0].LicenseId == "MIT" && matchingLicenses[1].LicenseId == "JSON")) {
+		if strings.Contains(strings.ToLower(content), "not evil") {
+			// Its JSON
+			matchingLicenses = []LicenseMatch{}
+			matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: "JSON", Percentage: 100})
+		} else {
+			// Its MIT
+			matchingLicenses = []LicenseMatch{}
+			matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: "MIT", Percentage: 100})
+		}
+	}
+
 	return matchingLicenses
 }
 
