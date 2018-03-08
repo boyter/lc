@@ -145,7 +145,7 @@ $ lc --format csv -output licences.csv --pathblacklist .git,licenses,vendor .
 Or to a SPDX 2.1 file
 
 ```
-$lc -f spdx -o spdx_example.spdx --pbl .git,vendor,licenses -dn licensechecker -pn licensechecker .
+$ lc -f spdx -o licensechecker.spdx --pbl .git,vendor,licenses -dn licensechecker -pn licensechecker .
 ```
 
 You can specify multiple directories as additional arguments and all results will be merged into a single output

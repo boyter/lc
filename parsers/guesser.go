@@ -20,7 +20,7 @@ import (
 
 // Shared all over the place
 var ToolName = "licensechecker"
-var ToolVersion = "1.3.0"
+var ToolVersion = "1.3.1"
 
 // Set by user as command line arguments
 var confidence = 0.85
