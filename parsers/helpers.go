@@ -10,8 +10,21 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math/rand"
+	"regexp"
 	"strings"
 )
+
+var alphaNumericRegex = regexp.MustCompile("[^a-zA-Z0-9 ]")
+var multipleSpacesRegex = regexp.MustCompile("\\s+")
+
+func cleanText(content string) string {
+	content = strings.ToLower(content)
+
+	content = alphaNumericRegex.ReplaceAllString(content, " ")
+	content = multipleSpacesRegex.ReplaceAllString(content, " ")
+
+	return content
+}
 
 func getMd5Hash(content []byte) string {
 	hasher := md5.New()
