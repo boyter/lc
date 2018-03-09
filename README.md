@@ -60,13 +60,13 @@ USAGE:
    lc [global options] [DIRECTORY|FILE] [DIRECTORY|FILE]
 
 VERSION:
-   1.3.0
+   1.3.1
 
 COMMANDS:
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --format csv, -f csv                                Set output format, supports progress, tabular, json, spdx, summary or csv (default: "tabular")
+   --format csv, -f csv                                Set output format, supports tabular, json, spdx, summary or csv (default: "tabular")
    --output FILE, -o FILE                              Set output file if not set will print to stdout FILE
    --confidence 0.95, -c 0.95                          Set required confidence level for licence matching between 0 and 1 E.G. 0.95 (default: "0.85")
    --deepguess true, --dg true                         Should attempt to deep guess the licence false or true true (default: "true")
@@ -92,7 +92,6 @@ to run at the end of CI tasks you may want to change it. This can be done like s
 
 ```
 $ lc -f tabular .
-$ lc -f progress .
 $ lc -f spdx .
 $ lc -f csv .
 $ lc -f summary .

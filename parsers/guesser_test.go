@@ -1,7 +1,7 @@
 package parsers
 
 import (
-	// "io/ioutil"
+	"io/ioutil"
 	"path/filepath"
 	// "strings"
 	"testing"
@@ -95,12 +95,12 @@ func TestProcessFile(t *testing.T) {
 
 // 	totalPercentageFuzzy := (correctFuzzy / float64(len(files))) * 100
 // 	if totalPercentageFuzzy < 0.95 {
-// 		t.Errorf("Not enough guesses correct fuzzy", correctFuzzy, len(files), totalPercentageFuzzy)
+// 		t.Errorf("Not enough guesses correct fuzzy %f, %d, %f", correctFuzzy, len(files), totalPercentageFuzzy)
 // 	}
 
 // 	totalPercentageKeywords := (correctKeywords / float64(len(files))) * 100
 // 	if totalPercentageKeywords < 0.95 {
-// 		t.Errorf("Not enough guesses correct keywords", correctKeywords, len(files), totalPercentageKeywords)
+// 		t.Errorf("Not enough guesses correct keywords %f, %d, %f", correctKeywords, len(files), totalPercentageKeywords)
 // 	}
 // }
 
@@ -109,7 +109,7 @@ func TestProcessFileLicensesTop10(t *testing.T) {
 	files := []string{"MIT", "GPL-2.0", "Apache-2.0", "GPL-3.0-only", "ISC", "Artistic-2.0", "LGPL-2.1", "LGPL-3.0", "EPL-2.0", "MS-PL"}
 
 	for _, file := range files {
-		content := readFile(filepath.Join("../examples/licenses/", file+".json"))
+		content, _ := ioutil.ReadFile(filepath.Join("../examples/licenses/", file+".json"))
 		actual := keywordGuessLicense(string(content), loadDatabase())
 
 		if len(actual) == 0 {

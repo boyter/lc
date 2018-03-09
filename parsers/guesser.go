@@ -1,44 +1,15 @@
 package parsers
 
 import (
-	"encoding/base64"
-	"encoding/json"
-	"fmt"
 	vectorspace "github.com/boyter/golangvectorspace"
-	"github.com/briandowns/spinner"
 	"io/ioutil"
 	"math"
-	"os"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"sort"
-	"strconv"
 	"strings"
-	"time"
 	"unicode/utf8"
 )
-
-// Shared all over the place
-var ToolName = "licensechecker"
-var ToolVersion = "1.3.1"
-
-// Set by user as command line arguments
-var confidence = 0.85
-var Confidence = ""
-var PossibleLicenceFiles = ""
-var DirFilePaths = []string{}
-var PathBlacklist = ""
-var deepGuess = true
-var DeepGuess = ""
-var Format = ""
-var FileOutput = ""
-var ExtentionBlacklist = ""
-var maxSize = 50000
-var MaxSize = ""
-var DocumentName = ""
-var PackageName = ""
-var DocumentNamespace = ""
 
 var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
 var alphaNumericRegex = regexp.MustCompile("[^a-zA-Z0-9 ]")
@@ -172,119 +143,6 @@ func guessLicense(content string, deepguess bool, licenses []License) []LicenseM
 	return matchingLicenses
 }
 
-func findPossibleLicenseFiles(fileList []string) []string {
-	possibleList := []string{}
-
-	for _, filename := range fileList {
-		possible := false
-
-		for _, indicator := range strings.Split(PossibleLicenceFiles, ",") {
-			if strings.Contains(strings.ToLower(filename), indicator) {
-				possible = true
-			}
-		}
-
-		for _, license := range loadDatabase() {
-			if strings.Split(filename, ".")[0] == strings.ToLower(license.LicenseId) {
-				possible = true
-			}
-		}
-
-		if possible == true {
-			possibleList = append(possibleList, filename)
-		}
-	}
-
-	return possibleList
-}
-
-// Caching the database load result reduces processing time by about 3x for this repository
-var Database = []License{}
-
-func loadDatabase() []License {
-	if len(Database) != 0 {
-		return Database
-	}
-
-	var database []License
-	data, _ := base64.StdEncoding.DecodeString(database_keywords)
-	_ = json.Unmarshal(data, &database)
-
-	for i, v := range database {
-		database[i].Concordance = vectorspace.BuildConcordance(strings.ToLower(v.LicenseText))
-	}
-
-	Database = database
-
-	return database
-}
-
-func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult {
-	fileResults := []FileResult{}
-	all, _ := ioutil.ReadDir(directory)
-
-	directories := []string{}
-	files := []string{}
-
-	// Work out which directories and files we want to investigate
-	for _, f := range all {
-		if f.IsDir() {
-			add := true
-
-			for _, black := range strings.Split(PathBlacklist, ",") {
-				if f.Name() == black {
-					add = false
-				}
-			}
-
-			if add == true {
-				directories = append(directories, f.Name())
-			}
-		} else {
-			files = append(files, f.Name())
-		}
-	}
-
-	// Determine any possible licence files which would classify everything else
-	possibleLicenses := findPossibleLicenseFiles(files)
-	identifiedRootLicense := []LicenseMatch{}
-	for _, possibleLicense := range possibleLicenses {
-		content := string(readFile(filepath.Join(directory, possibleLicense)))
-		guessLicenses := guessLicense(content, deepGuess, loadDatabase())
-
-		if len(guessLicenses) != 0 {
-			identifiedRootLicense = append(identifiedRootLicense, guessLicenses[0])
-		}
-	}
-
-	if len(identifiedRootLicense) != 0 {
-		rootLicenses = append(rootLicenses, identifiedRootLicense)
-	}
-
-	// TODO fan this out to many GoRoutines and process in parallel
-	for _, file := range files {
-
-		rootLicense := []LicenseMatch{}
-		if len(rootLicenses) != 0 {
-			rootLicense = rootLicenses[len(rootLicenses)-1]
-		}
-
-		fileResult := processFile(directory, file, rootLicense)
-		fileResults = append(fileResults, fileResult)
-
-		if strings.ToLower(Format) == "progress" {
-			toProgress(directory, file, rootLicense, fileResult.LicenseGuesses, fileResult.LicenseIdentified)
-		}
-	}
-
-	for _, newdirectory := range directories {
-		results := walkDirectory(filepath.Join(directory, newdirectory), rootLicenses)
-		fileResults = append(fileResults, results...)
-	}
-
-	return fileResults
-}
-
 func processFile(directory string, file string, rootLicenses []LicenseMatch) FileResult {
 	process := true
 
@@ -295,7 +153,7 @@ func processFile(directory string, file string, rootLicenses []LicenseMatch) Fil
 		}
 	}
 
-	content := readFile(filepath.Join(directory, file))
+	content, _ := ioutil.ReadFile(filepath.Join(directory, file))
 	licenseGuesses := []LicenseMatch{}
 	licenseIdentified := []LicenseMatch{}
 
@@ -321,76 +179,4 @@ func processFile(directory string, file string, rootLicenses []LicenseMatch) Fil
 		Bytes:             len(content)}
 
 	return fileResult
-}
-
-func processArguments() {
-	conf, err := strconv.ParseFloat(Confidence, 64)
-	if err == nil {
-		confidence = conf
-	} else {
-		fmt.Println("Using default confidence value")
-	}
-
-	size, err := strconv.ParseInt(MaxSize, 10, 32)
-	if err == nil {
-		maxSize = int(size)
-	} else {
-		fmt.Println("Using default filesize value")
-	}
-
-	deep, err := strconv.ParseBool(DeepGuess)
-	if err == nil {
-		deepGuess = deep
-	} else {
-		fmt.Println("Using default deepguess value")
-	}
-}
-
-func Process() {
-	processArguments()
-	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
-	s.Writer = os.Stderr
-	s.Prefix = "Processing... "
-
-	if strings.ToLower(Format) != "progress" && runtime.GOOS != "windows" {
-		s.Start()
-	}
-
-	fileResults := []FileResult{}
-
-	if len(DirFilePaths) == 0 {
-		DirFilePaths = append(DirFilePaths, ".")
-	}
-
-	for _, fileDirectory := range DirFilePaths {
-		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
-			fileResults = append(fileResults, walkDirectory(fileDirectory, [][]LicenseMatch{})...)
-		} else {
-			directory, file := filepath.Split(fileDirectory)
-			fileResult := processFile(directory, file, []LicenseMatch{})
-			fileResults = append(fileResults, fileResult)
-
-			if strings.ToLower(Format) == "progress" {
-				toProgress(directory, file, []LicenseMatch{}, fileResult.LicenseGuesses, fileResult.LicenseIdentified)
-			}
-		}
-	}
-	s.Stop()
-
-	switch strings.ToLower(Format) {
-	case "csv":
-		toCSV(fileResults)
-	case "json":
-		toJSON(fileResults)
-	case "tabular":
-		toTabular(fileResults)
-	case "summary":
-		toSummary(fileResults)
-	case "spdx21":
-		toSPDX21(fileResults)
-	case "spdx":
-		toSPDX21(fileResults)
-	default:
-		fmt.Println("")
-	}
 }

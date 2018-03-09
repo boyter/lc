@@ -9,7 +9,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"strings"
 )
@@ -30,17 +29,6 @@ func getSha256Hash(content []byte) string {
 	hasher := sha256.New()
 	hasher.Write(content)
 	return hex.EncodeToString(hasher.Sum(nil))
-}
-
-func readFile(filepath string) []byte {
-	// TODO only read as deep into the file as we need
-	bytes, err := ioutil.ReadFile(filepath)
-
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	return bytes
 }
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
