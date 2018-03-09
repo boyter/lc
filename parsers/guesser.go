@@ -7,6 +7,7 @@ import (
 	vectorspace "github.com/boyter/golangvectorspace"
 	"github.com/briandowns/spinner"
 	"io/ioutil"
+	"math"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -123,6 +124,9 @@ func guessLicense(content string, deepguess bool, licenses []License) []LicenseM
 
 		contentConcordance := vectorspace.BuildConcordance(string(runecontent[:trimto]))
 		relation := vectorspace.Relation(matchingLicense.Concordance, contentConcordance)
+
+		// Average out the vector calc against the keyword percentage
+		relation = (relation + math.Min(1, (license.Percentage/100)+0.5)) / 2
 
 		if relation >= confidence {
 			matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: relation})
