@@ -6,18 +6,21 @@ import (
 	"strings"
 )
 
+// Given a list of files use the possible license files list to find any that might be a match
 func findPossibleLicenseFiles(fileList []string) []string {
 	possibleList := []string{}
 
 	for _, filename := range fileList {
 		possible := false
 
+		// Check agains the list that can be controlled by the user
 		for _, indicator := range strings.Split(PossibleLicenceFiles, ",") {
 			if strings.Contains(strings.ToLower(filename), indicator) {
 				possible = true
 			}
 		}
 
+		// Check against any that are called MIT, BSD etc....
 		for _, license := range loadDatabase() {
 			if strings.Split(filename, ".")[0] == strings.ToLower(license.LicenseId) {
 				possible = true
@@ -32,7 +35,7 @@ func findPossibleLicenseFiles(fileList []string) []string {
 	return possibleList
 }
 
-func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult {
+func walkDirectory(output *chan FileJob, directory string, rootLicenses [][]LicenseMatch) []FileResult {
 	fileResults := []FileResult{}
 	all, _ := ioutil.ReadDir(directory)
 
@@ -47,6 +50,7 @@ func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult
 			for _, black := range strings.Split(PathBlacklist, ",") {
 				if f.Name() == black {
 					add = false
+					break
 				}
 			}
 
@@ -58,37 +62,19 @@ func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult
 		}
 	}
 
-	// Determine any possible licence files which would classify everything else
-	possibleLicenses := findPossibleLicenseFiles(files)
-	identifiedRootLicense := []LicenseMatch{}
-	for _, possibleLicense := range possibleLicenses {
-		contents, _ := ioutil.ReadFile(filepath.Join(directory, possibleLicense))
-		guessLicenses := guessLicense(string(contents), deepGuess, loadDatabase())
-
-		if len(guessLicenses) != 0 {
-			identifiedRootLicense = append(identifiedRootLicense, guessLicenses[0])
-		}
-	}
-
-	if len(identifiedRootLicense) != 0 {
-		rootLicenses = append(rootLicenses, identifiedRootLicense)
-	}
-
-	// TODO fan this out to many GoRoutines and process in parallel
+	possibleLicenseFiles := findPossibleLicenseFiles(files)
 	for _, file := range files {
-
-		rootLicense := []LicenseMatch{}
-		if len(rootLicenses) != 0 {
-			rootLicense = rootLicenses[len(rootLicenses)-1]
+		fileProcess(possibleLicenseFiles, directory, file, rootLicenses)
+		*output <- FileJob{
+			PossibleLicenses: possibleLicenseFiles,
+			Directory:        directory,
+			File:             file,
+			RootLicenses:     rootLicenses,
 		}
-
-		fileResult := processFile(directory, file, rootLicense)
-		fileResults = append(fileResults, fileResult)
 	}
 
 	for _, newdirectory := range directories {
-		results := walkDirectory(filepath.Join(directory, newdirectory), rootLicenses)
-		fileResults = append(fileResults, results...)
+		walkDirectory(output, filepath.Join(directory, newdirectory), rootLicenses)
 	}
 
 	return fileResults

@@ -74,7 +74,17 @@ func Process() {
 
 	for _, fileDirectory := range DirFilePaths {
 		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
-			fileResults = append(fileResults, walkDirectory(fileDirectory, [][]LicenseMatch{})...)
+
+			fileReadJobQueue := make(chan FileJob, runtime.NumCPU())
+			fileSummaryJobQueue := make(chan FileResult, runtime.NumCPU())
+
+			go fileProcessorWorker(&fileReadJobQueue, &fileSummaryJobQueue)
+			walkDirectory(&fileReadJobQueue, fileDirectory, [][]LicenseMatch{})
+			close(fileReadJobQueue)
+
+			for fileResult := range fileSummaryJobQueue {
+				fileResults = append(fileResults, fileResult)
+			}
 		} else {
 			directory, file := filepath.Split(fileDirectory)
 			fileResult := processFile(directory, file, []LicenseMatch{})

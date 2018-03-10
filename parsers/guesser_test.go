@@ -31,14 +31,6 @@ func TestLoadDatabase(t *testing.T) {
 	}
 }
 
-func TestWalkDirectory(t *testing.T) {
-	actual := walkDirectory("../examples/identifier/", [][]LicenseMatch{})
-
-	if len(actual) != 3 {
-		t.Errorf("Expected 3 results for directory")
-	}
-}
-
 func TestProcessFile(t *testing.T) {
 	actual := processFile("../examples/identifier/", "has_identifier.py", []LicenseMatch{})
 

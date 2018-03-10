@@ -29,3 +29,10 @@ type FileResult struct {
 	BytesHuman        string
 	Bytes             int
 }
+
+type FileJob struct {
+	PossibleLicenses []string
+	Directory        string
+	File             string
+	RootLicenses     [][]LicenseMatch
+}
