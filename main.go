@@ -2,14 +2,13 @@ package main
 
 import (
 	"github.com/boyter/lc/parsers"
-	// "github.com/pkg/profile"
 	"github.com/urfave/cli"
 	"os"
 )
 
 //go:generate go run scripts/include.go
 func main() {
-	// defer profile.Start().Stop()
+	//defer profile.Start(profile.CPUProfile).Stop()
 
 	app := cli.NewApp()
 	app.EnableBashCompletion = true
@@ -82,6 +81,16 @@ func main() {
 			Name:        "documentnamespace, dns",
 			Usage:       "SPDX only. Sets DocumentNamespace, if not set will default to http://spdx.org/spdxdocs/[packagename]-[HASH]",
 			Destination: &parsers.DocumentNamespace,
+		},
+		cli.BoolFlag{
+			Name:        "debug",
+			Usage:       "Set to enable debug output",
+			Destination: &parsers.Debug,
+		},
+		cli.BoolFlag{
+			Name:        "trace",
+			Usage:       "Set to enable debug output",
+			Destination: &parsers.Trace,
 		},
 	}
 	app.Action = func(c *cli.Context) error {

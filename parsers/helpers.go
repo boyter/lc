@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"strings"
+	"time"
 )
 
 func getMd5Hash(content []byte) string {
@@ -113,4 +114,33 @@ func bytesToHuman(bytes int64) string {
 	stringValue := fmt.Sprintf("%.1f", value)
 	stringValue = strings.TrimSuffix(stringValue, ".0")
 	return fmt.Sprintf("%s%s", stringValue, unit)
+}
+
+func getFormattedTime() string {
+	return time.Now().UTC().Format(time.RFC3339)
+}
+
+// Prints a message to stdout if flag to enable debug output is set
+func printDebug(msg string) {
+	if Debug {
+		fmt.Println(fmt.Sprintf("DEBUG %s: %s", getFormattedTime(), msg))
+	}
+}
+
+// Prints a message to stdout if flag to enable trace output is set
+func printTrace(msg string) {
+	if Trace {
+		fmt.Println(fmt.Sprintf("TRACE %s: %s", getFormattedTime(), msg))
+	}
+}
+
+// Returns the current time as a millisecond timestamp
+func makeTimestampMilli() int64 {
+	return time.Now().UnixNano() / int64(time.Millisecond)
+}
+
+// Returns the current time as a nanosecond timestamp as some things
+// are far too fast to measure using nanoseconds
+func makeTimestampNano() int64 {
+	return time.Now().UnixNano()
 }

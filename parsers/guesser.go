@@ -5,16 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	vectorspace "github.com/boyter/golangvectorspace"
-	"github.com/briandowns/spinner"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 	"unicode/utf8"
 )
 
@@ -38,6 +35,8 @@ var MaxSize = ""
 var DocumentName = ""
 var PackageName = ""
 var DocumentNamespace = ""
+var Debug = false
+var Trace = false
 
 var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
 var alphaNumericRegex = regexp.MustCompile("[^a-zA-Z0-9 ]")
@@ -169,7 +168,7 @@ func guessLicense(content string, deepguess bool, licenses []License) []LicenseM
 }
 
 func findPossibleLicenseFiles(fileList []string) []string {
-	possibleList := []string{}
+	var possibleList []string
 
 	for _, filename := range fileList {
 		possible := false
@@ -180,7 +179,7 @@ func findPossibleLicenseFiles(fileList []string) []string {
 			}
 		}
 
-		for _, license := range loadDatabase() {
+		for _, license := range Database {
 			if strings.Split(filename, ".")[0] == strings.ToLower(license.LicenseId) {
 				possible = true
 			}
@@ -198,6 +197,7 @@ func findPossibleLicenseFiles(fileList []string) []string {
 var Database = []License{}
 
 func loadDatabase() []License {
+	startTime := makeTimestampMilli()
 	if len(Database) != 0 {
 		return Database
 	}
@@ -212,10 +212,15 @@ func loadDatabase() []License {
 
 	Database = database
 
+	if Trace {
+		printTrace(fmt.Sprintf("milliseconds load database: %d", makeTimestampMilli()-startTime))
+	}
+
 	return database
 }
 
 func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult {
+	startTime := makeTimestampMilli()
 	fileResults := []FileResult{}
 	all, _ := ioutil.ReadDir(directory)
 
@@ -276,6 +281,10 @@ func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult
 	for _, newdirectory := range directories {
 		results := walkDirectory(filepath.Join(directory, newdirectory), rootLicenses)
 		fileResults = append(fileResults, results...)
+	}
+
+	if Trace {
+		printTrace(fmt.Sprintf("milliseconds walk file tree: %s: %d", directory, makeTimestampMilli()-startTime))
 	}
 
 	return fileResults
@@ -344,15 +353,9 @@ func processArguments() {
 
 func Process() {
 	processArguments()
-	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
-	s.Writer = os.Stderr
-	s.Prefix = "Processing... "
+	loadDatabase()
 
-	if strings.ToLower(Format) != "progress" && runtime.GOOS != "windows" {
-		s.Start()
-	}
-
-	fileResults := []FileResult{}
+	var fileResults []FileResult
 
 	if len(DirFilePaths) == 0 {
 		DirFilePaths = append(DirFilePaths, ".")
@@ -360,18 +363,25 @@ func Process() {
 
 	for _, fileDirectory := range DirFilePaths {
 		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
-			fileResults = append(fileResults, walkDirectory(fileDirectory, [][]LicenseMatch{})...)
-		} else {
-			directory, file := filepath.Split(fileDirectory)
-			fileResult := processFile(directory, file, []LicenseMatch{})
-			fileResults = append(fileResults, fileResult)
+			//fileResults = append(fileResults, walkDirectory(fileDirectory, [][]LicenseMatch{})...)
 
-			if strings.ToLower(Format) == "progress" {
-				toProgress(directory, file, []LicenseMatch{}, fileResult.LicenseGuesses, fileResult.LicenseIdentified)
+			startTime := makeTimestampMilli()
+			walkDirectoryFast(fileDirectory)
+			if Trace {
+				printTrace(fmt.Sprintf("milliseconds walk file tree: %s: %d", fileDirectory, makeTimestampMilli()-startTime))
 			}
 		}
+
+		//} else {
+		//	directory, file := filepath.Split(fileDirectory)
+		//	fileResult := processFile(directory, file, []LicenseMatch{})
+		//	fileResults = append(fileResults, fileResult)
+		//
+		//	if strings.ToLower(Format) == "progress" {
+		//		toProgress(directory, file, []LicenseMatch{}, fileResult.LicenseGuesses, fileResult.LicenseIdentified)
+		//	}
+		//}
 	}
-	s.Stop()
 
 	switch strings.ToLower(Format) {
 	case "csv":
