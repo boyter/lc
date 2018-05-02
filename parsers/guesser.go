@@ -167,25 +167,30 @@ func guessLicense(content string, deepguess bool, licenses []License) []LicenseM
 	return matchingLicenses
 }
 
+// Shamelessly stolen from https://github.com/src-d/go-license-detector
+// https://github.com/src-d/go-license-detector#L63
+// SPDX-License-Identifier: Apache-2.0
+var (
+	licenseFileNames = []string{
+		"li[cs]en[cs]e(s?)",
+		"legal",
+		"copy(left|right|ing)",
+		"unlicense",
+		"l?gpl([-_ v]?)(\\d\\.?\\d)?",
+		"bsd",
+		"mit",
+		"apache",
+	}
+	licenseFileRe = regexp.MustCompile(
+		fmt.Sprintf("^(|.*[-_. ])(%s)(|[-_. ].*)$",
+			strings.Join(licenseFileNames, "|")))
+)
+
 func findPossibleLicenseFiles(fileList []string) []string {
 	var possibleList []string
 
 	for _, filename := range fileList {
-		possible := false
-
-		for _, indicator := range strings.Split(PossibleLicenceFiles, ",") {
-			if strings.Contains(strings.ToLower(filename), indicator) {
-				possible = true
-			}
-		}
-
-		for _, license := range Database {
-			if strings.Split(filename, ".")[0] == strings.ToLower(license.LicenseId) {
-				possible = true
-			}
-		}
-
-		if possible == true {
+		if licenseFileRe.MatchString(strings.ToLower(filename)) {
 			possibleList = append(possibleList, filename)
 		}
 	}
@@ -194,7 +199,7 @@ func findPossibleLicenseFiles(fileList []string) []string {
 }
 
 // Caching the database load result reduces processing time by about 3x for this repository
-var Database = []License{}
+var Database []License
 
 func loadDatabase() []License {
 	startTime := makeTimestampMilli()
