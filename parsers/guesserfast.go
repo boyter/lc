@@ -4,6 +4,7 @@ import (
 	"unicode/utf8"
 	"strings"
 	"bytes"
+	"sort"
 )
 
 // Parses the supplied file content against the list of licences and
@@ -57,20 +58,6 @@ func guessLicenseFast(content []byte, deepguess bool, licenses []License) []Lice
 	//	return matchingLicenses[i].Percentage > matchingLicenses[j].Percentage
 	//})
 
-	//// Special cases such as MIT and JSON here
-	//if len(matchingLicenses) > 2 && ((matchingLicenses[0].LicenseId == "JSON" && matchingLicenses[1].LicenseId == "MIT") ||
-	//	(matchingLicenses[0].LicenseId == "MIT" && matchingLicenses[1].LicenseId == "JSON")) {
-	//	if strings.Contains(strings.ToLower(content), "not evil") {
-	//		// Its JSON
-	//		matchingLicenses = []LicenseMatch{}
-	//		matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: "JSON", Percentage: 1})
-	//	} else {
-	//		// Its MIT
-	//		matchingLicenses = []LicenseMatch{}
-	//		matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: "MIT", Percentage: 1})
-	//	}
-	//}
-
 	return matchingLicenses
 }
 
@@ -80,23 +67,40 @@ func guessLicenseFast(content []byte, deepguess bool, licenses []License) []Lice
 func keywordGuessLicenseFast(content []byte, licenses []License) []LicenseMatch {
 	content = cleanTextFast(content)
 
-	matchingLicenses := []LicenseMatch{}
+	var matchingLicenses []LicenseMatch
+	var keywordMatch int
 
 	for _, license := range licenses {
-		keywordmatch := 0
-		contains := false
+		keywordMatch = 0
 
 		for _, keyword := range license.Keywords {
-			contains = bytes.Contains(content, []byte(strings.ToLower(keyword)))
-
-			if contains == true {
-				keywordmatch++
+			if bytes.Contains(content, []byte(strings.ToLower(keyword))) {
+				keywordMatch++
 			}
 		}
 
-		if keywordmatch > 0 {
-			percentage := (float64(keywordmatch) / float64(len(license.Keywords))) * 100
-			matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: percentage})
+		if keywordMatch > 0 {
+			percentage := (float64(keywordMatch) / float64(len(license.Keywords))) * 100
+			if percentage > 70 {
+				matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: percentage})
+			}
+		}
+	}
+
+	sort.Slice(matchingLicenses, func(i, j int) bool {
+		return matchingLicenses[i].Percentage > matchingLicenses[j].Percentage
+	})
+
+	if len(matchingLicenses) > 2 && ((matchingLicenses[0].LicenseId == "JSON" && matchingLicenses[1].LicenseId == "MIT") ||
+		(matchingLicenses[0].LicenseId == "MIT" && matchingLicenses[1].LicenseId == "JSON")) {
+		if bytes.Contains(bytes.ToLower(content), []byte("not evil")) {
+			// Its JSON
+			matchingLicenses = []LicenseMatch{}
+			matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: "JSON", Percentage: 1})
+		} else {
+			// Its MIT
+			matchingLicenses = []LicenseMatch{}
+			matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: "MIT", Percentage: 1})
 		}
 	}
 

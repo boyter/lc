@@ -22,17 +22,16 @@ func walkDirectoryFast(directory string) {
 	}
 
 	// Determine if any of the files might be a possible license deceleration
-	// NB this doubles the process time appox
-	possibleLicenses := findPossibleLicenseFiles(files)
+	possibleLicenseFiles := findPossibleLicenseFiles(files)
 
 	// Determine the license for any of the possible files
-	for _, possibleLicense := range possibleLicenses {
+	for _, file := range possibleLicenseFiles {
 
-		bytes, err := ioutil.ReadFile(filepath.Join(directory, possibleLicense))
+		bytes, err := ioutil.ReadFile(filepath.Join(directory, file))
 
 		if err == nil {
 			guessLicenses := keywordGuessLicenseFast(bytes, loadDatabase())
-			fmt.Println(guessLicenses)
+			fmt.Println(file, guessLicenses)
 
 			//if len(guessLicenses) != 0 {
 			//	identifiedRootLicense = append(identifiedRootLicense, guessLicenses[0])
