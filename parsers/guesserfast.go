@@ -3,7 +3,6 @@ package parsers
 import (
 	"bytes"
 	"sort"
-	"strings"
 	"sync"
 )
 
@@ -14,7 +13,7 @@ func keywordGuessLicenseFast(content []byte, licenses []License) []LicenseMatch 
 	content = cleanTextFast(content)
 
 	var wg sync.WaitGroup
-	output := make(chan LicenseMatch, 10)
+	output := make(chan LicenseMatch, len(licenses))
 
 	for _, license := range licenses {
 		wg.Add(1)
@@ -22,13 +21,13 @@ func keywordGuessLicenseFast(content []byte, licenses []License) []LicenseMatch 
 			keywordMatch := 0
 
 			for _, keyword := range license.Keywords {
-				if bytes.Contains(content, []byte(strings.ToLower(keyword))) {
+				if bytes.Contains(content, []byte(keyword)) {
 					keywordMatch++
 				}
 			}
 
 			if keywordMatch > 0 {
-				percentage := (float64(keywordMatch) / float64(len(license.Keywords))) * 100
+				percentage := float64(keywordMatch * 2) // On the basis that there are 50 keywords
 				if percentage > 70 {
 					output <- LicenseMatch{LicenseId: license.LicenseId, Percentage: percentage}
 				}
@@ -49,14 +48,7 @@ func keywordGuessLicenseFast(content []byte, licenses []License) []LicenseMatch 
 		return matchingLicenses[i].Percentage > matchingLicenses[j].Percentage
 	})
 
-	if len(matchingLicenses) > 2 && ((matchingLicenses[0].LicenseId == "JSON" && matchingLicenses[1].LicenseId == "MIT") ||
-		(matchingLicenses[0].LicenseId == "MIT" && matchingLicenses[1].LicenseId == "JSON")) {
-		if bytes.Contains(content, []byte("not evil")) {
-			matchingLicenses = []LicenseMatch{{LicenseId: "JSON", Percentage: 1}}
-		} else {
-			matchingLicenses = []LicenseMatch{{LicenseId: "MIT", Percentage: 1}}
-		}
-	}
+	matchingLicenses = specialCases(content, matchingLicenses)
 
 	return matchingLicenses
 }
@@ -68,4 +60,29 @@ func cleanTextFast(content []byte) []byte {
 	tmp = multipleSpacesRegex.ReplaceAllString(tmp, " ")
 
 	return []byte(tmp)
+}
+
+func specialCases(content []byte, matchingLicenses []LicenseMatch) []LicenseMatch {
+	// Quite often JSON and MIT are confused
+	if len(matchingLicenses) > 2 && ((matchingLicenses[0].LicenseId == "JSON" && matchingLicenses[1].LicenseId == "MIT") ||
+		(matchingLicenses[0].LicenseId == "MIT" && matchingLicenses[1].LicenseId == "JSON")) {
+		if bytes.Contains(content, []byte("not evil")) {
+			matchingLicenses = []LicenseMatch{{LicenseId: "JSON", Percentage: 1}}
+		} else {
+			matchingLicenses = []LicenseMatch{{LicenseId: "MIT", Percentage: 1}}
+		}
+	}
+
+	// Another one is MIT-feh and MIT
+	if len(matchingLicenses) > 2 && ((matchingLicenses[0].LicenseId == "MIT-feh" && matchingLicenses[1].LicenseId == "MIT") ||
+		(matchingLicenses[0].LicenseId == "MIT" && matchingLicenses[1].LicenseId == "MIT-feh")) {
+
+		if bytes.HasPrefix(content, []byte("mit license")) || bytes.HasPrefix(content, []byte("the mit license")) {
+			matchingLicenses = []LicenseMatch{{LicenseId: "MIT", Percentage: 100}}
+		} else {
+			matchingLicenses = []LicenseMatch{{LicenseId: "MIT-feh", Percentage: 100}}
+		}
+	}
+
+	return matchingLicenses
 }
