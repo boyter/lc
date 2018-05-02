@@ -31,9 +31,9 @@ func walkDirectoryFast(directory string) {
 		bytes, err := ioutil.ReadFile(filepath.Join(directory, possibleLicense))
 
 		if err == nil {
-			guessLicenses := guessLicense(string(bytes), deepGuess, loadDatabase())
-
+			guessLicenses := keywordGuessLicenseFast(bytes, loadDatabase())
 			fmt.Println(guessLicenses)
+
 			//if len(guessLicenses) != 0 {
 			//	identifiedRootLicense = append(identifiedRootLicense, guessLicenses[0])
 			//}
