@@ -180,6 +180,7 @@ var (
 		"bsd",
 		"mit",
 		"apache",
+		"readme",
 	}
 	licenseFileRe = regexp.MustCompile(
 		fmt.Sprintf("^(|.*[-_. ])(%s)(|[-_. ].*)$",

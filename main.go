@@ -4,11 +4,12 @@ import (
 	"github.com/boyter/lc/parsers"
 	"github.com/urfave/cli"
 	"os"
+	"github.com/pkg/profile"
 )
 
 //go:generate go run scripts/include.go
 func main() {
-	//defer profile.Start(profile.CPUProfile).Stop()
+	defer profile.Start(profile.CPUProfile).Stop()
 
 	app := cli.NewApp()
 	app.EnableBashCompletion = true

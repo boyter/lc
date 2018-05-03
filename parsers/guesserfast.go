@@ -18,7 +18,7 @@ func keywordGuessLicenseFast(content []byte, licenses []License) []LicenseMatch 
 	output := make(chan LicenseMatch, len(licenses))
 
 	for _, license := range licenses {
-		if len(license.LicenseText) >= (length - lengthFuzzy) && len(license.LicenseText) <= (length + lengthFuzzy)  {
+		if len(license.LicenseText) >= (length - lengthFuzzy) && len(license.LicenseText) <= (length + lengthFuzzy) {
 			wg.Add(1)
 			go func(license License) {
 				keywordMatch := 0
