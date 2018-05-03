@@ -11,29 +11,33 @@ import (
 // returns the maching licences with shortname and the percentage of match.
 func keywordGuessLicenseFast(content []byte, licenses []License) []LicenseMatch {
 	content = cleanTextFast(content)
+	length := len(content)
+	lengthFuzzy := length / 100 * 30
 
 	var wg sync.WaitGroup
 	output := make(chan LicenseMatch, len(licenses))
 
 	for _, license := range licenses {
-		wg.Add(1)
-		go func(license License) {
-			keywordMatch := 0
+		if len(license.LicenseText) >= (length - lengthFuzzy) && len(license.LicenseText) <= (length + lengthFuzzy)  {
+			wg.Add(1)
+			go func(license License) {
+				keywordMatch := 0
 
-			for _, keyword := range license.Keywords {
-				if bytes.Contains(content, []byte(keyword)) {
-					keywordMatch++
+				for _, keyword := range license.Keywords {
+					if bytes.Contains(content, []byte(keyword)) {
+						keywordMatch++
+					}
 				}
-			}
 
-			if keywordMatch > 0 {
-				percentage := float64(keywordMatch * 2) // On the basis that there are 50 keywords
-				if percentage > 70 {
-					output <- LicenseMatch{LicenseId: license.LicenseId, Percentage: percentage}
+				if keywordMatch > 0 {
+					percentage := float64(keywordMatch * 2) // On the basis that there are 50 keywords
+					if percentage > 70 {
+						output <- LicenseMatch{LicenseId: license.LicenseId, Percentage: percentage}
+					}
 				}
-			}
-			wg.Done()
-		}(license)
+				wg.Done()
+			}(license)
+		}
 	}
 
 	wg.Wait()
