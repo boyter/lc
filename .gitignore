@@ -16,3 +16,6 @@ lc
 
 # IDEA
 .idea
+
+# Accuracy + Benchmarks
+/assets/accuracy/
