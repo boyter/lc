@@ -96,7 +96,7 @@ func main() {
 	}
 	app.Action = func(c *cli.Context) error {
 		parsers.DirFilePaths = c.Args()
-		parsers.Process()
+		parsers.ProcessFast()
 		return nil
 	}
 

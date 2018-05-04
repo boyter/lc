@@ -59,3 +59,7 @@ func walkDirectoryFast(directory string) {
 		walkDirectoryFast(filepath.Join(directory, newdirectory))
 	}
 }
+
+func processFileFast(directory string, file string, rootLicenses []LicenseMatch) {
+
+}

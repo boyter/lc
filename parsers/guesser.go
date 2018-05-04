@@ -369,24 +369,16 @@ func Process() {
 
 	for _, fileDirectory := range DirFilePaths {
 		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
-			//fileResults = append(fileResults, walkDirectory(fileDirectory, [][]LicenseMatch{})...)
+			fileResults = append(fileResults, walkDirectory(fileDirectory, [][]LicenseMatch{})...)
+		} else {
+			directory, file := filepath.Split(fileDirectory)
+			fileResult := processFile(directory, file, []LicenseMatch{})
+			fileResults = append(fileResults, fileResult)
 
-			startTime := makeTimestampMilli()
-			walkDirectoryFast(fileDirectory)
-			if Trace {
-				printTrace(fmt.Sprintf("milliseconds walk file tree: %s: %d", fileDirectory, makeTimestampMilli()-startTime))
+			if strings.ToLower(Format) == "progress" {
+				toProgress(directory, file, []LicenseMatch{}, fileResult.LicenseGuesses, fileResult.LicenseIdentified)
 			}
 		}
-
-		//} else {
-		//	directory, file := filepath.Split(fileDirectory)
-		//	fileResult := processFile(directory, file, []LicenseMatch{})
-		//	fileResults = append(fileResults, fileResult)
-		//
-		//	if strings.ToLower(Format) == "progress" {
-		//		toProgress(directory, file, []LicenseMatch{}, fileResult.LicenseGuesses, fileResult.LicenseIdentified)
-		//	}
-		//}
 	}
 
 	switch strings.ToLower(Format) {
@@ -404,5 +396,29 @@ func Process() {
 		toSPDX21(fileResults)
 	default:
 		fmt.Println("")
+	}
+}
+
+func ProcessFast() {
+	processArguments()
+	loadDatabase()
+
+	if len(DirFilePaths) == 0 {
+		DirFilePaths = append(DirFilePaths, ".")
+	}
+
+	//fileListQueue := make(chan *FileJob, FileListQueueSize)
+
+	for _, fileDirectory := range DirFilePaths {
+		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
+
+			startTime := makeTimestampMilli()
+			walkDirectoryFast(fileDirectory)
+
+			if Trace {
+				printTrace(fmt.Sprintf("milliseconds walk file tree: %s: %d", fileDirectory, makeTimestampMilli()-startTime))
+			}
+		}
+
 	}
 }
