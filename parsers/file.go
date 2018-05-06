@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"sync"
 )
 
-func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, fileListQueue *chan *File) {
+func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *chan *File) {
 	all, err := ioutil.ReadDir(directory)
 
 	if err != nil {
@@ -55,18 +56,30 @@ func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, fileList
 
 	// Given the possible license files pass those and this file into channel for processing
 	for _, file := range files {
-		*fileListQueue <- &File {
+		*output <- &File {
 			Directory: directory,
 			File: file,
 			RootLicenses: rootLicense,
 		}
 	}
 
-	for _, newdirectory := range directories {
-		walkDirectoryFast(filepath.Join(directory, newdirectory), rootLicenses, fileListQueue)
+	for _, newDirectory := range directories {
+		walkDirectoryFast(filepath.Join(directory, newDirectory), rootLicenses, output)
 	}
 }
 
-func processFileFast(directory string, file string, rootLicenses []LicenseMatch) {
+func processFileFast(input *chan *File) {
 
+	var wg sync.WaitGroup
+
+	for i := range *input {
+		wg.Add(1)
+		go func(file *File) {
+			fileResult := processFile(i.Directory, i.File, i.RootLicenses)
+			fmt.Println(fileResult.Filename, fileResult.Md5Hash)
+			wg.Done()
+		}(i)
+	}
+
+	wg.Wait()
 }

@@ -306,8 +306,8 @@ func processFile(directory string, file string, rootLicenses []LicenseMatch) Fil
 	}
 
 	content := readFile(filepath.Join(directory, file))
-	licenseGuesses := []LicenseMatch{}
-	licenseIdentified := []LicenseMatch{}
+	var licenseGuesses []LicenseMatch
+	var licenseIdentified []LicenseMatch
 
 	if len(content) > maxSize {
 		process = false
@@ -407,6 +407,7 @@ func ProcessFast() {
 	}
 
 	fileListQueue := make(chan *File, 5000)
+	go processFileFast(&fileListQueue)
 
 	for _, fileDirectory := range DirFilePaths {
 		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
