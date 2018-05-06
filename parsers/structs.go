@@ -29,3 +29,9 @@ type FileResult struct {
 	BytesHuman        string
 	Bytes             int
 }
+
+type File struct {
+	Directory    string
+	File         string
+	RootLicenses []LicenseMatch
+}

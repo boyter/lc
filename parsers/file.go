@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-func walkDirectoryFast(directory string) {
+func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, fileListQueue *chan *File) {
 	all, err := ioutil.ReadDir(directory)
 
 	if err != nil {
@@ -27,36 +27,43 @@ func walkDirectoryFast(directory string) {
 
 	// Determine if any of the files might be a license
 	possibleLicenseFiles := findPossibleLicenseFiles(files)
+	var identifiedRootLicense []LicenseMatch
 
 	// Determine the license for any of the possible files
 	for _, file := range possibleLicenseFiles {
 		bytes, err := ioutil.ReadFile(filepath.Join(directory, file))
 
 		if err == nil {
-			startTime := makeTimestampMilli()
 			guessLicenses := keywordGuessLicenseFast(bytes, Database)
-
-			if Trace {
-				printTrace(fmt.Sprintf("milliseconds to process file: %s: %d", filepath.Join(directory, file), makeTimestampMilli()-startTime))
-			}
 
 			fmt.Println(filepath.Join(directory, file), guessLicenses)
 
-			//if len(guessLicenses) != 0 {
-			//	identifiedRootLicense = append(identifiedRootLicense, guessLicenses[0])
-			//}
+			if len(guessLicenses) != 0 {
+				identifiedRootLicense = append(identifiedRootLicense, guessLicenses[0])
+			}
 		} else {
 			// TODO log error
 		}
 	}
 
-	//// Given the possible license files pass those and this file into channel for processing
-	//for _, file := range files {
-	//	fmt.Println(file, possibleLicenses)
-	//}
+	var rootLicense []LicenseMatch
+	if len(identifiedRootLicense) != 0 {
+		rootLicense = identifiedRootLicense
+	} else if len(rootLicenses) != 0 {
+		rootLicense = rootLicenses[len(rootLicenses)-1]
+	}
+
+	// Given the possible license files pass those and this file into channel for processing
+	for _, file := range files {
+		*fileListQueue <- &File {
+			Directory: directory,
+			File: file,
+			RootLicenses: rootLicense,
+		}
+	}
 
 	for _, newdirectory := range directories {
-		walkDirectoryFast(filepath.Join(directory, newdirectory))
+		walkDirectoryFast(filepath.Join(directory, newdirectory), rootLicenses, fileListQueue)
 	}
 }
 

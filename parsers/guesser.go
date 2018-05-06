@@ -227,11 +227,11 @@ func loadDatabase() []License {
 
 func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult {
 	startTime := makeTimestampMilli()
-	fileResults := []FileResult{}
+	var fileResults []FileResult
 	all, _ := ioutil.ReadDir(directory)
 
-	directories := []string{}
-	files := []string{}
+	var directories []string
+	var files []string
 
 	// Work out which directories and files we want to investigate
 	for _, f := range all {
@@ -254,7 +254,7 @@ func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult
 
 	// Determine any possible licence files which would classify everything else
 	possibleLicenses := findPossibleLicenseFiles(files)
-	identifiedRootLicense := []LicenseMatch{}
+	var identifiedRootLicense []LicenseMatch
 	for _, possibleLicense := range possibleLicenses {
 		content := string(readFile(filepath.Join(directory, possibleLicense)))
 		guessLicenses := guessLicense(content, deepGuess, loadDatabase())
@@ -268,10 +268,9 @@ func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult
 		rootLicenses = append(rootLicenses, identifiedRootLicense)
 	}
 
-	// TODO fan this out to many GoRoutines and process in parallel
 	for _, file := range files {
 
-		rootLicense := []LicenseMatch{}
+		var rootLicense []LicenseMatch
 		if len(rootLicenses) != 0 {
 			rootLicense = rootLicenses[len(rootLicenses)-1]
 		}
@@ -407,13 +406,13 @@ func ProcessFast() {
 		DirFilePaths = append(DirFilePaths, ".")
 	}
 
-	//fileListQueue := make(chan *FileJob, FileListQueueSize)
+	fileListQueue := make(chan *File, 5000)
 
 	for _, fileDirectory := range DirFilePaths {
 		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
 
 			startTime := makeTimestampMilli()
-			walkDirectoryFast(fileDirectory)
+			walkDirectoryFast(fileDirectory, [][]LicenseMatch{}, &fileListQueue)
 
 			if Trace {
 				printTrace(fmt.Sprintf("milliseconds walk file tree: %s: %d", fileDirectory, makeTimestampMilli()-startTime))
