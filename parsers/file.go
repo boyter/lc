@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"sync"
+	"strings"
 )
 
 func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *chan *File) {
@@ -75,11 +76,50 @@ func processFileFast(input *chan *File) {
 	for i := range *input {
 		wg.Add(1)
 		go func(file *File) {
-			fileResult := processFile(i.Directory, i.File, i.RootLicenses)
+			fileResult := processFile2(file.Directory, file.File, file.RootLicenses)
 			fmt.Println(fileResult.Filename, fileResult.Md5Hash)
 			wg.Done()
 		}(i)
 	}
 
 	wg.Wait()
+}
+
+func processFile2(directory string, file string, rootLicenses []LicenseMatch) FileResult {
+	process := true
+
+	for _, ext := range strings.Split(ExtentionBlacklist, ",") {
+		if strings.HasSuffix(file, "."+ext) {
+			// Needs to be smarter we should skip reading the contents but it should still be under the license in the root folders
+			process = false
+		}
+	}
+
+	content := readFile(filepath.Join(directory, file))
+
+	var licenseGuesses []LicenseMatch
+	var licenseIdentified []LicenseMatch
+
+	if len(content) > maxSize {
+		process = false
+	}
+
+	if process == true {
+		licenseGuesses = keywordGuessLicenseFast(content, Database)
+		licenseIdentified = identifierGuessLicence(string(content), Database)
+	}
+
+	fileResult := FileResult{
+		Directory:         directory,
+		Filename:          file,
+		LicenseGuesses:    licenseGuesses,
+		LicenseRoots:      rootLicenses,
+		LicenseIdentified: licenseIdentified,
+		Md5Hash:           getMd5Hash(content),
+		Sha1Hash:          getSha1Hash(content),
+		Sha256Hash:        getSha256Hash(content),
+		BytesHuman:        bytesToHuman(int64(len(content))),
+		Bytes:             len(content)}
+
+	return fileResult
 }

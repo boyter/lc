@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/boyter/lc/parsers"
-	"github.com/pkg/profile"
 	"github.com/urfave/cli"
 	"os"
+	"github.com/pkg/profile"
 )
 
 //go:generate go run scripts/include.go
