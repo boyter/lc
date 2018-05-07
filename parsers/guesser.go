@@ -187,17 +187,46 @@ var (
 			strings.Join(licenseFileNames, "|")))
 )
 
+//func findPossibleLicenseFiles(fileList []string) []string {
+//	var possibleList []string
+//
+//	for _, filename := range fileList {
+//		if licenseFileRe.MatchString(strings.ToLower(filename)) {
+//			possibleList = append(possibleList, filename)
+//		}
+//	}
+//
+//	return possibleList
+//}
+
 func findPossibleLicenseFiles(fileList []string) []string {
 	var possibleList []string
 
 	for _, filename := range fileList {
-		if licenseFileRe.MatchString(strings.ToLower(filename)) {
+		possible := false
+
+		for _, indicator := range strings.Split(PossibleLicenceFiles, ",") {
+			if strings.Contains(strings.ToLower(filename), indicator) {
+				possible = true
+			}
+		}
+
+		for _, license := range Database {
+			if strings.Split(filename, ".")[0] == strings.ToLower(license.LicenseId) {
+				possible = true
+			}
+		}
+
+		if possible == true {
 			possibleList = append(possibleList, filename)
 		}
 	}
 
 	return possibleList
 }
+
+
+
 
 // Caching the database load result reduces processing time by about 3x for this repository
 var Database []License

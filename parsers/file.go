@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
-	"sync"
 	"strings"
+	"sync"
 )
 
 func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *chan *File) {
@@ -57,9 +57,9 @@ func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *
 
 	// Given the possible license files pass those and this file into channel for processing
 	for _, file := range files {
-		*output <- &File {
-			Directory: directory,
-			File: file,
+		*output <- &File{
+			Directory:    directory,
+			File:         file,
 			RootLicenses: rootLicense,
 		}
 	}
