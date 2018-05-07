@@ -68,42 +68,13 @@ func identifierGuessLicence(content string, licenses []License) []LicenseMatch {
 	return matchingLicenses
 }
 
-// Fast method of checking if supplied content contains a licence using
-// matching keyword ngrams to find if the licence is a match or not
-// returns the maching licences with shortname and the percentage of match.
-func keywordGuessLicense(content string, licenses []License) []LicenseMatch {
-	content = cleanText(content)
-
-	matchingLicenses := []LicenseMatch{}
-
-	for _, license := range licenses {
-		keywordmatch := 0
-		contains := false
-
-		for _, keyword := range license.Keywords {
-			contains = strings.Contains(content, strings.ToLower(keyword))
-
-			if contains == true {
-				keywordmatch++
-			}
-		}
-
-		if keywordmatch > 0 {
-			percentage := (float64(keywordmatch) / float64(len(license.Keywords))) * 100
-			matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: percentage})
-		}
-	}
-
-	return matchingLicenses
-}
-
 // Parses the supplied file content against the list of licences and
 // returns the matching licences with the shortname and the percentage of match.
 // If fast lookup methods fail it will try deep matching which is slower.
 func guessLicense(content string, deepguess bool, licenses []License) []LicenseMatch {
 	matchingLicenses := []LicenseMatch{}
 
-	for _, license := range keywordGuessLicense(content, licenses) {
+	for _, license := range keywordGuessLicense([]byte(content), licenses) {
 		matchingLicense := License{}
 
 		for _, l := range licenses {
@@ -225,9 +196,6 @@ func findPossibleLicenseFiles(fileList []string) []string {
 	return possibleList
 }
 
-
-
-
 // Caching the database load result reduces processing time by about 3x for this repository
 var Database []License
 
@@ -322,44 +290,6 @@ func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult
 	}
 
 	return fileResults
-}
-
-func processFile(directory string, file string, rootLicenses []LicenseMatch) FileResult {
-	process := true
-
-	for _, ext := range strings.Split(ExtentionBlacklist, ",") {
-		if strings.HasSuffix(file, "."+ext) {
-			// Needs to be smarter we should skip reading the contents but it should still be under the license in the root folders
-			process = false
-		}
-	}
-
-	content := readFile(filepath.Join(directory, file))
-	var licenseGuesses []LicenseMatch
-	var licenseIdentified []LicenseMatch
-
-	if len(content) > maxSize {
-		process = false
-	}
-
-	if process == true {
-		licenseGuesses = guessLicense(string(content), deepGuess, loadDatabase())
-		licenseIdentified = identifierGuessLicence(string(content), loadDatabase())
-	}
-
-	fileResult := FileResult{
-		Directory:         directory,
-		Filename:          file,
-		LicenseGuesses:    licenseGuesses,
-		LicenseRoots:      rootLicenses,
-		LicenseIdentified: licenseIdentified,
-		Md5Hash:           getMd5Hash(content),
-		Sha1Hash:          getSha1Hash(content),
-		Sha256Hash:        getSha256Hash(content),
-		BytesHuman:        bytesToHuman(int64(len(content))),
-		Bytes:             len(content)}
-
-	return fileResult
 }
 
 func processArguments() {

@@ -21,7 +21,17 @@ func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *
 
 	for _, file := range all {
 		if file.IsDir() {
-			directories = append(directories, file.Name())
+			add := true
+
+			for _, black := range strings.Split(PathBlacklist, ",") {
+				if file.Name() == black {
+					add = false
+				}
+			}
+
+			if add == true {
+				directories = append(directories, file.Name())
+			}
 		} else {
 			files = append(files, file.Name())
 		}
@@ -36,7 +46,7 @@ func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *
 		bytes, err := ioutil.ReadFile(filepath.Join(directory, file))
 
 		if err == nil {
-			guessLicenses := keywordGuessLicenseFast(bytes, Database)
+			guessLicenses := keywordGuessLicense(bytes, Database)
 
 			fmt.Println(filepath.Join(directory, file), guessLicenses)
 
@@ -75,7 +85,7 @@ func processFileFast(input *chan *File, output *chan *FileResult) {
 	for i := range *input {
 		wg.Add(1)
 		go func(file *File) {
-			fileResult := processFile2(file.Directory, file.File, file.RootLicenses)
+			fileResult := processFile(file.Directory, file.File, file.RootLicenses)
 			*output <- &fileResult
 			wg.Done()
 		}(i)
@@ -85,7 +95,7 @@ func processFileFast(input *chan *File, output *chan *FileResult) {
 	close(*input)
 }
 
-func processFile2(directory string, file string, rootLicenses []LicenseMatch) FileResult {
+func processFile(directory string, file string, rootLicenses []LicenseMatch) FileResult {
 	process := true
 
 	for _, ext := range strings.Split(ExtentionBlacklist, ",") {
@@ -105,7 +115,7 @@ func processFile2(directory string, file string, rootLicenses []LicenseMatch) Fi
 	}
 
 	if process == true {
-		licenseGuesses = keywordGuessLicenseFast(content, Database)
+		licenseGuesses = keywordGuessLicense(content, Database)
 		licenseIdentified = identifierGuessLicence(string(content), Database)
 	}
 

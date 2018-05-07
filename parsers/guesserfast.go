@@ -9,7 +9,7 @@ import (
 // Fast method of checking if supplied content contains a licence using
 // matching keyword ngrams to find if the licence is a match or not
 // returns the maching licences with shortname and the percentage of match.
-func keywordGuessLicenseFast(content []byte, licenses []License) []LicenseMatch {
+func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
 	content = cleanTextFast(content)
 	length := len(content)
 	lengthFuzzy := length / 100 * 30
