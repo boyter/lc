@@ -407,11 +407,11 @@ func ProcessFast() {
 	}
 
 	fileListQueue := make(chan *File, 5000)
-	go processFileFast(&fileListQueue)
+	fileResultQueue := make(chan *FileResult, 5000)
+	go processFileFast(&fileListQueue, &fileResultQueue)
 
 	for _, fileDirectory := range DirFilePaths {
 		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
-
 			startTime := makeTimestampMilli()
 			walkDirectoryFast(fileDirectory, [][]LicenseMatch{}, &fileListQueue)
 
@@ -419,6 +419,5 @@ func ProcessFast() {
 				printTrace(fmt.Sprintf("milliseconds walk file tree: %s: %d", fileDirectory, makeTimestampMilli()-startTime))
 			}
 		}
-
 	}
 }

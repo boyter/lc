@@ -69,20 +69,20 @@ func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *
 	}
 }
 
-func processFileFast(input *chan *File) {
-
+func processFileFast(input *chan *File, output *chan *FileResult) {
 	var wg sync.WaitGroup
 
 	for i := range *input {
 		wg.Add(1)
 		go func(file *File) {
 			fileResult := processFile2(file.Directory, file.File, file.RootLicenses)
-			fmt.Println(fileResult.Filename, fileResult.Md5Hash)
+			*output <- &fileResult
 			wg.Done()
 		}(i)
 	}
 
 	wg.Wait()
+	close(*input)
 }
 
 func processFile2(directory string, file string, rootLicenses []LicenseMatch) FileResult {
