@@ -73,7 +73,7 @@ func TestProcessFileLicenses(t *testing.T) {
 	files, _ := ioutil.ReadDir("../examples/licenses/")
 
 	for _, file := range files {
-		content := readFile(filepath.Join("../examples/licenses/", file.Name()))
+		content, _ := ioutil.ReadFile(filepath.Join("../examples/licenses/", file.Name()))
 
 		var lic = License{}
 		json.Unmarshal(content, &lic)
