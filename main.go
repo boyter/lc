@@ -49,7 +49,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "licensefiles, lf",
-			Usage:       "Possible license files to inspect for over-arching license as comma seperated list `copying,readme`",
+			Usage:       "Possible license files to inspect for over-arching license as comma separated list `copying,readme`",
 			Value:       "license,licence,copying,readme",
 			Destination: &parsers.PossibleLicenceFiles,
 		},
@@ -61,7 +61,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "extblacklist, xbl",
-			Usage:       "Which file extensions should be ignored for deep analysis as comma seperated list E.G. `gif,jpg,png`",
+			Usage:       "Which file extensions should be ignored for deep analysis as comma separated list E.G. `gif,jpg,png`",
 			Value:       "woff,eot,cur,dm,xpm,emz,db,scc,idx,mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tiff,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm,pyd,pyo,raw,uyv,uyvy,xlsm,swf",
 			Destination: &parsers.ExtentionBlacklist,
 		},
@@ -95,7 +95,7 @@ func main() {
 	}
 	app.Action = func(c *cli.Context) error {
 		parsers.DirFilePaths = c.Args()
-		parsers.ProcessFast()
+		parsers.Process()
 		return nil
 	}
 

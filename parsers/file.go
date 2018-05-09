@@ -108,7 +108,12 @@ func processFile(directory string, file string, rootLicenses []LicenseMatch) Fil
 		}
 	}
 
-	content := readFile(filepath.Join(directory, file))
+	content, err := ioutil.ReadFile(filepath.Join(directory, file))
+
+	if err != nil {
+		// TODO log error
+		process = false
+	}
 
 	var licenseGuesses []LicenseMatch
 	var licenseIdentified []LicenseMatch

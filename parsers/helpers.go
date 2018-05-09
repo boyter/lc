@@ -33,8 +33,7 @@ func getSha256Hash(content []byte) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
-func readFile(filepath string) []byte {
-	// TODO only read as deep into the file as we need
+func readFile2(filepath string) []byte {
 	bytes, err := ioutil.ReadFile(filepath)
 
 	if err != nil {

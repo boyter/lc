@@ -253,11 +253,17 @@ func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult
 	possibleLicenses := findPossibleLicenseFiles(files)
 	var identifiedRootLicense []LicenseMatch
 	for _, possibleLicense := range possibleLicenses {
-		content := string(readFile(filepath.Join(directory, possibleLicense)))
-		guessLicenses := guessLicense(content, deepGuess, loadDatabase())
 
-		if len(guessLicenses) != 0 {
-			identifiedRootLicense = append(identifiedRootLicense, guessLicenses[0])
+		content, err := ioutil.ReadFile(filepath.Join(directory, possibleLicense))
+
+		if err == nil {
+			guessLicenses := guessLicense(string(content), deepGuess, loadDatabase())
+
+			if len(guessLicenses) != 0 {
+				identifiedRootLicense = append(identifiedRootLicense, guessLicenses[0])
+			}
+		} else {
+			// TODO log error
 		}
 	}
 
@@ -315,49 +321,9 @@ func processArguments() {
 	}
 }
 
+
+
 func Process() {
-	processArguments()
-	loadDatabase()
-
-	var fileResults []FileResult
-
-	if len(DirFilePaths) == 0 {
-		DirFilePaths = append(DirFilePaths, ".")
-	}
-
-	for _, fileDirectory := range DirFilePaths {
-		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
-			fileResults = append(fileResults, walkDirectory(fileDirectory, [][]LicenseMatch{})...)
-		} else {
-			directory, file := filepath.Split(fileDirectory)
-			fileResult := processFile(directory, file, []LicenseMatch{})
-			fileResults = append(fileResults, fileResult)
-
-			if strings.ToLower(Format) == "progress" {
-				toProgress(directory, file, []LicenseMatch{}, fileResult.LicenseGuesses, fileResult.LicenseIdentified)
-			}
-		}
-	}
-
-	switch strings.ToLower(Format) {
-	case "csv":
-		toCSV(fileResults)
-	case "json":
-		toJSON(fileResults)
-	case "tabular":
-		toTabular(fileResults)
-	case "summary":
-		toSummary(fileResults)
-	case "spdx21":
-		toSPDX21(fileResults)
-	case "spdx":
-		toSPDX21(fileResults)
-	default:
-		fmt.Println("")
-	}
-}
-
-func ProcessFast() {
 	processArguments()
 	loadDatabase()
 
