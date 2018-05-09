@@ -141,23 +141,23 @@ func guessLicense(content string, deepguess bool, licenses []License) []LicenseM
 // Shamelessly stolen from https://github.com/src-d/go-license-detector
 // https://github.com/src-d/go-license-detector#L63
 // SPDX-License-Identifier: Apache-2.0
-var (
-	licenseFileNames = []string{
-		"li[cs]en[cs]e(s?)",
-		"legal",
-		"copy(left|right|ing)",
-		"unlicense",
-		"l?gpl([-_ v]?)(\\d\\.?\\d)?",
-		"bsd",
-		"mit",
-		"apache",
-		"readme",
-	}
-	licenseFileRe = regexp.MustCompile(
-		fmt.Sprintf("^(|.*[-_. ])(%s)(|[-_. ].*)$",
-			strings.Join(licenseFileNames, "|")))
-)
-
+//var (
+//	licenseFileNames = []string{
+//		"li[cs]en[cs]e(s?)",
+//		"legal",
+//		"copy(left|right|ing)",
+//		"unlicense",
+//		"l?gpl([-_ v]?)(\\d\\.?\\d)?",
+//		"bsd",
+//		"mit",
+//		"apache",
+//		"readme",
+//	}
+//	licenseFileRe = regexp.MustCompile(
+//		fmt.Sprintf("^(|.*[-_. ])(%s)(|[-_. ].*)$",
+//			strings.Join(licenseFileNames, "|")))
+//)
+//
 //func findPossibleLicenseFiles(fileList []string) []string {
 //	var possibleList []string
 //
