@@ -1,7 +1,6 @@
 package parsers
 
 import (
-	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -47,8 +46,6 @@ func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *
 
 		if err == nil {
 			guessLicenses := keywordGuessLicense(bytes, Database)
-
-			fmt.Println(filepath.Join(directory, file), guessLicenses)
 
 			if len(guessLicenses) != 0 {
 				identifiedRootLicense = append(identifiedRootLicense, guessLicenses[0])
@@ -98,7 +95,7 @@ func processFileFast(input *chan *File, output *chan *FileResult) {
 	}
 
 	wg.Wait()
-	close(*input)
+	close(*output)
 }
 
 func processFile(directory string, file string, rootLicenses []LicenseMatch) FileResult {

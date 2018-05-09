@@ -369,6 +369,13 @@ func ProcessFast() {
 	fileResultQueue := make(chan *FileResult, 5000)
 	go processFileFast(&fileListQueue, &fileResultQueue)
 
+	var fileResults []FileResult
+	go func() {
+		for input := range fileResultQueue {
+			fileResults = append(fileResults, *input)
+		}
+	}()
+
 	for _, fileDirectory := range DirFilePaths {
 		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
 			startTime := makeTimestampMilli()
@@ -378,5 +385,27 @@ func ProcessFast() {
 				printTrace(fmt.Sprintf("milliseconds walk file tree: %s: %d", fileDirectory, makeTimestampMilli()-startTime))
 			}
 		}
+	}
+	close(fileListQueue)
+
+	sort.Slice(fileResults, func(i, j int) bool {
+		return len(fileResults[i].Directory) < len(fileResults[j].Directory)
+	})
+
+	switch strings.ToLower(Format) {
+	case "csv":
+		toCSV(fileResults)
+	case "json":
+		toJSON(fileResults)
+	case "tabular":
+		toTabular(fileResults)
+	case "summary":
+		toSummary(fileResults)
+	case "spdx21":
+		toSPDX21(fileResults)
+	case "spdx":
+		toSPDX21(fileResults)
+	default:
+		fmt.Println("")
 	}
 }
