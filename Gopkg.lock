@@ -8,12 +8,6 @@
   revision = "466a786b1f01779dcc7dcfb654bddaef059badd3"
 
 [[projects]]
-  name = "github.com/pkg/profile"
-  packages = ["."]
-  revision = "5b67d428864e92711fcbd2f8629456121a56d91f"
-  version = "v1.2.1"
-
-[[projects]]
   name = "github.com/ryanuber/columnize"
   packages = ["."]
   revision = "983d3a5fab1bf04d1b412465d2d9f8430e2e917e"
@@ -28,6 +22,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fe68e376f55936c94feafbabf04f96439f9e5e9b0bf96afee5831915b5c0ccb1"
+  inputs-digest = "3d731e23e628654e2b5962134b1d41a98c5fba95aeefd7c620c3510025d834ba"
   solver-name = "gps-cdcl"
   solver-version = 1

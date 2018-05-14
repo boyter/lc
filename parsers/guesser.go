@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	vectorspace "github.com/boyter/golangvectorspace"
-	"io/ioutil"
 	"os"
-	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -222,82 +220,6 @@ func loadDatabase() []License {
 	return database
 }
 
-func walkDirectory(directory string, rootLicenses [][]LicenseMatch) []FileResult {
-	startTime := makeTimestampMilli()
-	var fileResults []FileResult
-	all, _ := ioutil.ReadDir(directory)
-
-	var directories []string
-	var files []string
-
-	// Work out which directories and files we want to investigate
-	for _, f := range all {
-		if f.IsDir() {
-			add := true
-
-			for _, black := range strings.Split(PathBlacklist, ",") {
-				if f.Name() == black {
-					add = false
-				}
-			}
-
-			if add == true {
-				directories = append(directories, f.Name())
-			}
-		} else {
-			files = append(files, f.Name())
-		}
-	}
-
-	// Determine any possible licence files which would classify everything else
-	possibleLicenses := findPossibleLicenseFiles(files)
-	var identifiedRootLicense []LicenseMatch
-	for _, possibleLicense := range possibleLicenses {
-
-		content, err := ioutil.ReadFile(filepath.Join(directory, possibleLicense))
-
-		if err == nil {
-			guessLicenses := guessLicense(string(content), deepGuess, loadDatabase())
-
-			if len(guessLicenses) != 0 {
-				identifiedRootLicense = append(identifiedRootLicense, guessLicenses[0])
-			}
-		} else {
-			// TODO log error
-		}
-	}
-
-	if len(identifiedRootLicense) != 0 {
-		rootLicenses = append(rootLicenses, identifiedRootLicense)
-	}
-
-	for _, file := range files {
-
-		var rootLicense []LicenseMatch
-		if len(rootLicenses) != 0 {
-			rootLicense = rootLicenses[len(rootLicenses)-1]
-		}
-
-		fileResult := processFile(directory, file, rootLicense)
-		fileResults = append(fileResults, fileResult)
-
-		if strings.ToLower(Format) == "progress" {
-			toProgress(directory, file, rootLicense, fileResult.LicenseGuesses, fileResult.LicenseIdentified)
-		}
-	}
-
-	for _, newdirectory := range directories {
-		results := walkDirectory(filepath.Join(directory, newdirectory), rootLicenses)
-		fileResults = append(fileResults, results...)
-	}
-
-	if Trace {
-		printTrace(fmt.Sprintf("milliseconds walk file tree: %s: %d", directory, makeTimestampMilli()-startTime))
-	}
-
-	return fileResults
-}
-
 func processArguments() {
 	conf, err := strconv.ParseFloat(Confidence, 64)
 	if err == nil {
@@ -355,7 +277,7 @@ func Process() {
 	close(fileListQueue)
 
 	sort.Slice(fileResults, func(i, j int) bool {
-		return len(fileResults[i].Directory) < len(fileResults[j].Directory)
+		return strings.Compare(fileResults[i].Directory, fileResults[j].Directory) < 0
 	})
 
 	switch strings.ToLower(Format) {
