@@ -21,7 +21,7 @@ var ToolVersion = "2.0.0"
 var confidence = 0.85
 var Confidence = ""
 var PossibleLicenceFiles = ""
-var DirFilePaths = []string{}
+var DirFilePaths []string
 var PathBlacklist = ""
 var deepGuess = true
 var DeepGuess = ""
@@ -70,7 +70,7 @@ func identifierGuessLicence(content string, licenses []License) []LicenseMatch {
 // returns the matching licences with the shortname and the percentage of match.
 // If fast lookup methods fail it will try deep matching which is slower.
 func guessLicense(content string, deepguess bool, licenses []License) []LicenseMatch {
-	matchingLicenses := []LicenseMatch{}
+	var matchingLicenses []LicenseMatch
 
 	for _, license := range keywordGuessLicense([]byte(content), licenses) {
 		matchingLicense := License{}
@@ -243,8 +243,6 @@ func processArguments() {
 	}
 }
 
-
-
 func Process() {
 	processArguments()
 	loadDatabase()
@@ -255,14 +253,6 @@ func Process() {
 
 	fileListQueue := make(chan *File, 5000)
 	fileResultQueue := make(chan *FileResult, 5000)
-	go processFileFast(&fileListQueue, &fileResultQueue)
-
-	var fileResults []FileResult
-	go func() {
-		for input := range fileResultQueue {
-			fileResults = append(fileResults, *input)
-		}
-	}()
 
 	for _, fileDirectory := range DirFilePaths {
 		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
@@ -275,6 +265,15 @@ func Process() {
 		}
 	}
 	close(fileListQueue)
+
+	processFileFast(&fileListQueue, &fileResultQueue)
+	close(fileResultQueue)
+
+	var fileResults []FileResult
+
+	for input := range fileResultQueue {
+		fileResults = append(fileResults, *input)
+	}
 
 	sort.Slice(fileResults, func(i, j int) bool {
 		return strings.Compare(fileResults[i].Directory, fileResults[j].Directory) < 0

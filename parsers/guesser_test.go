@@ -4,9 +4,9 @@ import (
 	// "io/ioutil"
 	"path/filepath"
 	// "strings"
-	"testing"
 	"encoding/json"
 	"io/ioutil"
+	"testing"
 )
 
 func TestCleanText(t *testing.T) {
