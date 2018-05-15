@@ -89,7 +89,7 @@ func joinLicenseList(licenseList []LicenseMatch, ignore []LicenseMatch, operator
 			licenseDeclared = licenseList[0].LicenseId
 		}
 	} else if len(licenseList) >= 2 {
-		licenseNames := []string{}
+		var licenseNames []string
 		for _, v := range licenseList {
 			if licenceListHasLicense(v, ignore) == false {
 				licenseNames = append(licenseNames, v.LicenseId)
@@ -114,14 +114,14 @@ func joinLicenseList(licenseList []LicenseMatch, ignore []LicenseMatch, operator
 func determineLicense(result FileResult) (string, string) {
 	license := ""
 	confidence := 100.00
-	licenseMatches := []LicenseMatch{}
+	var licenseMatches []LicenseMatch
 
 	if len(result.LicenseIdentified) != 0 {
 		license = joinLicenseList(result.LicenseIdentified, result.LicenseRoots, " AND ")
 		confidence = 100.00
 	} else if len(result.LicenseGuesses) != 0 {
 		license = result.LicenseGuesses[0].LicenseId
-		confidence = result.LicenseGuesses[0].Percentage * 100
+		confidence = result.LicenseGuesses[0].Percentage
 		licenseMatches = append(licenseMatches, result.LicenseGuesses[0])
 	}
 
@@ -201,34 +201,9 @@ func toSummary(fileResults []FileResult) {
 	fmt.Println(result)
 }
 
-func toProgress(directory string, file string, rootLicenses []LicenseMatch, licenseGuesses []LicenseMatch, licenseIdentified []LicenseMatch) {
-	license := ""
-	confidence := ""
-
-	if len(licenseIdentified) != 0 {
-		license = joinLicenseList(licenseIdentified, []LicenseMatch{}, " AND ")
-		confidence = fmt.Sprintf("%.2f%%", 100.00)
-	} else if len(licenseGuesses) != 0 {
-		license = licenseGuesses[0].LicenseId
-		confidence = fmt.Sprintf("%.2f%%", licenseGuesses[0].Percentage*100)
-	}
-
-	rootLicenseString := ""
-	for _, v := range rootLicenses {
-		rootLicenseString += fmt.Sprintf("%s, ", v.LicenseId)
-	}
-	rootLicenseString = strings.TrimRight(rootLicenseString, ", ")
-
-	fmt.Println("Filename:", file)
-	fmt.Println("Directory:", directory)
-	fmt.Println("License:", license, confidence)
-	fmt.Println("Root License(s):", rootLicenseString)
-	fmt.Println("----------------------------")
-}
-
 func generatePackageVerificationCode(fileResults []FileResult) string {
 	// Based on https://github.com/spdx/tools-python/blob/a48022e65a8897d0e4f2e93d8e53695d2c13ea23/spdx/package.py#L233
-	hashes := []string{}
+	var hashes []string
 
 	for _, result := range fileResults {
 		hashes = append(hashes, result.Sha1Hash)
@@ -248,7 +223,7 @@ func generateDocumentNamespace() string {
 
 func toSPDX21(fileResults []FileResult) {
 
-	lines := []string{}
+	var lines []string
 
 	packageLicenseDeclared := "NONE"
 	if len(fileResults) != 0 {
@@ -273,7 +248,7 @@ func toSPDX21(fileResults []FileResult) {
 	lines = append(lines, "PackageLicenseDeclared: "+packageLicenseDeclared)
 	lines = append(lines, "PackageLicenseConcluded: "+packageLicenseDeclared)
 
-	duplicateLicenseMatch := []LicenseMatch{}
+	var duplicateLicenseMatch []LicenseMatch
 	for _, result := range fileResults {
 		if len(result.LicenseIdentified) != 0 {
 			for _, license := range result.LicenseIdentified {
