@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *chan *File) {
@@ -77,15 +78,15 @@ func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *
 		}
 	}
 
-	//var wg sync.WaitGroup
+	var wg sync.WaitGroup
 	for _, newDirectory := range directories {
-		//wg.Add(1)
-		//go func(directory string, newDirectory string, rootlicenses [][]LicenseMatch, output *chan *File) {
+		wg.Add(1)
+		go func(directory string, newDirectory string, rootlicenses [][]LicenseMatch, output *chan *File) {
 			walkDirectoryFast(filepath.Join(directory, newDirectory), rootLicenses, output)
-			//wg.Done()
-		//}(directory, newDirectory, rootLicenses, output)
+			wg.Done()
+		}(directory, newDirectory, rootLicenses, output)
 	}
-	//wg.Wait()
+	wg.Wait()
 }
 
 func processFileFast(input *chan *File, output *chan *FileResult) {

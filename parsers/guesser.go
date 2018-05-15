@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode/utf8"
+	"sync"
 )
 
 // Shared all over the place
@@ -52,7 +53,7 @@ func cleanText(content string) string {
 // Identify licenses in the text which is using the SPDX indicator
 // Can return multiple license matches
 func identifierGuessLicence(content string, licenses []License) []LicenseMatch {
-	matchingLicenses := []LicenseMatch{}
+	var matchingLicenses []LicenseMatch
 	matches := spdxLicenceRegex.FindAllStringSubmatch(content, -1)
 
 	for _, val := range matches {
@@ -254,20 +255,27 @@ func Process() {
 	fileListQueue := make(chan *File, 5000)
 	fileResultQueue := make(chan *FileResult, 5000)
 
-	for _, fileDirectory := range DirFilePaths {
-		if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
-			startTime := makeTimestampMilli()
-			walkDirectoryFast(fileDirectory, [][]LicenseMatch{}, &fileListQueue)
+	var wg sync.WaitGroup
+	go func() {
+		wg.Add(1)
+		for _, fileDirectory := range DirFilePaths {
+			if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
+				startTime := makeTimestampMilli()
+				walkDirectoryFast(fileDirectory, [][]LicenseMatch{}, &fileListQueue)
 
-			if Trace {
-				printTrace(fmt.Sprintf("milliseconds walk file tree: %s: %d", fileDirectory, makeTimestampMilli()-startTime))
+				if Trace {
+					printTrace(fmt.Sprintf("milliseconds walk file tree: %s: %d", fileDirectory, makeTimestampMilli()-startTime))
+				}
 			}
 		}
-	}
-	close(fileListQueue)
+		wg.Done()
+		close(fileListQueue)
+	}()
 
-	processFileFast(&fileListQueue, &fileResultQueue)
-	close(fileResultQueue)
+	go func() {
+		processFileFast(&fileListQueue, &fileResultQueue)
+		close(fileResultQueue)
+	}()
 
 	var fileResults []FileResult
 
