@@ -127,15 +127,25 @@ func processFile(directory string, file string, rootLicenses []LicenseMatch) Fil
 		licenseIdentified = identifierGuessLicence(string(content), Database)
 	}
 
+	md5 := ""
+	sha1 := ""
+	sha256 := ""
+
+	if strings.ToLower(Format) == "spdx21" || strings.ToLower(Format) == "spdx" {
+		md5 = getMd5Hash(content)
+		sha1 = getSha1Hash(content)
+		sha256 = getSha256Hash(content)
+	}
+
 	fileResult := FileResult{
 		Directory:         directory,
 		Filename:          file,
 		LicenseGuesses:    licenseGuesses,
 		LicenseRoots:      rootLicenses,
 		LicenseIdentified: licenseIdentified,
-		Md5Hash:           getMd5Hash(content),
-		Sha1Hash:          getSha1Hash(content),
-		Sha256Hash:        getSha256Hash(content),
+		Md5Hash:           md5,
+		Sha1Hash:          sha1,
+		Sha256Hash:        sha256,
 		BytesHuman:        bytesToHuman(int64(len(content))),
 		Bytes:             len(content)}
 
