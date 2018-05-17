@@ -183,7 +183,9 @@ func toTabular(results []FileResult) {
 
 		if len(tmp) + len(license) > 80 {
 			// Need to trim down the path
-			//toTrim := len(tmp) -
+			toTrim := 80 - len(license)
+			tmp = "~" + tmp[toTrim:]
+
 		} else {
 			// Need to pad out the file
 			toPad := 78 - len(tmp) - len(license)
