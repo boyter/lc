@@ -142,10 +142,10 @@ func determineLicense(result FileResult) (string, string) {
 }
 
 var tabularShortBreak = "-------------------------------------------------------------------------------\n"
-var tabularShortFormatHead = "%-73s %7s\n"
-var tabularShortFormatBody = "%-73s %7s\n"
+var tabularShortFormatHead = "%-71s %7s\n"
+var tabularShortFormatBody = "%-71s %7s\n"
 var tabularShortLicense = "%s %f"
-var shortFormatFileTrucate = 72
+var shortFormatFileTrucate = 70
 
 //func toTabular(fileResults []FileResult) {
 //	output := []string{
@@ -184,10 +184,17 @@ func toTabular(results []FileResult) {
 		if len(tmp) + len(license) > 80 {
 			// Need to trim down the path
 			//toTrim := len(tmp) -
+		} else {
+			// Need to pad out the file
+			toPad := 78 - len(tmp) - len(license)
+
+			for i := 0; i < toPad; i++ {
+				tmp = tmp + " "
+			}
 		}
 
 
-		str.WriteString(fmt.Sprintf(tabularShortFormatBody, tmp, license))
+		str.WriteString(fmt.Sprintf("%s %s\n", tmp, license))
 	}
 	str.WriteString(tabularShortBreak)
 
