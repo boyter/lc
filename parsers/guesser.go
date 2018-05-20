@@ -12,6 +12,7 @@ import (
 	"strings"
 	"unicode/utf8"
 	"sync"
+	"runtime"
 )
 
 // Shared all over the place
@@ -269,13 +270,20 @@ func Process() {
 			}
 		}
 		wg.Done()
-		close(fileListQueue)
 	}()
 
-	go func() {
-		processFileFast(&fileListQueue, &fileResultQueue)
-		close(fileResultQueue)
-	}()
+	for i := 0; i < runtime.NumCPU(); i++ {
+		wg.Add(1)
+		go func() {
+			processFileFast(&fileListQueue, &fileResultQueue)
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
+
+	close(fileListQueue)
+	close(fileResultQueue)
 
 	var fileResults []FileResult
 

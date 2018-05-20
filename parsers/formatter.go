@@ -147,24 +147,6 @@ var tabularShortFormatBody = "%-71s %7s\n"
 var tabularShortLicense = "%s %f"
 var shortFormatFileTrucate = 70
 
-//func toTabular(fileResults []FileResult) {
-//	output := []string{
-//		"-----",
-//		"Directory | File | License | Confidence | Size",
-//		"-----",
-//	}
-//
-//	for _, result := range fileResults {
-//		license, confidence := determineLicense(result)
-//		output = append(output, fmt.Sprintf("%s | %s | %s | %s | %s", result.Directory, result.Filename, license, confidence, result.BytesHuman))
-//	}
-//
-//	output = append(output, "-----")
-//	result := columnize.SimpleFormat(output)
-//
-//	fmt.Println(result)
-//}
-
 func toTabular(results []FileResult) {
 	var str strings.Builder
 
