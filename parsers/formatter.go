@@ -176,18 +176,10 @@ func toTabular(results []FileResult) {
 		license, _ := determineLicense(result)
 		tmp := filepath.Join(result.Directory, result.Filename)
 
-		//if len(tmp) >= shortFormatFileTrucate {
-		//	toTrim := len(tmp) - shortFormatFileTrucate
-		//	tmp = "~" + tmp[toTrim:]
-		//}
-
-		if len(tmp) + len(license) > 80 {
-			// Need to trim down the path
-			toTrim := 80 - len(license)
-			tmp = "~" + tmp[toTrim:]
-
+		if len(tmp) + len(license) > 79 {
+			toTrim := 77 - len(license)
+			tmp = "~" + tmp[:toTrim]
 		} else {
-			// Need to pad out the file
 			toPad := 78 - len(tmp) - len(license)
 
 			for i := 0; i < toPad; i++ {
@@ -195,11 +187,10 @@ func toTabular(results []FileResult) {
 			}
 		}
 
-
 		str.WriteString(fmt.Sprintf("%s %s\n", tmp, license))
 	}
-	str.WriteString(tabularShortBreak)
 
+	str.WriteString(tabularShortBreak)
 	fmt.Println(str.String())
 }
 
