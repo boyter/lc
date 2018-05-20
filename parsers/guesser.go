@@ -270,6 +270,7 @@ func Process() {
 			}
 		}
 		wg.Done()
+		close(fileListQueue)
 	}()
 
 	for i := 0; i < runtime.NumCPU(); i++ {
@@ -281,8 +282,6 @@ func Process() {
 	}
 
 	wg.Wait()
-
-	close(fileListQueue)
 	close(fileResultQueue)
 
 	var fileResults []FileResult
