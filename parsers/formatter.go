@@ -143,9 +143,6 @@ func determineLicense(result FileResult) (string, string) {
 
 var tabularShortBreak = "-------------------------------------------------------------------------------\n"
 var tabularShortFormatHead = "%-71s %7s\n"
-var tabularShortFormatBody = "%-71s %7s\n"
-var tabularShortLicense = "%s %f"
-var shortFormatFileTrucate = 70
 
 func toTabular(results []FileResult) {
 	var str strings.Builder
@@ -158,7 +155,7 @@ func toTabular(results []FileResult) {
 		license, _ := determineLicense(result)
 		tmp := filepath.Join(result.Directory, result.Filename)
 
-		if len(tmp)+len(license) > 79 {
+		if len(tmp)+len(license) >= 79 {
 			toTrim := 77 - len(license)
 			tmp = "~" + tmp[:toTrim]
 		} else {
