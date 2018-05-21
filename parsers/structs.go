@@ -2,6 +2,7 @@ package parsers
 
 import (
 	vectorspace "github.com/boyter/golangvectorspace"
+	"path/filepath"
 )
 
 type License struct {
@@ -34,4 +35,8 @@ type File struct {
 	Directory    string
 	File         string
 	RootLicenses []LicenseMatch
+}
+
+func (c *FileResult) FullPath() string {
+	return filepath.Join(c.Directory, c.Filename)
 }

@@ -134,38 +134,6 @@ func guessLicense(content string, deepguess bool, licenses []License) []LicenseM
 	return matchingLicenses
 }
 
-// Shamelessly stolen from https://github.com/src-d/go-license-detector
-// https://github.com/src-d/go-license-detector#L63
-// SPDX-License-Identifier: Apache-2.0
-//var (
-//	licenseFileNames = []string{
-//		"li[cs]en[cs]e(s?)",
-//		"legal",
-//		"copy(left|right|ing)",
-//		"unlicense",
-//		"l?gpl([-_ v]?)(\\d\\.?\\d)?",
-//		"bsd",
-//		"mit",
-//		"apache",
-//		"readme",
-//	}
-//	licenseFileRe = regexp.MustCompile(
-//		fmt.Sprintf("^(|.*[-_. ])(%s)(|[-_. ].*)$",
-//			strings.Join(licenseFileNames, "|")))
-//)
-//
-//func findPossibleLicenseFiles(fileList []string) []string {
-//	var possibleList []string
-//
-//	for _, filename := range fileList {
-//		if licenseFileRe.MatchString(strings.ToLower(filename)) {
-//			possibleList = append(possibleList, filename)
-//		}
-//	}
-//
-//	return possibleList
-//}
-
 func findPossibleLicenseFiles(fileList []string) []string {
 	var possibleList []string
 
@@ -263,7 +231,7 @@ func Process() {
 	}
 
 	sort.Slice(fileResults, func(i, j int) bool {
-		return strings.Compare(fileResults[i].Directory, fileResults[j].Directory) < 0
+		return strings.Compare(fileResults[i].FullPath(), fileResults[j].FullPath()) < 0
 	})
 
 	switch strings.ToLower(Format) {
