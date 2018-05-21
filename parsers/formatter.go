@@ -158,7 +158,7 @@ func toTabular(results []FileResult) {
 		license, _ := determineLicense(result)
 		tmp := filepath.Join(result.Directory, result.Filename)
 
-		if len(tmp) + len(license) > 79 {
+		if len(tmp)+len(license) > 79 {
 			toTrim := 77 - len(license)
 			tmp = "~" + tmp[:toTrim]
 		} else {

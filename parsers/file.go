@@ -118,7 +118,7 @@ func processFile(directory string, file string, rootLicenses []LicenseMatch) Fil
 	var licenseGuesses []LicenseMatch
 	var licenseIdentified []LicenseMatch
 
-	if len(content) > maxSize {
+	if len(content) > MaxSize {
 		process = false
 	}
 

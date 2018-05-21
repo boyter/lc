@@ -20,7 +20,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:        "format, f",
-			Usage:       "Set output format, supports progress, tabular, json, spdx, summary or `csv`",
+			Usage:       "Set output format, supports progress, tabular, json, spdx or `csv`",
 			Destination: &parsers.Format,
 			Value:       "tabular",
 		},
@@ -29,22 +29,10 @@ func main() {
 			Usage:       "Set output file if not set will print to stdout `FILE`",
 			Destination: &parsers.FileOutput,
 		},
-		cli.StringFlag{
-			Name:        "confidence, c",
-			Usage:       "Set required confidence level for licence matching between 0 and 1 E.G. `0.95`",
-			Value:       "0.85",
-			Destination: &parsers.Confidence,
-		},
-		cli.StringFlag{
-			Name:        "deepguess, dg",
-			Usage:       "Should attempt to deep guess the licence false or true `true`",
-			Value:       "true",
-			Destination: &parsers.DeepGuess,
-		},
-		cli.StringFlag{
+		cli.IntFlag{
 			Name:        "filesize, fs",
 			Usage:       "How large a file in bytes should be processed `50000`",
-			Value:       "50000",
+			Value:       50000,
 			Destination: &parsers.MaxSize,
 		},
 		cli.StringFlag{

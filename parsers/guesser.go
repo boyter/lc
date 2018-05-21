@@ -8,7 +8,6 @@ import (
 	"os"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 	"unicode/utf8"
 	"sync"
@@ -25,13 +24,10 @@ var Confidence = ""
 var PossibleLicenceFiles = ""
 var DirFilePaths []string
 var PathBlacklist = ""
-var deepGuess = true
-var DeepGuess = ""
 var Format = ""
 var FileOutput = ""
 var ExtentionBlacklist = ""
-var maxSize = 50000
-var MaxSize = ""
+var MaxSize = 50000
 var DocumentName = ""
 var PackageName = ""
 var DocumentNamespace = ""
@@ -222,31 +218,7 @@ func loadDatabase() []License {
 	return database
 }
 
-func processArguments() {
-	conf, err := strconv.ParseFloat(Confidence, 64)
-	if err == nil {
-		confidence = conf
-	} else {
-		fmt.Println("Using default confidence value")
-	}
-
-	size, err := strconv.ParseInt(MaxSize, 10, 32)
-	if err == nil {
-		maxSize = int(size)
-	} else {
-		fmt.Println("Using default filesize value")
-	}
-
-	deep, err := strconv.ParseBool(DeepGuess)
-	if err == nil {
-		deepGuess = deep
-	} else {
-		fmt.Println("Using default deepguess value")
-	}
-}
-
 func Process() {
-	processArguments()
 	loadDatabase()
 
 	if len(DirFilePaths) == 0 {
