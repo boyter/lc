@@ -158,6 +158,11 @@ func toTabular(results []FileResult) {
 		if len(tmp)+len(license) >= 79 {
 			// Slice out of bounds exception here
 			toTrim := 77 - len(license)
+
+			if toTrim <= 0 {
+				toTrim = 0
+			}
+
 			tmp = "~" + tmp[:toTrim]
 		} else {
 			toPad := 78 - len(tmp) - len(license)

@@ -34,6 +34,7 @@ func TestLoadDatabase(t *testing.T) {
 }
 
 func TestProcessFile(t *testing.T) {
+	Format = "csv"
 	actual := processFile("../examples/identifier/", "has_identifier.py", []LicenseMatch{})
 
 	if actual.Md5Hash != "fc7d75e0bc0275841de8426b18791fa4" {
