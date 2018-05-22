@@ -7,11 +7,11 @@ import (
 	vectorspace "github.com/boyter/golangvectorspace"
 	"os"
 	"regexp"
+	"runtime"
 	"sort"
 	"strings"
-	"unicode/utf8"
 	"sync"
-	"runtime"
+	"unicode/utf8"
 )
 
 // Shared all over the place

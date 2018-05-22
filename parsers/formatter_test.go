@@ -32,7 +32,7 @@ func TestGenerateDocumentNamespaceSomethingSpecified(t *testing.T) {
 }
 
 func TestToSummary(t *testing.T) {
-	sample := []FileResult{}
+	var sample []FileResult
 	toSummary(sample)
 
 	sample = append(sample, FileResult{})
@@ -40,15 +40,35 @@ func TestToSummary(t *testing.T) {
 }
 
 func TestToTabular(t *testing.T) {
-	sample := []FileResult{}
+	var sample []FileResult
 	toTabular(sample)
 
 	sample = append(sample, FileResult{})
 	toTabular(sample)
 }
 
+func TestToTabularMany(t *testing.T) {
+	var sample []FileResult
+	toTabular(sample)
+
+	tmp := ""
+	for i := 0; i < 80; i++ {
+		tmp = "a" + tmp
+
+		sample = []FileResult{
+			{
+				Filename: tmp,
+				LicenseIdentified: []LicenseMatch{
+					{LicenseId: tmp},
+				},
+			},
+		}
+		toTabular(sample)
+	}
+}
+
 func TestToCSV(t *testing.T) {
-	sample := []FileResult{}
+	var sample []FileResult
 	toCSV(sample)
 
 	sample = append(sample, FileResult{})

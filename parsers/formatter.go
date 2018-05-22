@@ -156,6 +156,7 @@ func toTabular(results []FileResult) {
 		tmp := filepath.Join(result.Directory, result.Filename)
 
 		if len(tmp)+len(license) >= 79 {
+			// Slice out of bounds exception here
 			toTrim := 77 - len(license)
 			tmp = "~" + tmp[:toTrim]
 		} else {

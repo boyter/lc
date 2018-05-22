@@ -9,6 +9,7 @@ import (
 //go:generate go run scripts/include.go
 func main() {
 	//defer profile.Start(profile.CPUProfile).Stop()
+	//see apache2.0 license which uses special value for it so this does not work example ./lc/xgboost
 
 	app := cli.NewApp()
 	app.EnableBashCompletion = true
