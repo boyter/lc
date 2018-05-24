@@ -118,7 +118,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"fmt"
 )
 
 type License struct {
@@ -143,12 +142,17 @@ func cleanText(content string) string {
 }
 
 func findNgrams(list []string, size int) [][]string {
+	var ngrams [][]string
+
 	for i := 0; i < len(list); i++ {
-		ngram := list[i:i+size]
-		fmt.Println(ngram, i, i + size)
+
+		if i+size < len(list) + 1 {
+			ngram := list[i:i+size]
+			ngrams = append(ngrams, ngram)
+		}
 	}
 
-	return nil
+	return ngrams
 }
 
 func main() {
@@ -167,13 +171,13 @@ func main() {
 		}
 	}
 
-	findNgrams(strings.Split("Lorem ipsum dolor sit amet consetetur sadipscing elitr", " "), 3)
+	//fmt.Println(findNgrams(strings.Split("Lorem ipsum dolor sit amet consetetur sadipscing elitr", " "), 4))
 
-
-	//for _, license := range licenses {
-	//	split := strings.Split(cleanText(license.LicenseText), " ")
-	//	//findNgrams(split, 7)
-	//	//findNgrams(split, 8)
-	//}
+	for _, license := range licenses {
+		split := strings.Split(cleanText(license.LicenseText), " ")
+		findNgrams(split, 3)
+		findNgrams(split, 7)
+		findNgrams(split, 8)
+	}
 
 }
