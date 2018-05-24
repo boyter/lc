@@ -143,16 +143,9 @@ func cleanText(content string) string {
 }
 
 func findNgrams(list []string, size int) [][]string {
-
 	for i := 0; i < len(list); i++ {
-		var ngram []string
-
-		for j := i; j < i+size; j++ {
-			fmt.Println(i, j)
-			ngram = append(ngram, list[i+j])
-		}
-
-		fmt.Println(ngram)
+		ngram := list[i:i+size]
+		fmt.Println(ngram, i, i + size)
 	}
 
 	return nil
