@@ -30,7 +30,7 @@
 //     onlyfiles = [f for f in listdir(license_dir) if isfile(join(license_dir, f))]
 //     licenses = []
 
-//     for license in onlyfiles[:10]:
+//     for license in onlyfiles:
 //         with open(join(license_dir, license), 'r') as file:
 //             temp = file.read()
 //             license_json = json.loads(temp)
@@ -113,17 +113,20 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"io/ioutil"
+	"path/filepath"
 	"regexp"
 	"strings"
+	"fmt"
 )
 
 type License struct {
-	LicenseText string   `json:"licenseText"`
-	Name        string   `json:"name"`
-	LicenseId   string   `json:"licenseId"`
-	Keywords    []string `json:"keywords"`
+	LicenseText             string   `json:"licenseText"`
+	StandardLicenseTemplate string   `json:"standardLicenseTemplate"`
+	Name                    string   `json:"name"`
+	LicenseId               string   `json:"licenseId"`
+	Keywords                []string `json:"keywords"`
 }
 
 var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
@@ -139,16 +142,32 @@ func cleanText(content string) string {
 	return content
 }
 
-// Reads all .json files in the current folder
-// and encodes them as strings literals in constants.go
+func findNgrams(list []string, size int) [][]string {
+	return nil
+}
+
 func main() {
 	files, _ := ioutil.ReadDir("./licenses/")
 
+	var licenses []License
+
 	for _, f := range files {
 		if strings.HasSuffix(f.Name(), ".json") {
-			// The constant variable name
-			fmt.Println(f.Name())
+			bytes, _ := ioutil.ReadFile(filepath.Join("./licenses/", f.Name()))
+
+			var license License
+			json.Unmarshal(bytes, &license)
+
+			licenses = append(licenses, license)
 		}
+	}
+
+	for _, license := range licenses {
+		split := strings.Split(cleanText(license.LicenseText), " ")
+		fmt.Println(len(split))
+		findNgrams(split, 3)
+		findNgrams(split, 7)
+		findNgrams(split, 8)
 	}
 
 }
