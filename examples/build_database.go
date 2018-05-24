@@ -143,6 +143,18 @@ func cleanText(content string) string {
 }
 
 func findNgrams(list []string, size int) [][]string {
+
+	for i := 0; i < len(list); i++ {
+		var ngram []string
+
+		for j := i; j < i+size; j++ {
+			fmt.Println(i, j)
+			ngram = append(ngram, list[i+j])
+		}
+
+		fmt.Println(ngram)
+	}
+
 	return nil
 }
 
@@ -162,12 +174,13 @@ func main() {
 		}
 	}
 
-	for _, license := range licenses {
-		split := strings.Split(cleanText(license.LicenseText), " ")
-		fmt.Println(len(split))
-		findNgrams(split, 3)
-		findNgrams(split, 7)
-		findNgrams(split, 8)
-	}
+	findNgrams(strings.Split("Lorem ipsum dolor sit amet consetetur sadipscing elitr", " "), 3)
+
+
+	//for _, license := range licenses {
+	//	split := strings.Split(cleanText(license.LicenseText), " ")
+	//	//findNgrams(split, 7)
+	//	//findNgrams(split, 8)
+	//}
 
 }
