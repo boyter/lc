@@ -27,12 +27,12 @@ def find_ngrams(input_list, n):
 
 
 def build_database():
-    license_dir = './license-list-data/json/details/'
+    license_dir = '../examples/licenses/'
 
     onlyfiles = [f for f in listdir(license_dir) if isfile(join(license_dir, f))]
     licenses = []
 
-    for license in onlyfiles:
+    for license in onlyfiles[:10]:
         with open(join(license_dir, license), 'r') as file:
             temp = file.read()
             license_json = json.loads(temp)
@@ -44,6 +44,8 @@ def build_database():
                 ngramrange = range(2, 35)
 
             cleaned = clean_text(license_json['licenseText']).split()
+            if 'standardLicenseTemplate' in license_json:
+                cleaned += clean_text(license_json['standardLicenseTemplate']).split()
 
             for x in ngramrange:
                 ngrams = ngrams + find_ngrams(cleaned, x)
@@ -65,10 +67,12 @@ def build_database():
 
 
 if __name__ == '__main__':
-
+    print 'Building database...'
     licenses = build_database()
     
+    print 'Processing licenses...'
     for license in licenses:
+        print 'PROCESSING', license['licenseId'], len(license['ngrams'])
         matches = []
 
         for ngram in license['ngrams']:
@@ -77,12 +81,20 @@ if __name__ == '__main__':
 
             filtered = [x for x in licenses if x['licenseId'] != license['licenseId']]
             for lic in filtered:
-                if find in lic['licenseText']:
-                    ismatch = False
-                    break
+                # if find in lic['licenseText']:
+                #     print find, 'FOUND'
+                #     ismatch = False
+                #     break
+                for ngram2 in lic['ngrams']:
+                    if find == ' '.join(ngram2):
+                        ismatch = False
+                        break
 
             if ismatch:
                 matches.append(find)
+
+            if len(matches) == 50:
+                break
 
         if len(matches) == 0:
             print '>>>>', license['licenseId'], len(matches)
