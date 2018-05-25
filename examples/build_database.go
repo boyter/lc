@@ -118,6 +118,9 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"reflect"
+	"fmt"
+	"sync"
 )
 
 type License struct {
@@ -126,6 +129,7 @@ type License struct {
 	Name                    string   `json:"name"`
 	LicenseId               string   `json:"licenseId"`
 	Keywords                []string `json:"keywords"`
+	Ngrams                  [][]string
 }
 
 var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
@@ -146,8 +150,8 @@ func findNgrams(list []string, size int) [][]string {
 
 	for i := 0; i < len(list); i++ {
 
-		if i+size < len(list) + 1 {
-			ngram := list[i:i+size]
+		if i+size < len(list)+1 {
+			ngram := list[i : i+size]
 			ngrams = append(ngrams, ngram)
 		}
 	}
@@ -155,29 +159,81 @@ func findNgrams(list []string, size int) [][]string {
 	return ngrams
 }
 
+func checkUniqueNgram(licenseId string, licenses []License, ngram []string) bool {
+	// For the ngram check if it is unique
+	for _, lic := range licenses {
+		// Ignore the same license
+		if lic.LicenseId != licenseId {
+			for _, ng := range lic.Ngrams {
+				if reflect.DeepEqual(ngram, ng) {
+					return false
+				}
+			}
+		}
+	}
+
+	return true
+}
+
 func main() {
 	files, _ := ioutil.ReadDir("./licenses/")
 
 	var licenses []License
 
+	// Load the licenses
 	for _, f := range files {
 		if strings.HasSuffix(f.Name(), ".json") {
 			bytes, _ := ioutil.ReadFile(filepath.Join("./licenses/", f.Name()))
 
 			var license License
 			json.Unmarshal(bytes, &license)
+			license.Ngrams = [][]string{}
 
 			licenses = append(licenses, license)
 		}
 	}
 
-	//fmt.Println(findNgrams(strings.Split("Lorem ipsum dolor sit amet consetetur sadipscing elitr", " "), 4))
+	// Build ngrams for them
+	for j := 0; j < len(licenses); j++ {
+		split := strings.Split(cleanText(licenses[j].LicenseText), " ")
 
+		for i := 2; i < 8; i++ {
+			ngrams := findNgrams(split, i)
+			licenses[j].Ngrams = append(licenses[j].Ngrams, ngrams...)
+		}
+	}
+
+	// For each licence, check each ngram and see if it is unique
 	for _, license := range licenses {
-		split := strings.Split(cleanText(license.LicenseText), " ")
-		findNgrams(split, 3)
-		findNgrams(split, 7)
-		findNgrams(split, 8)
+		fmt.Println(license.LicenseId, len(license.Ngrams))
+		//var wg sync.WaitGroup
+
+		// for each licence that isnt this one
+		// get all the ngrams and put it into a hash
+		// then look each of our ngrams and check if it is contained
+		contains := map[string]int{}
+		for _, lic := range licenses {
+			if lic.LicenseId != license.LicenseId {
+				for _, ngram := range lic.Ngrams {
+					contains[strings.Join(ngram, "")] = 1
+				}
+			}
+		}
+
+		fmt.Println("Checking for unique ngrams")
+		var wg sync.WaitGroup
+		for _, ngram := range license.Ngrams {
+			wg.Add(1)
+			go func(license License, ngram []string) {
+				_, ok := contains[strings.Join(ngram, "")]
+
+				if !ok {
+					fmt.Println(license.LicenseId, ngram)
+				}
+				wg.Done()
+			}(license, ngram)
+		}
+		wg.Wait()
 	}
 
 }
