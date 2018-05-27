@@ -45,4 +45,5 @@ func main() {
 
 	// Close out constants
 	out.Write([]byte(")\n"))
+	out.Close()
 }
