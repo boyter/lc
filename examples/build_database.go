@@ -114,22 +114,30 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-	"reflect"
-	"fmt"
 	"sync"
+	"time"
 )
 
 type License struct {
+	LicenseText             string `json:"licenseText"`
+	StandardLicenseTemplate string `json:"standardLicenseTemplate"`
+	Name                    string `json:"name"`
+	LicenseId               string `json:"licenseId"`
+	Ngrams                  [][]string
+}
+
+type LicenseOutput struct {
 	LicenseText             string   `json:"licenseText"`
 	StandardLicenseTemplate string   `json:"standardLicenseTemplate"`
 	Name                    string   `json:"name"`
 	LicenseId               string   `json:"licenseId"`
 	Keywords                []string `json:"keywords"`
-	Ngrams                  [][]string
 }
 
 var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
@@ -159,22 +167,6 @@ func findNgrams(list []string, size int) [][]string {
 	return ngrams
 }
 
-func checkUniqueNgram(licenseId string, licenses []License, ngram []string) bool {
-	// For the ngram check if it is unique
-	for _, lic := range licenses {
-		// Ignore the same license
-		if lic.LicenseId != licenseId {
-			for _, ng := range lic.Ngrams {
-				if reflect.DeepEqual(ngram, ng) {
-					return false
-				}
-			}
-		}
-	}
-
-	return true
-}
-
 func main() {
 	files, _ := ioutil.ReadDir("./licenses/")
 
@@ -197,43 +189,66 @@ func main() {
 	for j := 0; j < len(licenses); j++ {
 		split := strings.Split(cleanText(licenses[j].LicenseText), " ")
 
-		for i := 2; i < 8; i++ {
+		for i := 2; i < 45; i++ {
 			ngrams := findNgrams(split, i)
 			licenses[j].Ngrams = append(licenses[j].Ngrams, ngrams...)
 		}
 	}
 
-	// For each licence, check each ngram and see if it is unique
-	for _, license := range licenses {
-		fmt.Println(license.LicenseId, len(license.Ngrams))
-		//var wg sync.WaitGroup
+	//var licensesOutput []LicenseOutput
 
-		// for each licence that isnt this one
-		// get all the ngrams and put it into a hash
-		// then look each of our ngrams and check if it is contained
-		contains := map[string]int{}
-		for _, lic := range licenses {
-			if lic.LicenseId != license.LicenseId {
-				for _, ngram := range lic.Ngrams {
-					contains[strings.Join(ngram, "")] = 1
-				}
-			}
+	var wg sync.WaitGroup
+	// For each licence, check each ngram and see if it is unique
+	for i := 0; i < len(licenses); i++ {
+		// This is such an ugly way to control concurrency
+		if i%4 == 0 { // This uses about 8 GB of RAM currently.
+			time.Sleep(time.Second * 5) // Gotta wait for the goroutines to actually kick off first
+			fmt.Println("Waiting for results...")
+			wg.Wait()
 		}
 
-		fmt.Println("Checking for unique ngrams")
-		var wg sync.WaitGroup
-		for _, ngram := range license.Ngrams {
-			wg.Add(1)
-			go func(license License, ngram []string) {
+		wg.Add(1)
+		go func(i int) {
+			license := licenses[i]
+
+			// for each licence that isn't this one
+			// get all the ngrams and put it into a hash
+			// then look each of our ngrams and check if it is contained
+			contains := map[string]int{}
+			for _, lic := range licenses {
+				if lic.LicenseId != license.LicenseId {
+					for _, ngram := range lic.Ngrams {
+						contains[strings.Join(ngram, "")] = 1
+					}
+				}
+			}
+
+			var uniqueNgrams []string
+			for _, ngram := range license.Ngrams {
 				_, ok := contains[strings.Join(ngram, "")]
 
 				if !ok {
-					fmt.Println(license.LicenseId, ngram)
+					uniqueNgrams = append(uniqueNgrams, strings.Join(ngram, " "))
 				}
-				wg.Done()
-			}(license, ngram)
-		}
-		wg.Wait()
+			}
+
+			fmt.Println(license.LicenseId, len(license.Ngrams), "Unique Ngrams", len(uniqueNgrams))
+			wg.Done()
+		}(i)
 	}
+
+	wg.Wait()
+	out, _ := os.Create("database_keywords.json")
+
+	data, _ := json.Marshal(licenses)
+	out.Write(data)
+	out.Close()
+
+	//licenses = [{
+	//	'licenseText': x['licenseText'],
+	//	'name': x['name'],
+	//	'licenseId': x['licenseId'],
+	//	'keywords': x['keywords'][:50]
+	//} for x in licenses]
 
 }
