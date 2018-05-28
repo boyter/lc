@@ -37,14 +37,6 @@ var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|
 var alphaNumericRegex = regexp.MustCompile("[^a-zA-Z0-9 ]")
 var multipleSpacesRegex = regexp.MustCompile("\\s+")
 
-func cleanText(content string) string {
-	content = strings.ToLower(content)
-
-	content = alphaNumericRegex.ReplaceAllString(content, " ")
-	content = multipleSpacesRegex.ReplaceAllString(content, " ")
-
-	return content
-}
 
 // Identify licenses in the text which is using the SPDX indicator
 // Can return multiple license matches

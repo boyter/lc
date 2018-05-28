@@ -10,17 +10,17 @@ import (
 )
 
 func TestCleanText(t *testing.T) {
-	actual := cleanText("ToLower")
+	actual := cleanText([]byte("ToLower"))
 	expected := "tolower"
 
-	if expected != actual {
+	if expected != string(actual) {
 		t.Errorf("Expected %s but got %s", expected, actual)
 	}
 
-	actual = cleanText("   ToLower999$%")
+	actual = cleanText([]byte("   ToLower999$%"))
 	expected = " tolower999 "
 
-	if expected != actual {
+	if expected != string(actual) {
 		t.Errorf("Expected '%s' but got '%s'", expected, actual)
 	}
 }

@@ -10,7 +10,7 @@ import (
 // matching keyword ngrams to find if the licence is a match or not
 // returns the maching licences with shortname and the percentage of match.
 func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
-	content = cleanTextFast(content)
+	content = cleanText(content)
 	length := len(content)
 	lengthFuzzy := length / 100 * 30
 
@@ -57,7 +57,7 @@ func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
 	return matchingLicenses
 }
 
-func cleanTextFast(content []byte) []byte {
+func cleanText(content []byte) []byte {
 	content = bytes.ToLower(content)
 
 	tmp := alphaNumericRegex.ReplaceAllString(string(content), " ")
