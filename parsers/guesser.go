@@ -11,7 +11,6 @@ import (
 	"sort"
 	"strings"
 	"sync"
-	"unicode/utf8"
 )
 
 // Shared all over the place
@@ -58,76 +57,6 @@ func identifierGuessLicence(content string, licenses []License) []LicenseMatch {
 			if license.LicenseId == strings.TrimSpace(val[1]) {
 				matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: 1})
 			}
-		}
-	}
-
-	return matchingLicenses
-}
-
-// Parses the supplied file content against the list of licences and
-// returns the matching licences with the shortname and the percentage of match.
-// If fast lookup methods fail it will try deep matching which is slower.
-func guessLicense(content string, deepguess bool, licenses []License) []LicenseMatch {
-	var matchingLicenses []LicenseMatch
-
-	for _, license := range keywordGuessLicense([]byte(content), licenses) {
-		matchingLicense := License{}
-
-		for _, l := range licenses {
-			if l.LicenseId == license.LicenseId {
-				matchingLicense = l
-				break
-			}
-		}
-
-		runecontent := []rune(content)
-		trimto := utf8.RuneCountInString(matchingLicense.LicenseText)
-
-		if trimto > len(runecontent) {
-			trimto = len(runecontent)
-		}
-
-		contentConcordance := vectorspace.BuildConcordance(string(runecontent[:trimto]))
-		relation := vectorspace.Relation(matchingLicense.Concordance, contentConcordance)
-
-		if relation >= confidence {
-			matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: relation})
-		}
-	}
-
-	if len(matchingLicenses) == 0 && deepguess == true {
-		for _, license := range licenses {
-			runecontent := []rune(content)
-			trimto := utf8.RuneCountInString(license.LicenseText)
-
-			if trimto > len(runecontent) {
-				trimto = len(runecontent)
-			}
-
-			contentConcordance := vectorspace.BuildConcordance(string(runecontent[:trimto]))
-			relation := vectorspace.Relation(license.Concordance, contentConcordance)
-
-			if relation >= confidence {
-				matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: relation})
-			}
-		}
-	}
-
-	sort.Slice(matchingLicenses, func(i, j int) bool {
-		return matchingLicenses[i].Percentage > matchingLicenses[j].Percentage
-	})
-
-	// Special cases such as MIT and JSON here
-	if len(matchingLicenses) > 2 && ((matchingLicenses[0].LicenseId == "JSON" && matchingLicenses[1].LicenseId == "MIT") ||
-		(matchingLicenses[0].LicenseId == "MIT" && matchingLicenses[1].LicenseId == "JSON")) {
-		if strings.Contains(strings.ToLower(content), "not evil") {
-			// Its JSON
-			matchingLicenses = []LicenseMatch{}
-			matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: "JSON", Percentage: 1})
-		} else {
-			// Its MIT
-			matchingLicenses = []LicenseMatch{}
-			matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: "MIT", Percentage: 1})
 		}
 	}
 

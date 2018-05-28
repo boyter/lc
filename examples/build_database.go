@@ -80,7 +80,6 @@ func main() {
 		}
 	}
 
-
 	outputChan := make(chan LicenseOutput, 2000)
 
 	var wg sync.WaitGroup
@@ -118,11 +117,11 @@ func main() {
 			fmt.Println(license.LicenseId, len(license.Ngrams), "Unique Ngrams", len(uniqueNgrams))
 
 			outputChan <- LicenseOutput{
-				LicenseId: license.LicenseId,
-				Name: license.Name,
-				LicenseText: license.LicenseText,
+				LicenseId:               license.LicenseId,
+				Name:                    license.Name,
+				LicenseText:             license.LicenseText,
 				StandardLicenseTemplate: license.StandardLicenseTemplate,
-				Keywords: uniqueNgrams,
+				Keywords:                uniqueNgrams,
 			}
 
 			wg.Done()
