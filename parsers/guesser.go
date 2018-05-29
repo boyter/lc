@@ -144,6 +144,7 @@ func Process() {
 
 	var fileResults []FileResult
 
+	// TODO this needs to run in goroutine to avoid deadlock
 	for input := range fileResultQueue {
 		fileResults = append(fileResults, *input)
 	}
