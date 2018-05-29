@@ -18,8 +18,6 @@ var ToolName = "licensechecker"
 var ToolVersion = "2.0.0"
 
 // Set by user as command line arguments
-var confidence = 0.85
-var Confidence = ""
 var PossibleLicenceFiles = ""
 var DirFilePaths []string
 var PathBlacklist = ""
