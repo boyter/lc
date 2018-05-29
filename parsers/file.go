@@ -75,6 +75,7 @@ func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *
 			Directory:    directory,
 			File:         file,
 			RootLicenses: rootLicense,
+			LicenseGuesses: identifiedRootLicense,
 		}
 	}
 
@@ -91,12 +92,12 @@ func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *
 
 func processFileFast(input *chan *File, output *chan *FileResult) {
 	for file := range *input {
-		fileResult := processFile(file.Directory, file.File, file.RootLicenses)
+		fileResult := processFile(file.Directory, file.File, file.LicenseGuesses, file.RootLicenses)
 		*output <- &fileResult
 	}
 }
 
-func processFile(directory string, file string, rootLicenses []LicenseMatch) FileResult {
+func processFile(directory string, file string, guessed []LicenseMatch, rootLicenses []LicenseMatch) FileResult {
 	process := true
 
 	for _, ext := range strings.Split(ExtentionBlacklist, ",") {
@@ -119,6 +120,13 @@ func processFile(directory string, file string, rootLicenses []LicenseMatch) Fil
 	var licenseIdentified []LicenseMatch
 
 	if len(content) > MaxSize {
+		process = false
+	}
+
+	// If we have something here it means it was identified as a license file
+	// so we don't need to reprocess
+	if len(guessed) != 0 {
+		licenseGuesses = guessed
 		process = false
 	}
 

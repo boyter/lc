@@ -32,9 +32,10 @@ type FileResult struct {
 }
 
 type File struct {
-	Directory    string
-	File         string
-	RootLicenses []LicenseMatch
+	Directory      string
+	File           string
+	RootLicenses   []LicenseMatch
+	LicenseGuesses []LicenseMatch
 }
 
 func (c *FileResult) FullPath() string {
