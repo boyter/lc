@@ -151,6 +151,8 @@ func toTabular(results []FileResult) {
 	str.WriteString(fmt.Sprintf(tabularShortFormatHead, "File", "License"))
 	str.WriteString(tabularShortBreak)
 
+	wasTrimmed := false
+
 	for _, result := range results {
 		license, _ := determineLicense(result)
 		tmp := filepath.Join(result.Directory, result.Filename)
@@ -163,11 +165,17 @@ func toTabular(results []FileResult) {
 			}
 
 			tmp = "~" + tmp[:toTrim]
+
+			if len(license) > 78 {
+				license = license[:76] + "~"
+			}
+
 		} else {
 			toPad := 78 - len(tmp) - len(license)
 
 			for i := 0; i < toPad; i++ {
 				tmp = tmp + " "
+				wasTrimmed = true
 			}
 		}
 
@@ -175,6 +183,12 @@ func toTabular(results []FileResult) {
 	}
 
 	str.WriteString(tabularShortBreak)
+
+	if wasTrimmed {
+		str.WriteString("    Some licenses were too long for display. Please use CSV or JSON output.\n")
+		str.WriteString(tabularShortBreak)
+	}
+
 	fmt.Println(str.String())
 }
 
