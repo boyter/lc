@@ -37,7 +37,6 @@ var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|
 var alphaNumericRegex = regexp.MustCompile("[^a-zA-Z0-9 ]")
 var multipleSpacesRegex = regexp.MustCompile("\\s+")
 
-
 // Identify licenses in the text which is using the SPDX indicator
 // Can return multiple license matches
 func identifierGuessLicence(content string, licenses []License) []LicenseMatch {
@@ -162,8 +161,6 @@ func Process() {
 		toJSON(fileResults)
 	case "tabular":
 		toTabular(fileResults)
-	case "summary":
-		toSummary(fileResults)
 	case "spdx21":
 		toSPDX21(fileResults)
 	case "spdx":

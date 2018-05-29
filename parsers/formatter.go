@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"github.com/ryanuber/columnize"
 	"io/ioutil"
 	"log"
 	"os"
@@ -190,48 +189,6 @@ func toTabular(results []FileResult) {
 	}
 
 	fmt.Println(str.String())
-}
-
-func toSummary(fileResults []FileResult) {
-	output := []string{
-		"License | Count",
-	}
-
-	total := map[string]int64{}
-
-	for _, result := range fileResults {
-		license, _ := determineLicense(result)
-
-		_, ok := total[license]
-
-		if ok {
-			total[license] = total[license] + 1
-		} else {
-			total[license] = 1
-		}
-	}
-
-	type kv struct {
-		Key   string
-		Value int64
-	}
-
-	var ss []kv
-	for k, v := range total {
-		ss = append(ss, kv{k, v})
-	}
-
-	sort.Slice(ss, func(i, j int) bool {
-		return ss[i].Value > ss[j].Value
-	})
-
-	for _, value := range ss {
-		output = append(output, fmt.Sprintf("%s | %d", value.Key, value.Value))
-	}
-
-	result := columnize.SimpleFormat(output)
-
-	fmt.Println(result)
 }
 
 func generatePackageVerificationCode(fileResults []FileResult) string {

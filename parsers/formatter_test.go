@@ -31,14 +31,6 @@ func TestGenerateDocumentNamespaceSomethingSpecified(t *testing.T) {
 	}
 }
 
-func TestToSummary(t *testing.T) {
-	var sample []FileResult
-	toSummary(sample)
-
-	sample = append(sample, FileResult{})
-	toSummary(sample)
-}
-
 func TestToTabular(t *testing.T) {
 	var sample []FileResult
 	toTabular(sample)
