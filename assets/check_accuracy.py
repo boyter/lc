@@ -32,7 +32,7 @@ def check_license_detector(targets):
     return correct
 
 if __name__ == '__main__':
-    targets = ['./accuracy/' + x + '/' for x in os.listdir('./accuracy')]
+    targets = ['./accuracy/' + x + '/' for x in os.listdir('./accuracy')][:50]
 
     print 'count::%s' % (len(targets))
     print 'checking::lc'
