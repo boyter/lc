@@ -109,7 +109,7 @@ func main() {
 					uniqueNgrams = append(uniqueNgrams, ngram)
 				}
 
-				if len(uniqueNgrams) >= 50 {
+				if len(uniqueNgrams) >= 100 {
 					break
 				}
 			}

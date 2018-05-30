@@ -78,8 +78,7 @@ func specialCases(content []byte, matchingLicenses []LicenseMatch) []LicenseMatc
 	}
 
 	// Another one is MIT-feh and MIT
-	if len(matchingLicenses) > 2 && ((matchingLicenses[0].LicenseId == "MIT-feh" && matchingLicenses[1].LicenseId == "MIT") ||
-		(matchingLicenses[0].LicenseId == "MIT" && matchingLicenses[1].LicenseId == "MIT-feh")) {
+	if len(matchingLicenses) > 2 && matchingLicenses[0].LicenseId == "MIT" {
 
 		if bytes.HasPrefix(content, []byte("mit license")) || bytes.HasPrefix(content, []byte("the mit license")) {
 			matchingLicenses = []LicenseMatch{{LicenseId: "MIT", Percentage: 100}}
