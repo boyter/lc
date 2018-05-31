@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"path/filepath"
 )
 
 // Shared all over the place
@@ -118,12 +119,21 @@ func Process() {
 	go func() {
 		wg.Add(1)
 		for _, fileDirectory := range DirFilePaths {
-			if info, err := os.Stat(fileDirectory); err == nil && info.IsDir() {
-				startTime := makeTimestampMilli()
-				walkDirectoryFast(fileDirectory, [][]LicenseMatch{}, &fileListQueue)
+			if info, err := os.Stat(fileDirectory); err == nil {
+				if info.IsDir() {
+					startTime := makeTimestampMilli()
+					walkDirectoryFast(fileDirectory, [][]LicenseMatch{}, &fileListQueue)
 
-				if Trace {
-					printTrace(fmt.Sprintf("milliseconds walk file tree: %s: %d", fileDirectory, makeTimestampMilli()-startTime))
+					if Trace {
+						printTrace(fmt.Sprintf("milliseconds walk file tree: %s: %d", fileDirectory, makeTimestampMilli()-startTime))
+					}
+				} else {
+					fileListQueue <- &File{
+						Directory:      filepath.Dir(fileDirectory),
+						File:           info.Name(),
+						RootLicenses:   []LicenseMatch{},
+						LicenseGuesses: []LicenseMatch{},
+					}
 				}
 			}
 		}

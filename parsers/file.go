@@ -72,9 +72,9 @@ func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *
 	// Given the possible license files pass those and this file into channel for processing
 	for _, file := range files {
 		*output <- &File{
-			Directory:    directory,
-			File:         file,
-			RootLicenses: rootLicense,
+			Directory:      directory,
+			File:           file,
+			RootLicenses:   rootLicense,
 			LicenseGuesses: identifiedRootLicense,
 		}
 	}
