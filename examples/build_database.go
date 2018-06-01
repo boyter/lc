@@ -35,6 +35,7 @@ func cleanText(content string) string {
 
 	content = alphaNumericRegex.ReplaceAllString(content, " ")
 	content = multipleSpacesRegex.ReplaceAllString(content, " ")
+	content = strings.TrimSpace(content)
 
 	return content
 }

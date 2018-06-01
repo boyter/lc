@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"sort"
 	"sync"
+	"strings"
 )
 
 // Fast method of checking if supplied content contains a licence using
@@ -62,6 +63,7 @@ func cleanText(content []byte) []byte {
 
 	tmp := alphaNumericRegex.ReplaceAllString(string(content), " ")
 	tmp = multipleSpacesRegex.ReplaceAllString(tmp, " ")
+	tmp = strings.TrimSpace(tmp)
 
 	return []byte(tmp)
 }

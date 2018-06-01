@@ -15,8 +15,8 @@ func TestCleanText(t *testing.T) {
 		t.Errorf("Expected %s but got %s", expected, actual)
 	}
 
-	actual = cleanText([]byte("   ToLower999$%"))
-	expected = " tolower999 "
+	actual = cleanText([]byte("   ToLower999$%   "))
+	expected = "tolower999"
 
 	if expected != string(actual) {
 		t.Errorf("Expected '%s' but got '%s'", expected, actual)
