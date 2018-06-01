@@ -10,27 +10,38 @@ import time
 
 
 def check_lc(target):
-    data = commands.getstatusoutput('lc -f csv %s' % (target))
-    split = data[1].split(',')
-    return split[11]
-
+    try:
+        data = commands.getstatusoutput('lc -f csv %s' % (target))
+        split = data[1].split(',')
+        return split[11]
+    except:
+        return 'BROKEN::%s' % (target)
 
 def check_license_detector(target):
     data = commands.getstatusoutput('license-detector %s' % (target))
 
-    if 'no license file was found' not in data[1]:
-        return data[1].split('\n')[1].split('\t')[2]
-    return "UNKNOWN"
+    try:
+        if 'no license file was found' not in data[1]:
+            return data[1].split('\n')[1].split('\t')[2]
+        return "UNKNOWN"
+    except:
+        return 'BROKEN::%s' % (target)
 
 
 def check_identify_license(target):
-    data = commands.getstatusoutput('identify_license %s' % (target))
-    return data[1].split('\n')[2].split(' ')[1]
+    try:
+        data = commands.getstatusoutput('identify_license %s' % (target))
+        return data[1].split('\n')[2].split(' ')[1]
+    except:
+        return 'BROKEN::%s' % (target)
 
 
 def check_askalono(target):
-    data = commands.getstatusoutput('askalono id %s' % (target))
-    return data[1].split('\n')[0].split(' ')[1]
+    try:
+        data = commands.getstatusoutput('askalono id %s' % (target))
+        return data[1].split('\n')[0].split(' ')[1]
+    except:
+        return 'BROKEN::%s' % (target)
 
 
 if __name__ == '__main__':

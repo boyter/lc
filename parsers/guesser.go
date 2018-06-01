@@ -6,12 +6,12 @@ import (
 	"fmt"
 	//vectorspace "github.com/boyter/golangvectorspace"
 	"os"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"sort"
 	"strings"
 	"sync"
-	"path/filepath"
 )
 
 // Shared all over the place

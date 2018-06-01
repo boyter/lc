@@ -1,11 +1,9 @@
 package parsers
 
 import (
-	// "io/ioutil"
-	"path/filepath"
-	// "strings"
 	"encoding/json"
 	"io/ioutil"
+	"path/filepath"
 	"testing"
 )
 
