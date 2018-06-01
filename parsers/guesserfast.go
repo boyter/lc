@@ -3,8 +3,8 @@ package parsers
 import (
 	"bytes"
 	"sort"
-	"sync"
 	"strings"
+	"sync"
 )
 
 // Fast method of checking if supplied content contains a licence using
