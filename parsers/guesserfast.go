@@ -30,11 +30,8 @@ func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
 					}
 				}
 
-				if keywordMatch > 0 {
-					percentage := float64(keywordMatch * 2) // On the basis that there are 50 keywords
-					if percentage > 70 {
-						output <- LicenseMatch{LicenseId: license.LicenseId, Percentage: percentage}
-					}
+				if keywordMatch > 50 { // on the basis of there being 100
+					output <- LicenseMatch{LicenseId: license.LicenseId, Percentage: float64(keywordMatch)}
 				}
 				wg.Done()
 			}(license)

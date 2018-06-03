@@ -73,7 +73,7 @@ func main() {
 
 	// Build ngrams for them
 	for j := 0; j < len(licenses); j++ {
-		split := strings.Split(cleanText(licenses[j].LicenseText), " ")
+		split := strings.Split(cleanText(licenses[j].StandardLicenseTemplate)+" "+cleanText(licenses[j].LicenseText), " ")
 
 		for i := 2; i < 45; i++ { // 45 seems about right
 			ngrams := findNgrams(split, i)
@@ -110,7 +110,7 @@ func main() {
 					uniqueNgrams = append(uniqueNgrams, ngram)
 				}
 
-				if len(uniqueNgrams) >= 100 {
+				if len(uniqueNgrams) >= 200 {
 					break
 				}
 			}
