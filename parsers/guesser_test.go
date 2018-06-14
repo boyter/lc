@@ -270,7 +270,10 @@ under terms of your choice.`
 
 	result := keywordGuessLicense([]byte(content), loadDatabase())
 
-	t.Log(result)
+	if len(result) == 0 {
+		t.Errorf("Should find at least one license")
+	}
+
 	if result[0].LicenseId != "Apache-2.0" {
 		t.Errorf("Should be Apache-2.0")
 	}
