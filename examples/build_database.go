@@ -12,12 +12,12 @@ import (
 )
 
 type License struct {
-	LicenseText                   string `json:"licenseText"`
-	StandardLicenseTemplate       string `json:"standardLicenseTemplate"`
-	StandardLicenseHeaderTemplate string `json:"standardLicenseHeaderTemplate"`
-	Name                          string `json:"name"`
-	LicenseId                     string `json:"licenseId"`
-	Ngrams                        []string
+	LicenseText             string `json:"licenseText"`
+	StandardLicenseTemplate string `json:"standardLicenseTemplate"`
+	StandardLicenseHeader   string `json:"standardLicenseHeader"`
+	Name                    string `json:"name"`
+	LicenseId               string `json:"licenseId"`
+	Ngrams                  []string
 }
 
 type LicenseOutput struct {
@@ -75,9 +75,10 @@ func main() {
 	// Build ngrams for them
 	for j := 0; j < len(licenses); j++ {
 
-		split := strings.Split(cleanText(licenses[j].StandardLicenseHeaderTemplate)+" "+cleanText(licenses[j].StandardLicenseTemplate)+" "+cleanText(licenses[j].LicenseText), " ")
+		split := strings.Split(cleanText(licenses[j].StandardLicenseHeader)+" "+cleanText(licenses[j].StandardLicenseTemplate)+" "+cleanText(licenses[j].LicenseText), " ")
+		//split := strings.Split(cleanText(licenses[j].StandardLicenseHeader), " ")
 
-		for i := 2; i < 45; i++ { // 45 seems about right
+		for i := 5; i < 45; i++ { // 45 seems about right
 			ngrams := findNgrams(split, i)
 			licenses[j].Ngrams = append(licenses[j].Ngrams, ngrams...)
 		}
