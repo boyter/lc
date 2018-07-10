@@ -212,7 +212,6 @@ func generateDocumentNamespace() string {
 }
 
 func toSPDX21(fileResults []FileResult) {
-
 	var lines []string
 
 	packageLicenseDeclared := "NONE"
