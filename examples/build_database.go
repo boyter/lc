@@ -76,7 +76,6 @@ func main() {
 	for j := 0; j < len(licenses); j++ {
 
 		split := strings.Split(cleanText(licenses[j].StandardLicenseHeader)+" "+cleanText(licenses[j].StandardLicenseTemplate)+" "+cleanText(licenses[j].LicenseText), " ")
-		//split := strings.Split(cleanText(licenses[j].StandardLicenseHeader), " ")
 
 		for i := 5; i < 45; i++ { // 45 seems about right
 			ngrams := findNgrams(split, i)

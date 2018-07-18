@@ -92,10 +92,6 @@ func loadDatabase() []License {
 	data, _ := base64.StdEncoding.DecodeString(database_keywords)
 	_ = json.Unmarshal(data, &database)
 
-	//for i, v := range database {
-	//	database[i].Concordance = vectorspace.BuildConcordance(strings.ToLower(v.LicenseText))
-	//}
-
 	Database = database
 
 	if Trace {

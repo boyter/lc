@@ -12,14 +12,14 @@ import (
 // returns the maching licences with shortname and the percentage of match.
 func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
 	content = cleanText(content)
-	length := len(content)
-	lengthFuzzy := length / 100 * 30
+	//length := len(content)
+	//lengthFuzzy := length / 100 * 30
 
 	var wg sync.WaitGroup
 	output := make(chan LicenseMatch, len(licenses))
 
 	for _, license := range licenses {
-		if len(license.LicenseText) >= (length-lengthFuzzy) && len(license.LicenseText) <= (length+lengthFuzzy) {
+		//if len(license.LicenseText) >= (length-lengthFuzzy) && len(license.LicenseText) <= (length+lengthFuzzy) {
 			wg.Add(1)
 			go func(license License) {
 				keywordMatch := 0
@@ -35,7 +35,7 @@ func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
 				}
 				wg.Done()
 			}(license)
-		}
+		//}
 	}
 
 	wg.Wait()
