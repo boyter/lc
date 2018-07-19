@@ -163,7 +163,7 @@ func toTabular(results []FileResult) {
 				toTrim = 0
 			}
 
-			tmp = "~" + tmp[len(tmp) - toTrim:]
+			tmp = "~" + tmp[len(tmp)-toTrim:]
 
 			if len(license) > 78 {
 				license = license[:76] + "~"

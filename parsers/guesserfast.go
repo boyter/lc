@@ -9,33 +9,29 @@ import (
 
 // Fast method of checking if supplied content contains a licence using
 // matching keyword ngrams to find if the licence is a match or not
-// returns the maching licences with shortname and the percentage of match.
+// returns the matching licences with shortname and the percentage of match.
 func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
 	content = cleanText(content)
-	//length := len(content)
-	//lengthFuzzy := length / 100 * 30
 
 	var wg sync.WaitGroup
 	output := make(chan LicenseMatch, len(licenses))
 
 	for _, license := range licenses {
-		//if len(license.LicenseText) >= (length-lengthFuzzy) && len(license.LicenseText) <= (length+lengthFuzzy) {
-			wg.Add(1)
-			go func(license License) {
-				keywordMatch := 0
+		wg.Add(1)
+		go func(license License) {
+			keywordMatch := 0
 
-				for _, keyword := range license.Keywords {
-					if bytes.Contains(content, []byte(keyword)) {
-						keywordMatch++
-					}
+			for _, keyword := range license.Keywords {
+				if bytes.Contains(content, []byte(keyword)) {
+					keywordMatch++
 				}
+			}
 
-				if keywordMatch > 50 { // on the basis of there being 100
-					output <- LicenseMatch{LicenseId: license.LicenseId, Percentage: float64(keywordMatch)}
-				}
-				wg.Done()
-			}(license)
-		//}
+			if keywordMatch > 50 { // on the basis of there being 100
+				output <- LicenseMatch{LicenseId: license.LicenseId, Percentage: float64(keywordMatch)}
+			}
+			wg.Done()
+		}(license)
 	}
 
 	wg.Wait()
