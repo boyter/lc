@@ -1,7 +1,6 @@
 package parsers
 
 import (
-	vectorspace "github.com/boyter/golangvectorspace"
 	"path/filepath"
 )
 
@@ -10,7 +9,6 @@ type License struct {
 	LicenseText string   `json:"licenseText"`
 	Name        string   `json:"name"`
 	LicenseId   string   `json:"licenseId"`
-	Concordance vectorspace.Concordance
 }
 
 type LicenseMatch struct {

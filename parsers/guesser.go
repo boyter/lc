@@ -84,6 +84,7 @@ func findPossibleLicenseFiles(fileList []string) []string {
 
 // Caching the database load result reduces processing time by about 3x for this repository
 var Database []License
+var CommonDatabase []License
 func loadDatabase() []License {
 	startTime := makeTimestampMilli()
 	if len(Database) != 0 {
@@ -95,6 +96,21 @@ func loadDatabase() []License {
 	_ = json.Unmarshal(data, &database)
 
 	Database = database
+
+	// Load smaller faster database for checking most common licenses
+	common := []string {
+		"MIT",
+		"GPL-2.0",
+		"Apache-2.0",
+	}
+
+	for _, license := range database {
+		for _, com := range common {
+			if license.LicenseId == com {
+				CommonDatabase = append(CommonDatabase, license)
+			}
+		}
+	}
 
 	if Trace {
 		printTrace(fmt.Sprintf("milliseconds load database: %d", makeTimestampMilli()-startTime))
