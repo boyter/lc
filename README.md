@@ -198,6 +198,7 @@ GOOS=linux GOARCH=amd64 go build && zip -r9 lc-1.0.0-x86_64-unknown-linux.zip lc
 
 Source https://www.blackducksoftware.com/top-open-source-licenses
 
+```
 Rank 	Open Source License 	                            %
 1. 	    MIT License 	                                    38%
 2. 	    GNU General Public License (GPL 2.0) 	            14%
@@ -219,6 +220,7 @@ Rank 	Open Source License 	                            %
 18. 	Microsoft Reciprocal License 	                    < 1%
 19. 	Sun GPL with Classpath Exception v2.0 	            < 1%
 20. 	zlib/libpng License 	                            < 1%
+```
 
 ### TODO
 
