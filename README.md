@@ -200,12 +200,12 @@ Source https://www.blackducksoftware.com/top-open-source-licenses
 
 ```
 Rank 	Open Source License 	                            %
-1. 	    MIT License 	                                    38%
-2. 	    GNU General Public License (GPL 2.0) 	            14%
-3. 	    Apache License 2.0 	                                13%
-4. 	    ISC License 	                                    10%
-5. 	    GNU General Public License (GNU) 3.0 	            6%
-6. 	    BSD License 2.0 (3-clause, New or Revised) License 	5%
+1.      MIT License 	                                    38%
+2.      GNU General Public License (GPL 2.0) 	            14%
+3.      Apache License 2.0 	                                13%
+4.      ISC License 	                                    10%
+5.      GNU General Public License (GNU) 3.0 	            6%
+6.      BSD License 2.0 (3-clause, New or Revised) License 	5%
 7.      Artistic License (Perl) 	                        3%
 8.      GNU Lesser General Public License (LGPL) 2.1 	    3%
 9.      GNU Lesser General Public License (LGPL) 3.0 	    1%
