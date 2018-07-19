@@ -55,10 +55,10 @@ func toCSV(fileResults []FileResult) {
 		w.WriteAll(records) // calls Flush internally
 		w.Flush()
 	} else {
-		csvfile, _ := os.OpenFile(FileOutput, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0755)
-		defer csvfile.Close()
+		csvFile, _ := os.OpenFile(FileOutput, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0755)
+		defer csvFile.Close()
 
-		w := csv.NewWriter(csvfile)
+		w := csv.NewWriter(csvFile)
 		w.WriteAll(records) // calls Flush internally
 
 		if err := w.Error(); err != nil {

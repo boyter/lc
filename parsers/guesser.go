@@ -123,8 +123,8 @@ func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
 				}
 			}
 
-			if keywordMatch > 50 { // on the basis of there being 100
-				output <- LicenseMatch{LicenseId: license.LicenseId, Percentage: float64(keywordMatch)}
+			if keywordMatch > 100 { // on the basis of there being 100
+				output <- LicenseMatch{LicenseId: license.LicenseId, Percentage: float64(keywordMatch/2)}
 			}
 			wg.Done()
 		}(license)
@@ -170,7 +170,6 @@ func specialCases(content []byte, matchingLicenses []LicenseMatch) []LicenseMatc
 
 	// Another one is MIT-feh and MIT
 	if len(matchingLicenses) > 2 && matchingLicenses[0].LicenseId == "MIT" {
-
 		if bytes.HasPrefix(content, []byte("mit license")) || bytes.HasPrefix(content, []byte("the mit license")) {
 			matchingLicenses = []LicenseMatch{{LicenseId: "MIT", Percentage: 100}}
 		} else {
