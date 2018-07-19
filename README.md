@@ -198,6 +198,8 @@ GOOS=linux GOARCH=amd64 go build && zip -r9 lc-1.0.0-x86_64-unknown-linux.zip lc
 
 Source https://www.blackducksoftware.com/top-open-source-licenses
 
+Source https://blog.sourced.tech/post/gld/pga-licenses.csv
+
 ```
 Rank 	Open Source License 	                            %
 1.      MIT License 	                                    38%

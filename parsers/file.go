@@ -131,7 +131,11 @@ func processFile(directory string, file string, guessed []LicenseMatch, rootLice
 	}
 
 	if process == true {
-		licenseGuesses = keywordGuessLicense(content, Database)
+		licenseGuesses = keywordGuessLicense(content, CommonDatabase)
+		if len(licenseGuesses) == 0 {
+			licenseGuesses = keywordGuessLicense(content, Database)
+		}
+
 		licenseIdentified = identifierGuessLicence(string(content), Database)
 	}
 
