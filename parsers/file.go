@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *chan *File) {
+func walkDirectory(directory string, rootLicenses [][]LicenseMatch, output *chan *File) {
 	all, err := ioutil.ReadDir(directory)
 
 	if err != nil {
@@ -83,7 +83,7 @@ func walkDirectoryFast(directory string, rootLicenses [][]LicenseMatch, output *
 	for _, newDirectory := range directories {
 		wg.Add(1)
 		go func(directory string, newDirectory string, rootlicenses [][]LicenseMatch, output *chan *File) {
-			walkDirectoryFast(filepath.Join(directory, newDirectory), rootLicenses, output)
+			walkDirectory(filepath.Join(directory, newDirectory), rootLicenses, output)
 			wg.Done()
 		}(directory, newDirectory, rootLicenses, output)
 	}
