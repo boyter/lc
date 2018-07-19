@@ -206,9 +206,9 @@ Rank 	Open Source License 	                            %
 4. 	    ISC License 	                                    10%
 5. 	    GNU General Public License (GNU) 3.0 	            6%
 6. 	    BSD License 2.0 (3-clause, New or Revised) License 	5%
-7. 	    Artistic License (Perl) 	                        3%
-8. 	    GNU Lesser General Public License (LGPL) 2.1 	    3%
-9. 	    GNU Lesser General Public License (LGPL) 3.0 	    1%
+7.      Artistic License (Perl) 	                        3%
+8.      GNU Lesser General Public License (LGPL) 2.1 	    3%
+9.      GNU Lesser General Public License (LGPL) 3.0 	    1%
 10. 	Eclipse Public License (EPL) 	                    1%
 11. 	Microsoft Public License 	                        1%
 12. 	Simplified BSD License (BSD) 	                    1%
