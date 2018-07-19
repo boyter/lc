@@ -163,18 +163,18 @@ func toTabular(results []FileResult) {
 				toTrim = 0
 			}
 
-			tmp = "~" + tmp[:toTrim]
+			tmp = "~" + tmp[len(tmp) - toTrim:]
 
 			if len(license) > 78 {
 				license = license[:76] + "~"
 			}
+			wasTrimmed = true
 
 		} else {
 			toPad := 78 - len(tmp) - len(license)
 
 			for i := 0; i < toPad; i++ {
 				tmp = tmp + " "
-				wasTrimmed = true
 			}
 		}
 
