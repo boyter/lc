@@ -120,7 +120,7 @@ func determineLicense(result FileResult) (string, string) {
 		confidence = 100.00
 	} else if len(result.LicenseGuesses) != 0 {
 		license = result.LicenseGuesses[0].LicenseId
-		confidence = result.LicenseGuesses[0].Percentage
+		confidence = result.LicenseGuesses[0].Score
 		licenseMatches = append(licenseMatches, result.LicenseGuesses[0])
 	}
 

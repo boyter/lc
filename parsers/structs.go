@@ -12,8 +12,8 @@ type License struct {
 }
 
 type LicenseMatch struct {
-	LicenseId  string
-	Percentage float64
+	LicenseId string
+	Score     float64
 }
 
 type FileResult struct {

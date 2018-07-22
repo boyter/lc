@@ -1,17 +1,17 @@
 package parsers
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/texttheater/golang-levenshtein/levenshtein"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 	"sync"
-	"bytes"
-	"github.com/texttheater/golang-levenshtein/levenshtein"
 )
 
 // Shared all over the place
@@ -45,7 +45,7 @@ func identifierGuessLicence(content string, licenses []License) []LicenseMatch {
 	for _, val := range matches {
 		for _, license := range licenses {
 			if license.LicenseId == strings.TrimSpace(val[1]) {
-				matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Percentage: 1})
+				matchingLicenses = append(matchingLicenses, LicenseMatch{LicenseId: license.LicenseId, Score: 1})
 			}
 		}
 	}
@@ -84,6 +84,7 @@ func findPossibleLicenseFiles(fileList []string) []string {
 // Caching the database load result reduces processing time by about 3x for this repository
 var Database []License
 var CommonDatabase []License
+
 func loadDatabase() []License {
 	startTime := makeTimestampMilli()
 	if len(Database) != 0 {
@@ -97,7 +98,7 @@ func loadDatabase() []License {
 	Database = database
 
 	// Load smaller faster database for checking most common licenses
-	common := []string {
+	common := []string{
 		"MIT",
 		"Apache-2.0",
 		"GPL-3.0",
@@ -167,7 +168,7 @@ func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
 
 			if keywordMatch > 100 {
 				distance := levenshtein.DistanceForStrings([]rune(string(content)), []rune(string(cleanText([]byte(license.LicenseText)))), levenshtein.DefaultOptions)
-				output <- LicenseMatch{LicenseId: license.LicenseId, Percentage: float64(distance)}
+				output <- LicenseMatch{LicenseId: license.LicenseId, Score: float64(distance)}
 			}
 			wg.Done()
 		}(license)
@@ -183,7 +184,7 @@ func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
 
 	sort.Slice(matchingLicenses, func(i, j int) bool {
 		// For keywordMatch we want > but for distance we want <
-		return matchingLicenses[i].Percentage < matchingLicenses[j].Percentage
+		return matchingLicenses[i].Score < matchingLicenses[j].Score
 	})
 
 	matchingLicenses = specialCases(content, matchingLicenses)
@@ -206,18 +207,18 @@ func specialCases(content []byte, matchingLicenses []LicenseMatch) []LicenseMatc
 	if len(matchingLicenses) > 2 && ((matchingLicenses[0].LicenseId == "JSON" && matchingLicenses[1].LicenseId == "MIT") ||
 		(matchingLicenses[0].LicenseId == "MIT" && matchingLicenses[1].LicenseId == "JSON")) {
 		if bytes.Contains(content, []byte("not evil")) {
-			matchingLicenses = []LicenseMatch{{LicenseId: "JSON", Percentage: 1}}
+			matchingLicenses = []LicenseMatch{{LicenseId: "JSON", Score: 1}}
 		} else {
-			matchingLicenses = []LicenseMatch{{LicenseId: "MIT", Percentage: 1}}
+			matchingLicenses = []LicenseMatch{{LicenseId: "MIT", Score: 1}}
 		}
 	}
 
 	// Another one is MIT-feh and MIT
 	if len(matchingLicenses) > 2 && matchingLicenses[0].LicenseId == "MIT" {
 		if bytes.HasPrefix(content, []byte("mit license")) || bytes.HasPrefix(content, []byte("the mit license")) {
-			matchingLicenses = []LicenseMatch{{LicenseId: "MIT", Percentage: 100}}
+			matchingLicenses = []LicenseMatch{{LicenseId: "MIT", Score: 100}}
 		} else {
-			matchingLicenses = []LicenseMatch{{LicenseId: "MIT-feh", Percentage: 100}}
+			matchingLicenses = []LicenseMatch{{LicenseId: "MIT-feh", Score: 100}}
 		}
 	}
 
