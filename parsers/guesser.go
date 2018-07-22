@@ -4,15 +4,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	//vectorspace "github.com/boyter/golangvectorspace"
 	"os"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"sort"
 	"strings"
 	"sync"
 	"bytes"
+	"github.com/texttheater/golang-levenshtein/levenshtein"
 )
 
 // Shared all over the place
@@ -166,8 +165,9 @@ func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
 				}
 			}
 
-			if keywordMatch > 100 { // on the basis of there being 100
-				output <- LicenseMatch{LicenseId: license.LicenseId, Percentage: float64(keywordMatch/2)}
+			if keywordMatch > 100 {
+				distance := levenshtein.DistanceForStrings([]rune(string(content)), []rune(string(cleanText([]byte(license.LicenseText)))), levenshtein.DefaultOptions)
+				output <- LicenseMatch{LicenseId: license.LicenseId, Percentage: float64(distance)}
 			}
 			wg.Done()
 		}(license)
@@ -182,7 +182,8 @@ func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
 	}
 
 	sort.Slice(matchingLicenses, func(i, j int) bool {
-		return matchingLicenses[i].Percentage > matchingLicenses[j].Percentage
+		// For keywordMatch we want > but for distance we want <
+		return matchingLicenses[i].Percentage < matchingLicenses[j].Percentage
 	})
 
 	matchingLicenses = specialCases(content, matchingLicenses)
@@ -259,16 +260,12 @@ func Process() {
 		close(fileListQueue)
 	}()
 
-	for i := 0; i < runtime.NumCPU(); i++ {
+	go func() {
 		wg.Add(1)
-		go func() {
-			processFileFast(&fileListQueue, &fileResultQueue)
-			wg.Done()
-		}()
-	}
-
-	wg.Wait()
-	close(fileResultQueue)
+		processFileFast(&fileListQueue, &fileResultQueue)
+		wg.Done()
+		close(fileResultQueue)
+	}()
 
 	var fileResults []FileResult
 
@@ -276,6 +273,7 @@ func Process() {
 	for input := range fileResultQueue {
 		fileResults = append(fileResults, *input)
 	}
+	wg.Wait()
 
 	sort.Slice(fileResults, func(i, j int) bool {
 		return strings.Compare(fileResults[i].FullPath(), fileResults[j].FullPath()) < 0

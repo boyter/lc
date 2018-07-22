@@ -3,15 +3,9 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/boyter/golangvectorspace"
-  packages = ["."]
-  revision = "466a786b1f01779dcc7dcfb654bddaef059badd3"
-
-[[projects]]
-  name = "github.com/ryanuber/columnize"
-  packages = ["."]
-  revision = "983d3a5fab1bf04d1b412465d2d9f8430e2e917e"
-  version = "v2.1.0"
+  name = "github.com/texttheater/golang-levenshtein"
+  packages = ["levenshtein"]
+  revision = "d188e65d659ef53fcdb0691c12f1bba64928b649"
 
 [[projects]]
   name = "github.com/urfave/cli"
@@ -22,6 +16,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3d731e23e628654e2b5962134b1d41a98c5fba95aeefd7c620c3510025d834ba"
+  inputs-digest = "5d7dc104afb66926db0ca145018fe37e16eb5fbdec9305337c4af3e5fea3ec49"
   solver-name = "gps-cdcl"
   solver-version = 1
