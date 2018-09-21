@@ -4,6 +4,9 @@ import (
 	"testing"
 )
 
+func init() {
+	LoadDatabase()
+}
 func TestGetMd5Hash(t *testing.T) {
 	actual := getMd5Hash([]byte("ToLower"))
 	expected := "82b2da23d045588f0a386e035a43effd"
@@ -33,7 +36,7 @@ func TestGetSha256Hash(t *testing.T) {
 
 func TestLicenceListHasLicense(t *testing.T) {
 	licenseList := []LicenseMatch{}
-	licenseMatch := LicenseMatch{LicenseId: "test", Percentage: 0.0}
+	licenseMatch := LicenseMatch{LicenseId: "test", Score: 0.0}
 
 	actual := licenceListHasLicense(licenseMatch, licenseList)
 
@@ -52,8 +55,8 @@ func TestLicenceListHasLicense(t *testing.T) {
 
 func TestUniqLicenseMatch(t *testing.T) {
 	licenseList := []LicenseMatch{}
-	licenseMatch1 := LicenseMatch{LicenseId: "test", Percentage: 0.0}
-	licenseMatch2 := LicenseMatch{LicenseId: "test", Percentage: 0.0}
+	licenseMatch1 := LicenseMatch{LicenseId: "test", Score: 0.0}
+	licenseMatch2 := LicenseMatch{LicenseId: "test", Score: 0.0}
 
 	licenseList = append(licenseList, licenseMatch1)
 	licenseList = append(licenseList, licenseMatch2)
@@ -65,8 +68,8 @@ func TestUniqLicenseMatch(t *testing.T) {
 	}
 
 	// if even one portion changes then it should be included
-	licenseMatch3 := LicenseMatch{LicenseId: "test", Percentage: 0.1}
-	licenseMatch4 := LicenseMatch{LicenseId: "test2", Percentage: 0.0}
+	licenseMatch3 := LicenseMatch{LicenseId: "test", Score: 0.1}
+	licenseMatch4 := LicenseMatch{LicenseId: "test2", Score: 0.0}
 
 	licenseList = append(licenseList, licenseMatch3)
 	licenseList = append(licenseList, licenseMatch4)

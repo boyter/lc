@@ -5,13 +5,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/texttheater/golang-levenshtein/levenshtein"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/texttheater/golang-levenshtein/levenshtein"
 )
 
 // Shared all over the place
@@ -85,7 +86,8 @@ func findPossibleLicenseFiles(fileList []string) []string {
 var Database []License
 var CommonDatabase []License
 
-func loadDatabase() []License {
+// LoadDatabase will initialize the database values and should only be called once such as in an init
+func LoadDatabase() []License {
 	startTime := makeTimestampMilli()
 	if len(Database) != 0 {
 		return Database
@@ -146,7 +148,7 @@ func loadDatabase() []License {
 	return database
 }
 
-// Fast method of checking if supplied content contains a licence using
+// fast method of checking if supplied content contains a licence using
 // matching keyword ngrams to find if the licence is a match or not
 // returns the matching licences with shortname and the percentage of match.
 func keywordGuessLicense(content []byte, licenses []License) []LicenseMatch {
@@ -226,7 +228,7 @@ func specialCases(content []byte, matchingLicenses []LicenseMatch) []LicenseMatc
 }
 
 func Process() {
-	loadDatabase()
+	LoadDatabase()
 
 	if len(DirFilePaths) == 0 {
 		DirFilePaths = append(DirFilePaths, ".")

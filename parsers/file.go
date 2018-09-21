@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 )
@@ -95,6 +96,26 @@ func processFileFast(input *chan *File, output *chan *FileResult) {
 		fileResult := processFile(file.Directory, file.File, file.LicenseGuesses, file.RootLicenses)
 		*output <- &fileResult
 	}
+}
+
+// GuessLicense will attempt to find any licenses in the content and return them as a sorted set of guesses with the highest
+// score first (if more than one)
+func GuessLicense(content []byte) []LicenseMatch {
+	if len(content) > MaxSize {
+		return []LicenseMatch{}
+	}
+	licenseGuesses := keywordGuessLicense(content, CommonDatabase)
+	if len(licenseGuesses) == 0 {
+		licenseGuesses = keywordGuessLicense(content, Database)
+	}
+	licenseGuesses = append(licenseGuesses, identifierGuessLicence(string(content), Database)...)
+	if len(licenseGuesses) > 1 {
+		sort.Slice(licenseGuesses, func(i, j int) bool {
+			// For keywordMatch we want > but for distance we want <
+			return licenseGuesses[i].Score < licenseGuesses[j].Score
+		})
+	}
+	return licenseGuesses
 }
 
 func processFile(directory string, file string, guessed []LicenseMatch, rootLicenses []LicenseMatch) FileResult {
