@@ -2,20 +2,36 @@
 
 
 [[projects]]
+  digest = "1:e60f2f1cd2e8dfdea48c2440c303d103266e754ab1d8b75796a4e4caddb7a68c"
+  name = "github.com/tealeg/xlsx"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "8be35264fa75a1bbe954ce51eba04f273e2c59e5"
+  version = "v1.0.3"
+
+[[projects]]
   branch = "master"
+  digest = "1:a38c75e7edd595bbaa03334c1ac26163a5e990d81f05cd9ec5fd0edc9c786078"
   name = "github.com/texttheater/golang-levenshtein"
   packages = ["levenshtein"]
+  pruneopts = "UT"
   revision = "d188e65d659ef53fcdb0691c12f1bba64928b649"
 
 [[projects]]
+  digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"
   name = "github.com/urfave/cli"
   packages = ["."]
+  pruneopts = "UT"
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
   version = "v1.20.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5d7dc104afb66926db0ca145018fe37e16eb5fbdec9305337c4af3e5fea3ec49"
+  input-imports = [
+    "github.com/tealeg/xlsx",
+    "github.com/texttheater/golang-levenshtein/levenshtein",
+    "github.com/urfave/cli",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
