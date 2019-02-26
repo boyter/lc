@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"github.com/tealeg/xlsx"
 	"io/ioutil"
 	"log"
 	"os"
@@ -65,6 +66,68 @@ func toCSV(fileResults []FileResult) {
 			log.Fatalln("error writing csv:", err)
 		}
 
+		fmt.Println("Results written to " + FileOutput)
+	}
+}
+
+func toXLSX(fileResults []FileResult) {
+	records := [][]string{{
+		"filename",
+		"directory",
+		"license",
+		"confidence",
+		"rootlicenses",
+		"md5",
+		"sha1",
+		"sha256",
+		"bytes",
+		"byteshuman"},
+	}
+
+	for _, result := range fileResults {
+		licenseConcluded, confidence := determineLicense(result)
+
+		rootLicenseString := ""
+		for _, v := range result.LicenseRoots {
+			rootLicenseString += fmt.Sprintf("%s,", v.LicenseId)
+		}
+		rootLicenseString = strings.TrimRight(rootLicenseString, ", ")
+
+		records = append(records, []string{
+			result.Filename,
+			result.Directory,
+			licenseConcluded,
+			confidence,
+			rootLicenseString,
+			result.Md5Hash,
+			result.Sha1Hash,
+			result.Sha256Hash,
+			strconv.Itoa(result.Bytes),
+			result.BytesHuman})
+	}
+
+	file := xlsx.NewFile()
+	sheet, err := file.AddSheet("Sheet1")
+	if err != nil {
+		log.Fatalln("error creating xlsx:", err)
+	}
+
+	for _, record := range records {
+		row := sheet.AddRow()
+		written := row.WriteSlice(&record, -1)
+		if written < 0 {
+			log.Fatalln("error writing row")
+		}
+	}
+
+	// As this is a binary format, writing to stdout is primarily for the purpose of enabling redirection
+	if FileOutput == "" {
+		err = file.Write(os.Stdout)
+		if err != nil {
+			log.Fatalln("error writing xlsx:", err)
+		}
+	} else {
+		file.Save(FileOutput)
 		fmt.Println("Results written to " + FileOutput)
 	}
 }

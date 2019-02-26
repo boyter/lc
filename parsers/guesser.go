@@ -285,6 +285,8 @@ func Process() {
 	switch strings.ToLower(Format) {
 	case "csv":
 		toCSV(fileResults)
+	case "xlsx":
+		toXLSX(fileResults)
 	case "json":
 		toJSON(fileResults)
 	case "tabular":
