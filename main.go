@@ -21,7 +21,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:        "format, f",
-			Usage:       "Set output format, supports progress, tabular, json, spdx or `csv`",
+			Usage:       "Set output format, supports progress, tabular, json, spdx, xlsx or `csv`",
 			Destination: &parsers.Format,
 			Value:       "tabular",
 		},

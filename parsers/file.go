@@ -164,7 +164,7 @@ func processFile(directory string, file string, guessed []LicenseMatch, rootLice
 	sha1 := ""
 	sha256 := ""
 
-	if strings.ToLower(Format) == "csv" || strings.ToLower(Format) == "json" || strings.ToLower(Format) == "spdx21" || strings.ToLower(Format) == "spdx" {
+	if strings.ToLower(Format) == "csv" || strings.ToLower(Format) == "xlsx" || strings.ToLower(Format) == "json" || strings.ToLower(Format) == "spdx21" || strings.ToLower(Format) == "spdx" {
 		md5 = getMd5Hash(content)
 		sha1 = getSha1Hash(content)
 		sha256 = getSha256Hash(content)

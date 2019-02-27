@@ -9,7 +9,7 @@ license files named appropiately or inline licenses such as the below in source 
 
 In a nutshell this project is a reimplementation of http://www.boyter.org/2017/05/identify-software-licenses-python-vector-space-search-ngram-keywords/ using Go while I attempt to nut out the nuances of the language. 
 
-It can produce report outputs as valid [SPDX](https://spdx.org/), CSV, JSON and CLI formatted. It has been designed to work inside CI systems that capture either stdout or file artifacts.
+It can produce report outputs as valid [SPDX](https://spdx.org/), CSV, XLSX, JSON and CLI formatted. It has been designed to work inside CI systems that capture either stdout or file artifacts.
 
 [![Build Status](https://travis-ci.org/boyter/lc.svg?branch=master)](https://travis-ci.org/boyter/lc)
 
@@ -66,7 +66,7 @@ COMMANDS:
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --format csv, -f csv                                Set output format, supports progress, tabular, json, spdx, summary or csv (default: "tabular")
+   --format csv, -f csv                                Set output format, supports progress, tabular, json, spdx, summary, xlsx or csv (default: "tabular")
    --output FILE, -o FILE                              Set output file if not set will print to stdout FILE
    --confidence 0.95, -c 0.95                          Set required confidence level for licence matching between 0 and 1 E.G. 0.95 (default: "0.85")
    --deepguess true, --dg true                         Should attempt to deep guess the licence false or true true (default: "true")
