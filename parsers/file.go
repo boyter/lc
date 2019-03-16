@@ -1,26 +1,67 @@
 package parsers
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
 )
 
-func walkDirectory(directory string, rootLicenses [][]LicenseMatch, output *chan *File) {
+func walkGitDirectory(directory string, files *[]string) error {
+	var stdout bytes.Buffer
+
+	// Check for a valid git command in the PATH
+	_, err := exec.LookPath("git")
+	if err != nil {
+		// Fall back to flat directory walking
+		return errors.New("Git command not found")
+	}
+
+	cmd := exec.Command("git", "ls-files")
+	cmd.Stdout = &stdout
+
+	// Make sure the command is executed from within the repository
+	// directory in order to avoid out-of-repository errors from git
+	cmd.Dir = directory
+
+	err = cmd.Run()
+	if err != nil {
+		return errors.New("unable to obtain file list from git")
+	}
+
+	for {
+		file, err := stdout.ReadString('\n')
+		if err != nil {
+			break
+		}
+
+		file = strings.TrimRight(file, "\r\n")
+		*files = append(*files, file)
+	}
+
+	if err != nil && err != io.EOF {
+		// Clear out any partially constructed file list
+		files = nil
+
+		return errors.New("failed to iterate file list from git")
+	}
+
+	return nil
+}
+
+func walkFlatDirectory(directory string, files *[]string, directories *[]string) error {
 	all, err := ioutil.ReadDir(directory)
 
 	if err != nil {
-		if Debug {
-			printDebug(fmt.Sprintf("unable to read or directory: %s", directory))
-		}
-		return
+		return errors.New("unable to read or directory: " + directory)
 	}
-
-	var directories []string
-	var files []string
 
 	for _, file := range all {
 		if file.IsDir() {
@@ -33,10 +74,42 @@ func walkDirectory(directory string, rootLicenses [][]LicenseMatch, output *chan
 			}
 
 			if add == true {
-				directories = append(directories, file.Name())
+				*directories = append(*directories, file.Name())
 			}
 		} else {
-			files = append(files, file.Name())
+			*files = append(*files, file.Name())
+		}
+	}
+
+	return nil
+}
+
+func walkDirectory(directory string, rootLicenses [][]LicenseMatch, output *chan *File) {
+	var directories []string
+	var files []string
+
+	// In the case where the directory is a valid git repository, prefer
+	// extracting the file list from git directly. This saves us from
+	// needing to walk directories recursively, and has the added benefit
+	// of excluding files not included in the distribution but which may
+	// still be present in the working directory.
+	if _, err := os.Stat(directory + "/.git"); !os.IsNotExist(err) {
+		err = walkGitDirectory(directory, &files)
+		if err != nil {
+			if Debug {
+				printDebug(err.Error())
+			}
+
+		}
+	}
+
+	// If earlier directory walking methods have failed, walk manually
+	if len(files) == 0 {
+		err := walkFlatDirectory(directory, &files, &directories)
+		if err != nil {
+			if Debug {
+				printDebug(err.Error())
+			}
 		}
 	}
 
