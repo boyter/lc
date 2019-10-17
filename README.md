@@ -231,3 +231,4 @@ Rank 	Open Source License 	                            %
 * Add logic to guess the file type for SPDX value FileType
 * Add addtional unit and integration tests
 * Investigate using "github.com/gosuri/uitable" for formatting https://github.com/gosuri/uitable
+
