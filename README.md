@@ -18,7 +18,7 @@ Dual-licensed under MIT or the [UNLICENSE](http://unlicense.org).
 
 ### Why
 
-In short taken from, http://ben.balter.com/licensee/
+In short taken from, https://licensee.github.io/licensee/
 
  * You've got an open source project. How do you know what you can and can't do with the software?
  * You've got a bunch of open source projects, how do you know what their licenses are?
