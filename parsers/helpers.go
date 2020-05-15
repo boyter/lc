@@ -82,7 +82,6 @@ func licenceListHasLicense(license LicenseMatch, licenseList []LicenseMatch) boo
 // See https://apache.org/licenses/GPL-compatibility.html
 // SPDX-License-Identifier: Apache-2.0
 func bytesToHuman(bytes int64) string {
-
 	const TERABYTE = 1099511627776
 	const GIGABYTE = 1073741824
 	const MEGABYTE = 1048576

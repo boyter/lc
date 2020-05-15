@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/boyter/lc/processor"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"sync"
 )
@@ -28,19 +28,6 @@ type LicenseOutput struct {
 	Keywords                []string `json:"keywords"`
 }
 
-var alphaNumericRegex = regexp.MustCompile("[^a-zA-Z0-9 ]")
-var multipleSpacesRegex = regexp.MustCompile("\\s+")
-
-func cleanText(content string) string {
-	content = strings.ToLower(content)
-
-	content = alphaNumericRegex.ReplaceAllString(content, " ")
-	content = multipleSpacesRegex.ReplaceAllString(content, " ")
-	content = strings.TrimSpace(content)
-
-	return content
-}
-
 func findNgrams(list []string, size int) []string {
 	var ngrams []string
 
@@ -57,8 +44,8 @@ func findNgrams(list []string, size int) []string {
 func main() {
 	files, _ := ioutil.ReadDir("./licenses/")
 
+	fmt.Println("loading licenses")
 	var licenses []License
-
 	// Load the licenses
 	for _, f := range files {
 		if strings.HasSuffix(f.Name(), ".json") {
@@ -72,76 +59,69 @@ func main() {
 		}
 	}
 
-	// Build ngrams for them
-	for j := 0; j < len(licenses); j++ {
-
-		split := strings.Split(cleanText(licenses[j].StandardLicenseHeader)+" "+cleanText(licenses[j].StandardLicenseTemplate)+" "+cleanText(licenses[j].LicenseText), " ")
-
-		for i := 5; i < 45; i++ { // 45 seems about right
-			ngrams := findNgrams(split, i)
-			licenses[j].Ngrams = append(licenses[j].Ngrams, ngrams...)
-		}
-	}
-
-	outputChan := make(chan LicenseOutput, 2000)
-
 	var wg sync.WaitGroup
+	fmt.Println("building ngrams for each license")
+	// Build ngrams for each license
+	for j := 0; j < len(licenses); j++ {
+		wg.Add(1)
+		go func(k int) {
+			split := strings.Split(
+				processor.LcCleanText(licenses[k].StandardLicenseHeader)+" "+
+						processor.LcCleanText(licenses[k].LicenseText), " ")
+
+			for i := 3; i < 7; i++ {
+				ngrams := findNgrams(split, i)
+				licenses[k].Ngrams = append(licenses[k].Ngrams, ngrams...)
+			}
+			wg.Done()
+		}(j)
+	}
+	wg.Wait()
+
+	fmt.Println("finding unique ngrams")
+
+	outputLicenses := []LicenseOutput{}
 	// For each licence, check each ngram and see if it is unique
 	for i := 0; i < len(licenses); i++ {
-		wg.Add(1)
-		go func(i int) {
-			license := licenses[i]
+		license := licenses[i]
 
-			// for each licence that isn't this one
-			// get all the ngrams and put it into a hash
-			// then look each of our ngrams and check if it is contained
-			contains := map[*string]int{}
-			for _, lic := range licenses {
-				if lic.LicenseId != license.LicenseId {
-					for _, ngram := range lic.Ngrams {
-						contains[&ngram] = 1
-					}
+		// what we should do is get every ngram into a huge map EXCEPT for those from this license...
+		// then for each one check if its in the map if it isnt its unique... more ram but SOOOO much faster
+		ngramMap := map[string]bool{}
+		for _, lic := range licenses {
+			if license.LicenseId != lic.LicenseId {
+				for _, ng := range lic.Ngrams {
+					ngramMap[ng] = true
 				}
 			}
+		}
 
-			var uniqueNgrams []string
-			for _, ngram := range license.Ngrams {
-				_, ok := contains[&ngram]
+		// go through every ngram for this license and check that it does not occur anywhere else
+		var uniqueNgrams []string
 
-				if !ok {
-					uniqueNgrams = append(uniqueNgrams, ngram)
-				}
+		for _, ngram := range license.Ngrams {
+			_, ok := ngramMap[ngram]
 
-				if len(uniqueNgrams) >= 200 {
-					break
-				}
+			if !ok {
+				uniqueNgrams = append(uniqueNgrams, ngram)
 			}
+		}
 
-			fmt.Println(license.LicenseId, len(license.Ngrams), "Unique Ngrams", len(uniqueNgrams))
+		fmt.Println(license.LicenseId, "Ngrams", len(license.Ngrams), "Unique Ngrams", len(uniqueNgrams))
 
-			outputChan <- LicenseOutput{
-				LicenseId:               license.LicenseId,
-				Name:                    license.Name,
-				LicenseText:             license.LicenseText,
-				StandardLicenseTemplate: license.StandardLicenseTemplate,
-				Keywords:                uniqueNgrams,
-			}
-
-			wg.Done()
-		}(i)
+		outputLicenses = append(outputLicenses, LicenseOutput{
+			LicenseId:               license.LicenseId,
+			Name:                    license.Name,
+			LicenseText:             license.LicenseText,
+			StandardLicenseTemplate: license.StandardLicenseTemplate,
+			Keywords:                uniqueNgrams,
+		})
 	}
 
-	wg.Wait()
-	close(outputChan)
-
-	var outputLicenses []LicenseOutput
-	for lic := range outputChan {
-		outputLicenses = append(outputLicenses, lic)
-	}
 
 	out, _ := os.Create("database_keywords.json")
 
 	data, _ := json.Marshal(outputLicenses)
-	out.Write(data)
-	out.Close()
+	_, _ = out.Write(data)
+	_ = out.Close()
 }
