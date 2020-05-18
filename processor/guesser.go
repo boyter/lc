@@ -3,6 +3,7 @@ package processor
 import (
 	"encoding/base64"
 	"encoding/json"
+	"github.com/texttheater/golang-levenshtein/levenshtein"
 	"regexp"
 	"sort"
 	"strings"
@@ -120,6 +121,7 @@ func (l *LicenceGuesser) KeyWordGuessLicence(content []byte) []License {
 
 	var matchingLicenses []License
 	var totalScore float64
+	var maxScore float64
 
 	// Swap out the database to the full one if configured to use it
 	db := l.CommonDatabase
@@ -139,6 +141,19 @@ func (l *LicenceGuesser) KeyWordGuessLicence(content []byte) []License {
 	// Normalise the scores based on the total so we can make a reasonable guess of how confident we are
 	for i := 0; i < len(matchingLicenses); i++ {
 		matchingLicenses[i].ScorePercentage = (matchingLicenses[i].ScorePercentage / totalScore) * 100
+
+		// keep track of the highest score
+		if matchingLicenses[i].ScorePercentage > maxScore {
+			maxScore = matchingLicenses[i].ScorePercentage
+		}
+	}
+
+	// If we have multiple licenses and their scores aren't at least 70% confident do some additional checks
+	if len(matchingLicenses) >= 2 && maxScore < 60 {
+		for i := 0; i< len(matchingLicenses); i++ {
+			distance := levenshtein.DistanceForStrings([]rune(haystack), []rune(LcCleanText(matchingLicenses[i].LicenseText)), levenshtein.DefaultOptions)
+			matchingLicenses[i].ScorePercentage = float64(100) / float64(distance)
+		}
 	}
 
 	// Sort so if someone wants to get the best candidate they can get the 0 index of the return

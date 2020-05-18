@@ -42,7 +42,7 @@ func findNgrams(list []string, size int) []string {
 }
 
 func main() {
-	files, _ := ioutil.ReadDir("./licenses/")
+	files, _ := ioutil.ReadDir("./gpl/")
 
 	fmt.Println("loading licenses")
 	var licenses []License
@@ -124,4 +124,38 @@ func main() {
 	data, _ := json.Marshal(outputLicenses)
 	_, _ = out.Write(data)
 	_ = out.Close()
+
+	//// Write out
+	//files, _ = ioutil.ReadDir(".")
+	//out, _ = os.Create("./database.go")
+	//
+	//// Open constants
+	//out.Write([]byte("package processor \n\nvar LicenseDatabase = []License{\n"))
+	//for _, f := range outputLicenses {
+	//
+	//	key := ""
+	//	if len(f.Keywords) != 0 {
+	//		for _, k := range f.Keywords {
+	//			key += fmt.Sprintf(`"%s",`, k)
+	//		}
+	//	}
+	//
+	//	out.Write(bytes.Trim([]byte(fmt.Sprintf(`{
+	//		LicenseText:             ` + "`" + `%s` + "`" + `,
+	//		StandardLicenseTemplate: ` + "`" + `%s` + "`" + `,
+	//		Name:                    ` + "`" + `%s` + "`" + `,
+	//		LicenseId:               ` + "`" + `%s` + "`" + `,
+	//		Keywords:                []string{
+	//			%s
+	//		},
+	//	},`,
+	//		strings.Replace(f.LicenseText, "`", "` + \"`\" + `", -1),
+	//		strings.Replace(f.StandardLicenseTemplate, "`", "` + \"`\" + `", -1),
+	//		strings.Replace(f.Name, "`", "` + \"`\" + `", -1),
+	//		strings.Replace(f.LicenseId, "`", "` + \"`\" + `", -1),
+	//		key)), "\xef\xbb\xbf"))
+	//}
+	//
+	//out.Write([]byte("}\n"))
+	//out.Close()
 }
