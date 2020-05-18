@@ -1,20 +1,23 @@
+// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Unlicense
+
 package processor
 
 import (
 	"encoding/base64"
 	"encoding/json"
 	corasick "github.com/BobuSumisu/aho-corasick"
-	//"github.com/m1ome/leven"
 	"regexp"
-	"sort"
 	"strings"
 )
 
 var spdxLicenceIdentifier = "SPDX-License-Identifier:"
 var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
 
-func NewLicenceGuesser() LicenceGuesser {
+func NewLicenceGuesser(keyword bool, vectorspace bool) LicenceGuesser {
 	l := LicenceGuesser{}
+	l.keyword = keyword
+	l.vectorspace = vectorspace
 	l.LoadDatabase()
 	l.UseFullDatabase = false
 	return l
@@ -24,6 +27,8 @@ type LicenceGuesser struct {
 	Database []License
 	CommonDatabase []License
 	UseFullDatabase bool
+	keyword bool
+	vectorspace bool
 }
 
 // LoadDatabase will initialize the database values and should only be called once such as in an init
@@ -69,10 +74,18 @@ func (l *LicenceGuesser) LoadDatabase() {
 		"BitTorrent-1.0",
 	}
 
-	for i:=0; i<len(l.Database); i++ {
-		l.Database[i].Trie = corasick.NewTrieBuilder().
-			AddStrings(l.Database[i].Keywords).
-			Build()
+	if l.keyword {
+		for i := 0; i < len(l.Database); i++ {
+			l.Database[i].Trie = corasick.NewTrieBuilder().
+				AddStrings(l.Database[i].Keywords).
+				Build()
+		}
+	}
+
+	if l.vectorspace {
+		for i := 0; i < len(l.Database); i++ {
+			l.Database[i].Concordance = BuildConcordance(strings.Split(LcCleanText(l.Database[i].LicenseText), " "))
+		}
 	}
 
 	for _, license := range l.Database {
@@ -102,6 +115,7 @@ func (l *LicenceGuesser) SpdxIdentify(content string) []License {
 			t = strings.Split(t, " ")[0]
 		}
 
+		// Check the full database because there is so little cost to do so
 		for _, license := range l.Database {
 			if license.LicenseId == t {
 				license.ScorePercentage = 100 // set the score to be 100% IE we are 100% confidence in this guess
@@ -126,97 +140,4 @@ func (l *LicenceGuesser) GuessLicense(content []byte) []License {
 	// so if the keyword guess licence found nothing we should consider using vector space
 
 	// it should be possible to ask it to spend more time checking IE really nail down
-}
-
-// Given some content try to guess what the licence is based on checking for unique keywords
-// using the prebuilt licence library
-func (l *LicenceGuesser) KeyWordGuessLicence(content []byte) []License {
-	haystack := LcCleanText(string(content))
-
-	var matchingLicenses []License
-	var totalScore float64
-	var maxScore float64
-
-	// Swap out the database to the full one if configured to use it
-	db := l.CommonDatabase
-	if l.UseFullDatabase {
-		db = l.Database
-	}
-
-	for _, lic := range db {
-		c := l.checkLicenceKeywords(haystack, lic)
-		if c != 0 {
-			lic.ScorePercentage = float64(c)
-			totalScore += lic.ScorePercentage
-			matchingLicenses = append(matchingLicenses, lic)
-		}
-	}
-
-	// Normalise the scores based on the total so we can make a reasonable guess of how confident we are
-	for i := 0; i < len(matchingLicenses); i++ {
-		matchingLicenses[i].ScorePercentage = (matchingLicenses[i].ScorePercentage / totalScore) * 100
-
-		// keep track of the highest score
-		if matchingLicenses[i].ScorePercentage > maxScore {
-			maxScore = matchingLicenses[i].ScorePercentage
-		}
-	}
-
-	// only keep those close to the max score so we can ignore anything that isn't even close
-	var t []License
-	for _, lic := range matchingLicenses {
-		if lic.ScorePercentage >= (maxScore*0.8) {
-			t = append(t, lic)
-		}
-	}
-	if len(t) != 0 {
-		matchingLicenses = t
-	}
-
-	// TODO this should be moved out
-	// this appears to be horribly slow...
-	//// If we have multiple licenses and their scores aren't at least 70% confident do some additional checks
-	//if len(matchingLicenses) >= 2 && maxScore < 60 {
-	//	for i := 0; i< len(matchingLicenses); i++ {
-	//		distance := leven.Distance(haystack, LcCleanText(matchingLicenses[i].LicenseText))
-	//		if distance == 0 {
-	//			matchingLicenses[i].ScorePercentage = 100
-	//		} else {
-	//			matchingLicenses[i].ScorePercentage = float64(100) / float64(distance)
-	//		}
-	//	}
-	//}
-
-
-	// TODO this should be moved out
-	//If we have a bunch and the score isnt very good try more fuzzy matching using vector space...
-	if len(matchingLicenses) >= 2 && maxScore < 60 {
-		con := BuildConcordance(strings.Split(haystack, " "))
-		for i := 0; i < len(matchingLicenses); i++ {
-			distance := Relation(con, BuildConcordance(strings.Split(LcCleanText(matchingLicenses[i].LicenseText), " ")))
-			matchingLicenses[i].ScorePercentage = distance * 100
-		}
-	}
-
-	// Sort so if someone wants to get the best candidate they can get the 0 index of the return
-	sort.Slice(matchingLicenses, func(i, j int) bool {
-		return matchingLicenses[i].ScorePercentage > matchingLicenses[j].ScorePercentage
-	})
-
-	return matchingLicenses
-}
-
-func (l *LicenceGuesser) checkLicenceKeywords(haystack string, lic License) int {
-	var count int
-
-	// quickly check if we have any match and then go and confirm it
-	if lic.Trie.MatchFirst([]byte(haystack)) != nil {
-		for _, k := range lic.Keywords {
-			if strings.Contains(haystack, k) {
-				count++
-			}
-		}
-	}
-
-	return count
 }

@@ -19,7 +19,7 @@ type LicenseJson struct {
 
 // Note that this takes a long time to run hence goroutines to try and speed it up
 func TestFullDatabase(t *testing.T) {
-	lg := NewLicenceGuesser()
+	lg := NewLicenceGuesser(true, false)
 	lg.UseFullDatabase = true
 
 	files, _ := ioutil.ReadDir("../assets/database/licenses/")

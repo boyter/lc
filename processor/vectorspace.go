@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Unlicense
 
 package processor
 
@@ -44,6 +45,6 @@ func Relation(con1 Concordance, con2 Concordance) float64 {
 	if mag != 0 {
 		return topValue / mag
 	}
-	
+
 	return 0
 }
