@@ -3,7 +3,8 @@ package processor
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/boyter/lc/common/levenshtein"
+	corasick "github.com/BobuSumisu/aho-corasick"
+	//"github.com/m1ome/leven"
 	"regexp"
 	"sort"
 	"strings"
@@ -68,6 +69,12 @@ func (l *LicenceGuesser) LoadDatabase() {
 		"BitTorrent-1.0",
 	}
 
+	for i:=0; i<len(l.Database); i++ {
+		l.Database[i].Trie = corasick.NewTrieBuilder().
+			AddStrings(l.Database[i].Keywords).
+			Build()
+	}
+
 	for _, license := range l.Database {
 		for _, com := range common {
 			if license.LicenseId == com {
@@ -117,6 +124,8 @@ func (l *LicenceGuesser) GuessLicense(content []byte) []License {
 	// try via vector space or otherwise
 	return l.KeyWordGuessLicence(content)
 	// so if the keyword guess licence found nothing we should consider using vector space
+
+	// it should be possible to ask it to spend more time checking IE really nail down
 }
 
 // Given some content try to guess what the licence is based on checking for unique keywords
@@ -153,11 +162,39 @@ func (l *LicenceGuesser) KeyWordGuessLicence(content []byte) []License {
 		}
 	}
 
-	// If we have multiple licenses and their scores aren't at least 70% confident do some additional checks
+	// only keep those close to the max score so we can ignore anything that isn't even close
+	var t []License
+	for _, lic := range matchingLicenses {
+		if lic.ScorePercentage >= (maxScore*0.8) {
+			t = append(t, lic)
+		}
+	}
+	if len(t) != 0 {
+		matchingLicenses = t
+	}
+
+	// TODO this should be moved out
+	// this appears to be horribly slow...
+	//// If we have multiple licenses and their scores aren't at least 70% confident do some additional checks
+	//if len(matchingLicenses) >= 2 && maxScore < 60 {
+	//	for i := 0; i< len(matchingLicenses); i++ {
+	//		distance := leven.Distance(haystack, LcCleanText(matchingLicenses[i].LicenseText))
+	//		if distance == 0 {
+	//			matchingLicenses[i].ScorePercentage = 100
+	//		} else {
+	//			matchingLicenses[i].ScorePercentage = float64(100) / float64(distance)
+	//		}
+	//	}
+	//}
+
+
+	// TODO this should be moved out
+	//If we have a bunch and the score isnt very good try more fuzzy matching using vector space...
 	if len(matchingLicenses) >= 2 && maxScore < 60 {
-		for i := 0; i< len(matchingLicenses); i++ {
-			distance := levenshtein.DistanceForStrings([]rune(haystack), []rune(LcCleanText(matchingLicenses[i].LicenseText)), levenshtein.DefaultOptions)
-			matchingLicenses[i].ScorePercentage = float64(100) / float64(distance)
+		con := BuildConcordance(strings.Split(haystack, " "))
+		for i := 0; i < len(matchingLicenses); i++ {
+			distance := Relation(con, BuildConcordance(strings.Split(LcCleanText(matchingLicenses[i].LicenseText), " ")))
+			matchingLicenses[i].ScorePercentage = distance * 100
 		}
 	}
 
@@ -171,9 +208,13 @@ func (l *LicenceGuesser) KeyWordGuessLicence(content []byte) []License {
 
 func (l *LicenceGuesser) checkLicenceKeywords(haystack string, lic License) int {
 	var count int
-	for _, k := range lic.Keywords {
-		if strings.Contains(haystack, k) {
-			count++
+
+	// quickly check if we have any match and then go and confirm it
+	if lic.Trie.MatchFirst([]byte(haystack)) != nil {
+		for _, k := range lic.Keywords {
+			if strings.Contains(haystack, k) {
+				count++
+			}
 		}
 	}
 
