@@ -3,7 +3,7 @@ package processor
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/texttheater/golang-levenshtein/levenshtein"
+	"github.com/boyter/lc/common/levenshtein"
 	"regexp"
 	"sort"
 	"strings"
@@ -90,8 +90,13 @@ func (l *LicenceGuesser) SpdxIdentify(content string) []License {
 	matches := spdxLicenceRegex.FindAllStringSubmatch(content, -1)
 
 	for _, val := range matches {
+		t := strings.TrimSpace(val[1])
+		if strings.Contains(val[1], " ") {
+			t = strings.Split(t, " ")[0]
+		}
+
 		for _, license := range l.Database {
-			if license.LicenseId == strings.TrimSpace(val[1]) {
+			if license.LicenseId == t {
 				license.ScorePercentage = 100 // set the score to be 100% IE we are 100% confidence in this guess
 				matchingLicenses = append(matchingLicenses, license)
 			}

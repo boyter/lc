@@ -24,11 +24,18 @@ func readFile(filepath string) []byte {
 // Reads all .json files in the current folder
 // and encodes them as strings literals in constants.go
 func main() {
-	files, _ := ioutil.ReadDir(".")
-	out, _ := os.Create("./parsers/constants.go")
+	fmt.Println("running...")
+	files, err := ioutil.ReadDir(".")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	out, err := os.Create("./processor/constants.go")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
 	// Open constants
-	out.Write([]byte("package parsers \n\nconst (\n"))
+	out.Write([]byte("package processor \n\nconst (\n"))
 
 	for _, f := range files {
 		if strings.HasSuffix(f.Name(), ".json") {
@@ -44,6 +51,12 @@ func main() {
 	}
 
 	// Close out constants
-	out.Write([]byte(")\n"))
-	out.Close()
+	_, err = out.Write([]byte(")\n"))
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	err = out.Close()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }

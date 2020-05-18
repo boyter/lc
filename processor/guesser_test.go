@@ -20,6 +20,11 @@ func TestSpdxGuesser(t *testing.T) {
 		t.Errorf("Should match GPL-2.0")
 	}
 
+	actual = lg.SpdxIdentify("/* SPDX-License-Identifier: GPL-2.0 */")
+	if actual[0].LicenseId != "GPL-2.0" {
+		t.Errorf("Should match GPL-2.0")
+	}
+
 	actual = lg.SpdxIdentify("# SPDX-License-Identifier: GPL-2.0 ")
 	if actual[0].LicenseId != "GPL-2.0" {
 		t.Errorf("Should match GPL-2.0")
@@ -411,8 +416,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	}
 }
 
-func TestLicenseGuessGpl3OrLater(t *testing.T) {
+func TestLicenseGuessGpl3Only(t *testing.T) {
 	lg := NewLicenceGuesser()
+	lg.UseFullDatabase = true
 
 	licenses := lg.GuessLicense([]byte(`GNU GENERAL PUBLIC LICENSE
 Version 3, 29 June 2007
@@ -541,7 +547,7 @@ The hypothetical commands show w' and show c' should show the appropriate parts 
 You should also get your employer (if you work as a programmer) or school, if any, to sign a "copyright disclaimer" for the program, if necessary. For more information on this, and how to apply and follow the GNU GPL, see <http s ://www.gnu.org/licenses/>.
 The GNU General Public License does not permit incorporating your program into proprietary programs. If your program is a subroutine library, you may consider it more useful to permit linking proprietary applications with the library. If this is what you want to do, use the GNU Lesser General Public License instead of this License. But first, please read <http s ://www.gnu.org/philosophy/why-not-lgpl.html>.`))
 
-	if licenses[0].LicenseId != "GPL-3.0-or-later" {
-		t.Error("expected GPL-3.0-or-later got", licenses[0].LicenseId)
+	if licenses[0].LicenseId != "GPL-3.0-only" {
+		t.Error("expected GPL-3.0-only got", licenses[0].LicenseId)
 	}
 }

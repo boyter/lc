@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 )
@@ -28,6 +29,11 @@ type LicenseOutput struct {
 	Keywords                []string `json:"keywords"`
 }
 
+type NgramUnique struct {
+	Ngram string
+	Count int
+}
+
 func findNgrams(list []string, size int) []string {
 	var ngrams []string
 
@@ -42,7 +48,7 @@ func findNgrams(list []string, size int) []string {
 }
 
 func main() {
-	files, _ := ioutil.ReadDir("./gpl/")
+	files, _ := ioutil.ReadDir("./licenses/")
 
 	fmt.Println("loading licenses")
 	var licenses []License
@@ -83,23 +89,23 @@ func main() {
 	outputLicenses := []LicenseOutput{}
 	// For each licence, check each ngram and see if it is unique
 	for i := 0; i < len(licenses); i++ {
-		license := licenses[i]
+		currentLicense := licenses[i]
 
-		// what we should do is get every ngram into a huge map EXCEPT for those from this license...
+		// what we should do is get every ngram into a huge map EXCEPT for those from this currentLicense...
 		// then for each one check if its in the map if it isnt its unique... more ram but SOOOO much faster
 		ngramMap := map[string]bool{}
 		for _, lic := range licenses {
-			if license.LicenseId != lic.LicenseId {
+			if currentLicense.LicenseId != lic.LicenseId {
 				for _, ng := range lic.Ngrams {
 					ngramMap[ng] = true
 				}
 			}
 		}
 
-		// go through every ngram for this license and check that it does not occur anywhere else
+		// go through every ngram for this currentLicense and check that it does not occur anywhere else
 		var uniqueNgrams []string
 
-		for _, ngram := range license.Ngrams {
+		for _, ngram := range currentLicense.Ngrams {
 			_, ok := ngramMap[ngram]
 
 			if !ok {
@@ -107,13 +113,68 @@ func main() {
 			}
 		}
 
-		fmt.Println(license.LicenseId, "Ngrams", len(license.Ngrams), "Unique Ngrams", len(uniqueNgrams))
+		// If we don't have anything we should try and find the MOST unique ones for this
+		if len(uniqueNgrams) == 0 {
+			mostlyUniqueNgrams := []NgramUnique{}
+			var mostlyUniqueNgramsMutex sync.Mutex
+			fmt.Println("finding mostly unique ngrams for", currentLicense.LicenseId)
+
+			var wg sync.WaitGroup
+
+			for i, ngram := range currentLicense.Ngrams {
+				wg.Add(1)
+				go func(i int, ngram string) {
+					ngramCount := 0
+
+					// go through every other ngram
+					for _, lic := range licenses {
+						if currentLicense.LicenseId != lic.LicenseId {
+							for _, ng := range lic.Ngrams {
+								if ng == ngram {
+									ngramCount++
+								}
+							}
+						}
+					}
+
+					mostlyUniqueNgramsMutex.Lock()
+					mostlyUniqueNgrams = append(mostlyUniqueNgrams, NgramUnique{
+						Ngram: ngram,
+						Count: ngramCount,
+					})
+					mostlyUniqueNgramsMutex.Unlock()
+
+					if i % 1000 == 0 {
+						fmt.Println(i, "done for", len(currentLicense.Ngrams))
+					}
+					wg.Done()
+				}(i, ngram)
+			}
+			wg.Wait()
+
+			sort.Slice(mostlyUniqueNgrams, func(i, j int) bool {
+				return mostlyUniqueNgrams[i].Count > mostlyUniqueNgrams[j].Count
+			})
+
+			for _, m := range mostlyUniqueNgrams {
+				if m.Count < 10 {
+					uniqueNgrams = append(uniqueNgrams, m.Ngram)
+				}
+			}
+		}
+
+
+		fmt.Println(currentLicense.LicenseId, "Ngrams", len(currentLicense.Ngrams), "Unique Ngrams", len(uniqueNgrams))
+
+		if len(uniqueNgrams) > 100 {
+			uniqueNgrams = uniqueNgrams[:100]
+		}
 
 		outputLicenses = append(outputLicenses, LicenseOutput{
-			LicenseId:               license.LicenseId,
-			Name:                    license.Name,
-			LicenseText:             license.LicenseText,
-			StandardLicenseTemplate: license.StandardLicenseTemplate,
+			LicenseId:               currentLicense.LicenseId,
+			Name:                    currentLicense.Name,
+			LicenseText:             currentLicense.LicenseText,
+			StandardLicenseTemplate: currentLicense.StandardLicenseTemplate,
 			Keywords:                uniqueNgrams,
 		})
 	}

@@ -8,6 +8,7 @@ import (
 	"os"
 )
 
+//go:generate go run scripts/include.go
 func main() {
 	rootCmd := &cobra.Command{
 		Use: "lc",
