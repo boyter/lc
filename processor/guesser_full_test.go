@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Unlicense
+
 package processor
 
 import (
@@ -40,6 +43,8 @@ func TestFullDatabase(t *testing.T) {
 		}
 	}
 
+	fail := 0
+
 	var wg sync.WaitGroup
 	for _, l := range licenses {
 		wg.Add(1)
@@ -48,9 +53,14 @@ func TestFullDatabase(t *testing.T) {
 
 			if guesses[0].LicenseId != l.LicenseId {
 				t.Error("expected", l.LicenseId, "got", guesses[0].LicenseId)
+				fail++
 			}
 			wg.Done()
 		}(l)
 	}
 	wg.Wait()
+
+	if fail != 0 {
+		t.Error(fail, "fails")
+	}
 }

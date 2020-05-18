@@ -2,7 +2,8 @@
 
 echo "building the database..."
 pushd ./assets/database/ || exit
-go run build_database.go
+go build
+./database
 popd || exit
 
 echo "copying the database..."

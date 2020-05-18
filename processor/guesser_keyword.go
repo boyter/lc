@@ -9,7 +9,8 @@ import (
 
 
 // Given some content try to guess what the licence is based on checking for unique keywords
-// using the prebuilt licence library
+// using the prebuilt licence library which contains what we hope are unique ngrams for each
+// licence
 func (l *LicenceGuesser) KeyWordGuessLicence(content []byte) []License {
 	haystack := LcCleanText(string(content))
 

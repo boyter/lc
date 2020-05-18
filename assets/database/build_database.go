@@ -47,9 +47,16 @@ func findNgrams(list []string, size int) []string {
 	return ngrams
 }
 
-var startNgrams = 1
-var endNgrams = 15
-var keepNgrams = 5000
+// 3 5 200 = 81 fails
+// 3 7 200 = 59 fails
+// 6 7 200 = 59 fails
+// 6 8 200 = 58 fails
+// 6 8 100 = 61 fails
+// 3 8 200 = 55 fails
+// 3 12 200 =
+var startNgrams = 3
+var endNgrams = 12
+var keepNgrams = 200
 
 func main() {
 	files, _ := ioutil.ReadDir("./licenses/")
