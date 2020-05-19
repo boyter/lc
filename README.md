@@ -233,3 +233,4 @@ Rank 	Open Source License 	                            %
 * Investigate using "github.com/gosuri/uitable" for formatting https://github.com/gosuri/uitable
 * https://web.archive.org/web/20180822173147/https://blog.sourced.tech/post/gld/
 * https://github.com/boyter/boyter.org/blob/01601a2cafc2b2788b29b6943ad45ad40316d9a8/content/posts/improving-lc-performance.md
+* https://reuse.software/

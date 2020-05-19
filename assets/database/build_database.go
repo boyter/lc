@@ -53,9 +53,11 @@ func findNgrams(list []string, size int) []string {
 // 6 8 200 = 58 fails
 // 6 8 100 = 61 fails
 // 3 8 200 = 55 fails
-// 3 12 200 =
-var startNgrams = 3
-var endNgrams = 12
+// 3 12 200 = 53 fails
+// 3 12 400 = 55 fails
+// 4 20 200 =
+var startNgrams = 4
+var endNgrams = 20
 var keepNgrams = 200
 
 func main() {
