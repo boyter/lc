@@ -19,6 +19,7 @@ type License struct {
 	Name                    string `json:"name"`
 	LicenseId               string `json:"licenseId"`
 	Ngrams                  []string
+	Duplicates              []string `json:"duplicates"`
 }
 
 type LicenseOutput struct {
@@ -27,6 +28,7 @@ type LicenseOutput struct {
 	Name                    string   `json:"name"`
 	LicenseId               string   `json:"licenseId"`
 	Keywords                []string `json:"keywords"`
+	Duplicates              []string `json:"duplicates"`
 }
 
 type NgramUnique struct {
@@ -55,15 +57,17 @@ func findNgrams(list []string, size int) []string {
 // 3 8 200 = 55 fails
 // 3 12 200 = 53 fails
 // 3 12 400 = 55 fails
-// 4 20 200 =
-var startNgrams = 4
-var endNgrams = 20
-var keepNgrams = 200
+// 3 12 100 = 51 fails
+var startNgrams = 3
+var endNgrams = 12
+var keepNgrams = 100
 
 func main() {
 	files, _ := ioutil.ReadDir("./licenses/")
 
 	fmt.Println("loading licenses")
+
+	same := map[string]int{}
 	var licenses []License
 	// Load all of the licenses from disk
 	for _, f := range files {
@@ -75,6 +79,27 @@ func main() {
 			license.Ngrams = []string{}
 
 			licenses = append(licenses, license)
+			same[license.LicenseText] = same[license.LicenseText] + 1
+		}
+	}
+
+	fmt.Println("the following are duplicates... ie have the same license text...")
+	for k, v := range same {
+		if v != 1 {
+			dupes := []string{}
+			for _, lic := range licenses {
+				if lic.LicenseText == k {
+					dupes = append(dupes, lic.LicenseId)
+				}
+			}
+
+			// update any license with this text to tell it about all the duplicates
+			for i := 0; i < len(licenses); i++ {
+				if licenses[i].LicenseText == k {
+					licenses[i].Duplicates = dupes
+					fmt.Println(licenses[i].LicenseId, dupes)
+				}
+			}
 		}
 	}
 
@@ -153,7 +178,7 @@ func main() {
 					})
 					mostlyUniqueNgramsMutex.Unlock()
 
-					if i % 1000 == 0 {
+					if i%1000 == 0 {
 						fmt.Println(i, "done of", len(currentLicense.Ngrams))
 					}
 					wg.Done()
@@ -186,7 +211,6 @@ func main() {
 			Keywords:                uniqueNgrams,
 		})
 	}
-
 
 	out, _ := os.Create("database_keywords.json")
 

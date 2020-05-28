@@ -16,17 +16,16 @@ type File struct {
 type FileWalker struct {
 	directory              string
 	fileListQueue          chan *File // holds all of the files it has foundÒ
-	LocationExcludePattern []string // case sensitive patterns which exclude files
-	PathExclude            []string // paths to always ignore such as .git,.svn and .hg
-	IgnoreIgnoreFile       bool     // should .ignore files be respected?
-	IgnoreGitIgnore        bool     // should .gitignore files be respected?
-	IncludeHidden          bool     // should hidden files and directories be included/walked
+	LocationExcludePattern []string   // case sensitive patterns which exclude files
+	PathExclude            []string   // paths to always ignore such as .git,.svn and .hg
+	IgnoreIgnoreFile       bool       // should .ignore files be respected?
+	IgnoreGitIgnore        bool       // should .gitignore files be respected?
+	IncludeHidden          bool       // should hidden files and directories be included/walked
 	InstanceId             int
 	AllowListExtensions    []string // which extensions should be allowed
 }
 
 func (f *FileWalker) walkDirectoryRecursive(directory string, ignores []gitignore.IgnoreMatcher) error {
-
 
 	// walk the directory
 	// identify any potential license files

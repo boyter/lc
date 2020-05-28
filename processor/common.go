@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-
 var alphaNumericRegex = regexp.MustCompile("[^a-zA-Z0-9 ]")
 var multipleSpacesRegex = regexp.MustCompile("\\s+")
 

@@ -7,7 +7,6 @@ import (
 	"sort"
 )
 
-
 // Given some content try to guess what the licence is based on checking for unique keywords
 // using the prebuilt licence library which contains what we hope are unique ngrams for each
 // licence
@@ -47,7 +46,7 @@ func (l *LicenceGuesser) KeyWordGuessLicence(content []byte) []License {
 	// only keep those close to the max score so we can ignore anything that isn't even close
 	var t []License
 	for _, lic := range matchingLicenses {
-		if lic.ScorePercentage >= (maxScore*0.8) {
+		if lic.ScorePercentage >= (maxScore * 0.8) {
 			t = append(t, lic)
 		}
 	}
@@ -68,7 +67,6 @@ func (l *LicenceGuesser) KeyWordGuessLicence(content []byte) []License {
 	//		}
 	//	}
 	//}
-
 
 	// Sort so if someone wants to get the best candidate they can get the 0 index of the return
 	sort.Slice(matchingLicenses, func(i, j int) bool {

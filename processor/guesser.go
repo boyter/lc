@@ -24,11 +24,11 @@ func NewLicenceGuesser(keyword bool, vectorspace bool) LicenceGuesser {
 }
 
 type LicenceGuesser struct {
-	Database []License
-	CommonDatabase []License
+	Database        []License
+	CommonDatabase  []License
 	UseFullDatabase bool
-	keyword bool
-	vectorspace bool
+	keyword         bool
+	vectorspace     bool
 }
 
 // LoadDatabase will initialize the database values and should only be called once such as in an init

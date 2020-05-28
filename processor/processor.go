@@ -25,8 +25,6 @@ var IncludeHidden = false
 var AllowListExtensions []string
 var Format = ""
 
-
-
 type Process struct {
 	Directory string // What directory are we searching
 	FindRoot  bool

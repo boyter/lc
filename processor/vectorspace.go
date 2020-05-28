@@ -23,7 +23,7 @@ func BuildConcordance(words []string) Concordance {
 	con := map[string]float64{}
 
 	for _, key := range words {
-		con[key] =  con[key] + 1
+		con[key] = con[key] + 1
 	}
 
 	return con

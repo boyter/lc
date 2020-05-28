@@ -521,7 +521,6 @@ limitations under the License.`))
 	}
 }
 
-
 func TestLicenseApache2Multiple(t *testing.T) {
 	samples := []string{`Apache License
 ==============
@@ -717,7 +716,7 @@ third-party archives.
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.`,
-	`h1>Apache License</h1>
+		`h1>Apache License</h1>
 
 <p><em>Version 2.0, January 2004</em>
 <em>&amp;lt;<a href="http://www.apache.org/licenses/">http://www.apache.org/licenses/</a>&amp;gt;</em></p>
@@ -913,7 +912,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 </code></pre>`,
-	`Apache License
+		`Apache License
 
 Version 2.0, January 2004
 <http://www.apache.org/licenses/>
@@ -1108,7 +1107,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.`,
-	`apache license
+		`apache license
 
 version 2.0, january 2004
 http:/www.apache.org/licenses/
@@ -1271,7 +1270,7 @@ distributed under the license is distributed on an "as is" basis,
 without warranties or conditions of any kind, either express or implied.
 see the license for the specific language governing permissions and
 limitations under the license`,
-	`apache license
+		`apache license
 
 version 20, january 2004
 http:/wwwapacheorg/licenses/

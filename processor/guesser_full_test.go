@@ -66,8 +66,6 @@ func TestKeywordFullDatabase(t *testing.T) {
 	}
 }
 
-
-
 // Note that this takes a long time to run hence goroutines to try and speed it up
 func TestVectorSpaceFullDatabase(t *testing.T) {
 	lg := NewLicenceGuesser(false, true)
