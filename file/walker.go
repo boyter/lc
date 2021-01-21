@@ -76,10 +76,10 @@ func (f *FileWalker) walkDirectoryRecursive(directory string, ignores []gitignor
 		}
 	}
 
-	// identify any files that could be a license file
-	for _, file := range files {
-
-	}
+	//// identify any files that could be a license file
+	//for _, file := range files {
+	//
+	//}
 
 	// Process files first to start feeding whatever process is consuming
 	// the output before traversing into directories for more files

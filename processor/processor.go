@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: MIT OR Unlicense
 package processor
 
+import (
+	"fmt"
+	file "github.com/boyter/go-code-walker"
+)
+
 var Version = "2.0.0 alpha"
 
 // Set by user as command line arguments
@@ -37,4 +42,15 @@ func NewProcess(directory string) Process {
 
 // Process is the main entry point of the command line output it sets everything up and starts running
 func (process *Process) StartProcess() {
+	fileListQueue := make(chan *file.File, 1000)
+
+	fileWalker := file.NewFileWalker(".", fileListQueue)
+	//fileWalker.AllowListExtensions = append(fileWalker.AllowListExtensions, "go")
+
+	go fileWalker.Start()
+
+	for f := range fileListQueue {
+		fmt.Println(f.Location)
+	}
+	fmt.Println("here")
 }

@@ -17,7 +17,9 @@ func main() {
 			"Ben Boyter <ben@boyter.org>",
 		Version: processor.Version,
 		Run: func(cmd *cobra.Command, args []string) {
-			// process hher
+			// process here
+			process := processor.NewProcess(".")
+			process.StartProcess()
 		},
 	}
 

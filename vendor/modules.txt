@@ -1,6 +1,10 @@
 # github.com/BobuSumisu/aho-corasick v1.0.3
 ## explicit
 github.com/BobuSumisu/aho-corasick
+# github.com/boyter/go-code-walker v1.0.0
+## explicit
+github.com/boyter/go-code-walker
+github.com/boyter/go-code-walker/go-gitignore
 # github.com/inconshreveable/mousetrap v1.0.0
 ## explicit
 github.com/inconshreveable/mousetrap

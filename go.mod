@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/BobuSumisu/aho-corasick v1.0.3
+	github.com/boyter/go-code-walker v1.0.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20160105113617-38717d0a108c
 	github.com/spf13/cobra v1.0.0
