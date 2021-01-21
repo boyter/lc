@@ -44,21 +44,40 @@ func NewProcess(directory string) Process {
 // Process is the main entry point of the command line output it sets everything up and starts running
 func (process *Process) StartProcess() {
 	lg := NewLicenceGuesser(true, true)
+	lg.UseFullDatabase = true
 
 	fileListQueue := make(chan *file.File, 1000)
 
 	fileWalker := file.NewFileWalker(".", fileListQueue)
-	fileWalker.AllowListExtensions = append(fileWalker.AllowListExtensions, "go")
+	fileWalker.IgnoreGitIgnore = true
+	fileWalker.IgnoreIgnoreFile = true
+	//fileWalker.AllowListExtensions = append(fileWalker.AllowListExtensions, "go")
 
 	go fileWalker.Start()
 
 	for f := range fileListQueue {
 		data, err := ioutil.ReadFile(f.Location)
 		if err == nil {
-			fmt.Println()
-			fmt.Println(f.Location)
-			for _, x := range lg.SpdxIdentify(string(data)) {
-				fmt.Println(x.LicenseId)
+
+			isBinary := false
+			// Check if this file is binary by checking for nul byte and if so bail out
+			// this is how GNU Grep, git and ripgrep check for binary files
+			for _, b := range data {
+				if b == 0 {
+					isBinary = true
+					continue
+				}
+			}
+
+			if !isBinary {
+				fmt.Println()
+				fmt.Println(f.Location)
+				for _, x := range lg.SpdxIdentify(string(data)) {
+					fmt.Println(x.LicenseId, x.ScorePercentage)
+				}
+				for _, x := range lg.VectorSpaceGuessLicence(data) {
+					fmt.Println(x.LicenseId, x.ScorePercentage)
+				}
 			}
 		}
 
