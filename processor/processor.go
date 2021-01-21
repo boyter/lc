@@ -4,6 +4,7 @@ package processor
 import (
 	"fmt"
 	file "github.com/boyter/go-code-walker"
+	"io/ioutil"
 )
 
 var Version = "2.0.0 alpha"
@@ -42,6 +43,8 @@ func NewProcess(directory string) Process {
 
 // Process is the main entry point of the command line output it sets everything up and starts running
 func (process *Process) StartProcess() {
+	lg := NewLicenceGuesser(true, true)
+
 	fileListQueue := make(chan *file.File, 1000)
 
 	fileWalker := file.NewFileWalker(".", fileListQueue)
@@ -50,7 +53,14 @@ func (process *Process) StartProcess() {
 	go fileWalker.Start()
 
 	for f := range fileListQueue {
-		fmt.Println(f.Location)
+		data, err := ioutil.ReadFile(f.Location)
+		if err == nil {
+			fmt.Println()
+			fmt.Println(f.Location)
+			for _, x := range lg.SpdxIdentify(string(data)) {
+				fmt.Println(x.LicenseId)
+			}
+		}
+
 	}
-	fmt.Println("here")
 }
