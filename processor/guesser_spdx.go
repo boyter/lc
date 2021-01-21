@@ -1,0 +1,59 @@
+package processor
+
+import "strings"
+
+// SpdxIdentify will identify licenses in the text which are using the SPDX indicator
+// which is reasonably cheap in terms of looking things up
+// This is the only guesser that is 100% accurate as literally everything
+// else is slightly fuzzy and "best" effort
+func (l *LicenceGuesser) SpdxIdentify(content string) []License {
+	// cheap check to see if there might be on in the source code
+	if strings.Index(content, spdxLicenceIdentifier) == -1 {
+		return nil
+	}
+
+	var matchingLicenses []License
+	matches := spdxLicenceRegex.FindAllStringSubmatch(content, -1)
+
+	for _, val := range matches {
+		var toCheck []string
+		t := strings.TrimSpace(val[1])
+		if strings.Contains(val[1], " ") {
+			// deal with multiple with an OR or some such
+			for _, x := range strings.Split(t, " ") {
+				x = strings.TrimSpace(x)
+				if x != "" {
+					toCheck = append(toCheck, x)
+				}
+			}
+		} else {
+			toCheck = append(toCheck, t)
+		}
+
+		for _, x := range toCheck {
+			found := false
+			// Check the full database because there is so little cost to do so
+			for _, license := range l.Database {
+				if license.LicenseId == x {
+					license.ScorePercentage = 100 // set the score to be 100% IE we are 100% confidence in this guess
+					matchingLicenses = append(matchingLicenses, license)
+					found = true
+				}
+			}
+
+			// if we didn't find anything try using lower case because hey why not
+			// TODO this could probably fit into the above loop for some free performance
+			if !found {
+				x = strings.ToLower(x)
+				for _, license := range l.Database {
+					if strings.ToLower(license.LicenseId) == x {
+						license.ScorePercentage = 99 // set the score to be 99% because we are still very confident
+						matchingLicenses = append(matchingLicenses, license)
+					}
+				}
+			}
+		}
+	}
+
+	return matchingLicenses
+}

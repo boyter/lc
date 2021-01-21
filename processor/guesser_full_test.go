@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"strings"
-	"sync"
 	"testing"
 )
 
@@ -20,15 +19,11 @@ type LicenseJson struct {
 	LicenseId               string `json:"licenseId"`
 }
 
-// Note that this takes a long time to run hence goroutines to try and speed it up
-func TestKeywordFullDatabase(t *testing.T) {
-	lg := NewLicenceGuesser(true, false)
-	lg.UseFullDatabase = true
-
+func loadLicences(t *testing.T) []LicenseJson {
 	files, _ := ioutil.ReadDir("../assets/database/licenses/")
 
 	var licenses []LicenseJson
-	// Load all of the licenses from disk
+	// Load all of the licenses from disk to use as a comparison for the check
 	for _, f := range files {
 		if strings.HasSuffix(f.Name(), ".json") {
 			bytes, _ := ioutil.ReadFile(filepath.Join("../assets/database/licenses/", f.Name()))
@@ -42,70 +37,116 @@ func TestKeywordFullDatabase(t *testing.T) {
 			licenses = append(licenses, license)
 		}
 	}
+	return licenses
+}
 
+func TestKeywordCommonDatabase(t *testing.T) {
+	lg := NewLicenceGuesser(true, false)
+	lg.UseFullDatabase = false
+	licenses := loadLicences(t)
 	fail := 0
+	pass := 0
 
-	var wg sync.WaitGroup
 	for _, l := range licenses {
-		wg.Add(1)
-		go func(l LicenseJson) {
-			guesses := lg.KeyWordGuessLicence([]byte(l.LicenseText))
+		guesses := lg.KeyWordGuessLicence([]byte(l.LicenseText))
 
-			if guesses[0].LicenseId != l.LicenseId {
-				t.Error("expected", l.LicenseId, "got", guesses[0].LicenseId)
-				fail++
-			}
-			wg.Done()
-		}(l)
+		if len(guesses) == 0 {
+			fail++
+			t.Error("expected", l.LicenseId)
+			continue
+		}
+
+		if guesses[0].LicenseId != l.LicenseId {
+			t.Error("expected", l.LicenseId, "got", guesses[0].LicenseId)
+			fail++
+		} else {
+			pass++
+		}
 	}
-	wg.Wait()
 
 	if fail != 0 {
+		t.Error(pass, "passes")
 		t.Error(fail, "fails")
 	}
 }
 
-// Note that this takes a long time to run hence goroutines to try and speed it up
+func TestKeywordFullDatabase(t *testing.T) {
+	lg := NewLicenceGuesser(true, false)
+	lg.UseFullDatabase = true
+
+	licenses := loadLicences(t)
+	fail := 0
+	pass := 0
+
+	for _, l := range licenses {
+		guesses := lg.KeyWordGuessLicence([]byte(l.LicenseText))
+
+		if guesses[0].LicenseId != l.LicenseId {
+			t.Error("expected", l.LicenseId, "got", guesses[0].LicenseId)
+			fail++
+		} else {
+			pass++
+		}
+	}
+
+	if fail != 0 {
+		t.Error(pass, "passes")
+		t.Error(fail, "fails")
+	}
+}
+
+func TestVectorSpaceCommonDatabase(t *testing.T) {
+	lg := NewLicenceGuesser(false, true)
+	lg.UseFullDatabase = false
+
+	licenses := loadLicences(t)
+	fail := 0
+	pass := 0
+
+	for _, l := range licenses {
+		guesses := lg.VectorSpaceGuessLicence([]byte(l.LicenseText))
+
+		if len(guesses) == 0 {
+			fail++
+			t.Error("expected", l.LicenseId)
+			continue
+		}
+
+		if guesses[0].LicenseId != l.LicenseId {
+			t.Error("expected", l.LicenseId, "got", guesses[0].LicenseId)
+			fail++
+		} else {
+			pass++
+		}
+	}
+
+	if fail != 0 {
+		t.Error(pass, "passes")
+		t.Error(fail, "fails")
+	}
+}
+
 func TestVectorSpaceFullDatabase(t *testing.T) {
 	lg := NewLicenceGuesser(false, true)
 	lg.UseFullDatabase = true
 
-	files, _ := ioutil.ReadDir("../assets/database/licenses/")
+	licenses := loadLicences(t)
+	fail := 0
+	pass := 0
 
-	var licenses []LicenseJson
-	// Load all of the licenses from disk
-	for _, f := range files {
-		if strings.HasSuffix(f.Name(), ".json") {
-			bytes, _ := ioutil.ReadFile(filepath.Join("../assets/database/licenses/", f.Name()))
+	for _, l := range licenses {
+		guesses := lg.VectorSpaceGuessLicence([]byte(l.LicenseText))
 
-			var license LicenseJson
-			err := json.Unmarshal(bytes, &license)
-			if err != nil {
-				t.Error(err)
-			}
-
-			licenses = append(licenses, license)
+		if guesses[0].LicenseId != l.LicenseId {
+			t.Error("expected", l.LicenseId, "got", guesses[0].LicenseId)
+			fail++
+		} else {
+			pass++
 		}
 	}
 
-	fail := 0
-
-	var wg sync.WaitGroup
-	for _, l := range licenses {
-		wg.Add(1)
-		go func(l LicenseJson) {
-			guesses := lg.VectorSpaceGuessLicence([]byte(l.LicenseText))
-
-			if guesses[0].LicenseId != l.LicenseId {
-				t.Error("expected", l.LicenseId, "got", guesses[0].LicenseId)
-				fail++
-			}
-			wg.Done()
-		}(l)
-	}
-	wg.Wait()
-
 	if fail != 0 {
+		t.Error(pass, "passes")
 		t.Error(fail, "fails")
 	}
 }

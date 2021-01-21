@@ -1,5 +1,4 @@
-// SPDX-License-Identifier: MIT
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT OR Unlicense
 
 package processor
 
@@ -7,9 +6,8 @@ import (
 	"sort"
 )
 
-// Given some content try to guess what the licence is based on checking for unique keywords
-// using the prebuilt licence library which contains what we hope are unique ngrams for each
-// licence
+// KeyWordGuessLicence will some content try to guess what the licence is based on checking for unique keywords
+// using the prebuilt licence library which contains what we hope are unique ngrams for each licence
 func (l *LicenceGuesser) KeyWordGuessLicence(content []byte) []License {
 	haystack := LcCleanText(string(content))
 

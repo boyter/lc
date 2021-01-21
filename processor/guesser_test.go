@@ -86,3 +86,21 @@ func TestSpdxGuesserMultipleAnd(t *testing.T) {
 		t.Errorf("Should match Unlicense")
 	}
 }
+
+func TestSpdxGuesserMultipleLowerCase(t *testing.T) {
+	lg := NewLicenceGuesser(false, false)
+
+	actual := lg.SpdxIdentify("# SPDX-License-Identifier: mit unlicense gpl-2.0")
+	if actual[0].LicenseId != "MIT" {
+		t.Errorf("Should match MIT")
+	}
+	if actual[0].ScorePercentage != 99 {
+		t.Errorf("Should match 99")
+	}
+	if actual[1].LicenseId != "Unlicense" {
+		t.Errorf("Should match Unlicense")
+	}
+	if actual[2].LicenseId != "GPL-2.0" {
+		t.Errorf("Should match GPL-2.0")
+	}
+}
