@@ -45,6 +45,7 @@ func TestTesty(t *testing.T) {
 		t.Error("error...")
 	}
 }
+
 //
 //func TestKeywordCommonDatabase(t *testing.T) {
 //	lg := NewLicenceGuesser(true, false)

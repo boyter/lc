@@ -19,15 +19,17 @@ func NewLicenceGuesser(keyword bool, vectorspace bool) LicenceGuesser {
 	l.vectorspace = vectorspace
 	l.LoadDatabase()
 	l.UseFullDatabase = false
+	l.cutoffPercentage = 60
 	return l
 }
 
 type LicenceGuesser struct {
-	Database        []License
-	CommonDatabase  []License
-	UseFullDatabase bool
-	keyword         bool
-	vectorspace     bool
+	Database         []License
+	CommonDatabase   []License
+	UseFullDatabase  bool
+	keyword          bool
+	vectorspace      bool
+	cutoffPercentage float64
 }
 
 // LoadDatabase will initialize the database values and should only be called once such as in an init
@@ -94,17 +96,4 @@ func (l *LicenceGuesser) LoadDatabase() {
 			}
 		}
 	}
-}
-
-// Try to guess the licence for this content based on whatever heuristics are set on the
-// guesser itself
-// TODO this should guess based on criteria IE try spdx first then keywords etc...
-func (l *LicenceGuesser) GuessLicense(content []byte) []License {
-	// try via spdx
-	// try via keywords
-	// try via vector space or otherwise
-	return l.KeyWordGuessLicence(content)
-	// so if the keyword guess licence found nothing we should consider using vector space
-
-	// it should be possible to ask it to spend more time checking IE really nail down
 }

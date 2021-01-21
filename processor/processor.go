@@ -58,28 +58,25 @@ func (process *Process) StartProcess() {
 	for f := range fileListQueue {
 		data, err := ioutil.ReadFile(f.Location)
 		if err == nil {
-
-			isBinary := false
-			// Check if this file is binary by checking for nul byte and if so bail out
-			// this is how GNU Grep, git and ripgrep check for binary files
-			for _, b := range data {
-				if b == 0 {
-					isBinary = true
-					continue
-				}
-			}
-
-			if !isBinary {
-				fmt.Println()
+			if !process.isBinary(data) {
 				fmt.Println(f.Location)
-				for _, x := range lg.SpdxIdentify(string(data)) {
-					fmt.Println(x.LicenseId, x.ScorePercentage)
-				}
-				for _, x := range lg.VectorSpaceGuessLicence(data) {
-					fmt.Println(x.LicenseId, x.ScorePercentage)
-				}
+				lg.GuessLicense(data)
 			}
 		}
 
 	}
+}
+
+// Helper function that looks through supplied bytes looking for null which indicates
+// it is a binary file and returns true/false
+func (process *Process) isBinary(data []byte) bool {
+	// Check if this content is binary by checking for null bytes and if found assume it is binary
+	// this is how GNU Grep, git and ripgrep check for binary files
+	for _, b := range data {
+		if b == 0 {
+			return true
+		}
+	}
+
+	return false
 }
