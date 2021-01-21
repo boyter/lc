@@ -6,7 +6,7 @@ licensechecker (lc)
 `lc` is a command line tool that recursively iterates over a supplied directory or file 
 attempting to identify what software license each file is under using the list
 of licenses supplied by the SPDX (Software Package Data Exchange) Project. It will pick up 
-license files named appropiately or inline licenses such as the below in source files
+license files named appropriately or inline licenses such as the below in source files
 
 `SPDX-License-Identifier: GPL-3.0-only`
 

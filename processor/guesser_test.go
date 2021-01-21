@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Unlicense
+
 package processor
 
 import "testing"
@@ -58,5 +60,17 @@ if __name__ == '__main__':
 	}
 	if actual[1].LicenseId != "GPL-3.0+" {
 		t.Errorf("Should match GPL-3.0+")
+	}
+}
+
+func TestSpdxGuesserMultipleOr(t *testing.T) {
+	lg := NewLicenceGuesser(false, false)
+
+	actual := lg.SpdxIdentify("# SPDX-License-Identifier: MIT OR Unlicense")
+	if actual[0].LicenseId != "MIT" {
+		t.Errorf("Should match MIT")
+	}
+	if actual[1].LicenseId != "Unlicense" {
+		t.Errorf("Should match Unlicense")
 	}
 }

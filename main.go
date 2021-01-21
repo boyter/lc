@@ -1,5 +1,4 @@
-// SPDX-License-Identifier: MIT
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT OR Unlicense
 
 package main
 
@@ -12,7 +11,7 @@ import (
 //go:generate go run scripts/include.go
 func main() {
 	rootCmd := &cobra.Command{
-		Use: "lc",
+		Use: "lc [flags] [files or directories]",
 		Long: "Check directory/file for licenses and list what license(s) a file is under.\n" +
 			"Version " + processor.Version + "\n" +
 			"Ben Boyter <ben@boyter.org>",
