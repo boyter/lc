@@ -60,7 +60,10 @@ func (process *Process) StartProcess() {
 		if err == nil {
 			if !process.isBinary(data) {
 				fmt.Println(f.Location)
-				lg.GuessLicense(data)
+				license := lg.GuessLicense(data)
+				for _, x := range license {
+					fmt.Println("SPDX", x.LicenseId)
+				}
 			}
 		}
 

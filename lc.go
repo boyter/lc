@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT OR Unlicense
+
 package main
 
 // Old and from the v1 stuff just here to ensure it all still works as expected
