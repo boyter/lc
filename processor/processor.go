@@ -45,7 +45,7 @@ func (process *Process) StartProcess() {
 	fileListQueue := make(chan *file.File, 1000)
 
 	fileWalker := file.NewFileWalker(".", fileListQueue)
-	//fileWalker.AllowListExtensions = append(fileWalker.AllowListExtensions, "go")
+	fileWalker.AllowListExtensions = append(fileWalker.AllowListExtensions, "go")
 
 	go fileWalker.Start()
 
