@@ -123,7 +123,6 @@ func (l *LicenceGuesser) SpdxIdentify(content string) []License {
 			toCheck = append(toCheck, t)
 		}
 
-
 		for _, x := range toCheck {
 			// Check the full database because there is so little cost to do so
 			for _, license := range l.Database {

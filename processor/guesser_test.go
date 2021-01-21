@@ -74,3 +74,15 @@ func TestSpdxGuesserMultipleOr(t *testing.T) {
 		t.Errorf("Should match Unlicense")
 	}
 }
+
+func TestSpdxGuesserMultipleAnd(t *testing.T) {
+	lg := NewLicenceGuesser(false, false)
+
+	actual := lg.SpdxIdentify("# SPDX-License-Identifier: MIT AND Unlicense")
+	if actual[0].LicenseId != "MIT" {
+		t.Errorf("Should match MIT")
+	}
+	if actual[1].LicenseId != "Unlicense" {
+		t.Errorf("Should match Unlicense")
+	}
+}
