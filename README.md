@@ -1,5 +1,8 @@
 licensechecker (lc)
 -------------------
+
+# NOTE - this is under heavy development, and as such master does not currently work, see a release for a working solution!
+
 `lc` is a command line tool that recursively iterates over a supplied directory or file 
 attempting to identify what software license each file is under using the list
 of licenses supplied by the SPDX (Software Package Data Exchange) Project. It will pick up 
