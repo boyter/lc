@@ -1,5 +1,4 @@
-// SPDX-License-Identifier: MIT
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT OR Unlicense
 package processor
 
 var Version = "2.0.0 alpha"
