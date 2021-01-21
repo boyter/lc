@@ -6,6 +6,7 @@ import "testing"
 
 func TestVectorSpaceGuess0BSD(t *testing.T) {
 	lg := NewLicenceGuesser(false, true)
+	lg.UseFullDatabase = true
 
 	licenses := lg.VectorSpaceGuessLicence([]byte(`{
   "isDeprecatedLicenseId": false,
@@ -26,6 +27,7 @@ func TestVectorSpaceGuess0BSD(t *testing.T) {
 
 func TestVectorSpaceGuessMIT(t *testing.T) {
 	lg := NewLicenceGuesser(false, true)
+	lg.UseFullDatabase = true
 
 	licenses := lg.VectorSpaceGuessLicence([]byte(`The MIT License (MIT)
 
@@ -57,6 +59,7 @@ THE SOFTWARE.
 
 func TestVectorSpaceGuessUnlicence(t *testing.T) {
 	lg := NewLicenceGuesser(false, true)
+	lg.UseFullDatabase = true
 
 	licenses := lg.VectorSpaceGuessLicence([]byte(`This is free and unencumbered software released into the public domain.
 
@@ -91,6 +94,7 @@ For more information, please refer to <http://unlicense.org/>
 
 func TestVectorSpaceGuessJSON(t *testing.T) {
 	lg := NewLicenceGuesser(false, true)
+	lg.UseFullDatabase = true
 
 	licenses := lg.VectorSpaceGuessLicence([]byte(`JSON License
 Copyright (c) 2002 JSON.org
@@ -1017,6 +1021,7 @@ see the license for the specific language governing permissions and
 limitations under the license`}
 
 	lg := NewLicenceGuesser(true, true)
+	lg.UseFullDatabase = true
 
 	for i, l := range samples {
 		license := lg.VectorSpaceGuessLicence([]byte(l))
