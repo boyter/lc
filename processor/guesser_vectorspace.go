@@ -21,7 +21,7 @@ func (l *LicenceGuesser) VectorSpaceGuessLicence(content []byte) []License {
 	for _, lic := range db {
 		distance := Relation(con, lic.Concordance)
 		lic.ScorePercentage = distance * 100
-
+		lic.MatchType = MatchTypeVector
 		matchingLicenses = append(matchingLicenses, lic)
 	}
 

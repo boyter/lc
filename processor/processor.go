@@ -49,8 +49,8 @@ func (process *Process) StartProcess() {
 	fileListQueue := make(chan *file.File, 1000)
 
 	fileWalker := file.NewFileWalker(".", fileListQueue)
-	fileWalker.IgnoreGitIgnore = true
-	fileWalker.IgnoreIgnoreFile = true
+	fileWalker.IgnoreGitIgnore = false
+	fileWalker.IgnoreIgnoreFile = false
 	//fileWalker.AllowListExtensions = append(fileWalker.AllowListExtensions, "go")
 
 	go fileWalker.Start()
@@ -58,11 +58,17 @@ func (process *Process) StartProcess() {
 	for f := range fileListQueue {
 		data, err := ioutil.ReadFile(f.Location)
 		if err == nil {
+
+			// TODO should be configurable
+			if len(data) > 100_000 {
+				data = data[:100_000]
+			}
+
 			if !process.isBinary(data) {
 				fmt.Println(f.Location)
 				license := lg.GuessLicense(data)
 				for _, x := range license {
-					fmt.Println("SPDX", x.LicenseId)
+					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
 				}
 			}
 		}

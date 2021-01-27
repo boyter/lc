@@ -21,3 +21,10 @@ func LcCleanText(content string) string {
 
 	return content
 }
+
+const (
+	MatchTypeSpdx    = "SPDX"
+	MatchTypeKeyword = "Keyword"
+	MatchTypeVector  = "Vector"
+	MatchTypeBlended = "Blended"
+)

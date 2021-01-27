@@ -104,3 +104,14 @@ func TestSpdxGuesserMultipleLowerCase(t *testing.T) {
 		t.Errorf("Should match GPL-2.0")
 	}
 }
+
+func TestSpdxGuesserDuplicates(t *testing.T) {
+	lg := NewLicenceGuesser(false, false)
+
+	actual := lg.SpdxIdentify(`# SPDX-License-Identifier: mit
+# SPDX-License-Identifier: mit`)
+
+	if len(actual) != 1 {
+		t.Error("should only get 1 got", len(actual))
+	}
+}

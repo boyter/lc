@@ -27,6 +27,7 @@ func (l *LicenceGuesser) KeyWordGuessLicence(content []byte) []License {
 		if len(match) != 0 {
 			lic.ScorePercentage = float64(len(match))
 			totalScore += lic.ScorePercentage
+			lic.MatchType = MatchTypeKeyword
 			matchingLicenses = append(matchingLicenses, lic)
 		}
 	}

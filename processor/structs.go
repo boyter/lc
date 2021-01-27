@@ -14,4 +14,5 @@ type License struct {
 	ScorePercentage         float64           `json:"scorePercentage"` // this is used so we don't have a new struct
 	Trie                    *ahocorasick.Trie // used for faster matching
 	Concordance             Concordance       // used for vector matching
+	MatchType               string            // indicates how this license match was made
 }

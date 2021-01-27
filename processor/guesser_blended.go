@@ -1,7 +1,5 @@
 package processor
 
-import "fmt"
-
 // GuessLicense tries to guess the licence for this content based on whatever heuristics are set on the
 // guesser itself, note that this is a multi stage approach where it mixes each one together
 func (l *LicenceGuesser) GuessLicense(content []byte) []License {
@@ -34,15 +32,14 @@ func (l *LicenceGuesser) GuessLicense(content []byte) []License {
 			for _, y := range fvectorSpaceGuessLicence {
 				if x.LicenseId == y.LicenseId {
 					x.ScorePercentage = (x.ScorePercentage + y.ScorePercentage) / 2
+					x.MatchType = MatchTypeBlended
 					common = append(common, x)
 				}
 			}
 		}
 
 		fcommon := l.filterByPercentage(common)
-		for _, x := range fcommon {
-			fmt.Println(x.LicenseId, x.ScorePercentage)
-		}
+		return fcommon
 	}
 
 	return nil

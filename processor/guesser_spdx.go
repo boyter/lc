@@ -49,7 +49,7 @@ func (l *LicenceGuesser) SpdxIdentify(content string) []License {
 				x = strings.ToLower(x)
 				for _, license := range l.Database {
 					if strings.ToLower(license.LicenseId) == x {
-						license.ScorePercentage = 99 // set the score to be 99% because we are still very confident
+						license.ScorePercentage = 99.99 // set the score to be 99.99% because we are still very confident
 						matchingLicenses = append(matchingLicenses, license)
 					}
 				}
@@ -57,5 +57,18 @@ func (l *LicenceGuesser) SpdxIdentify(content string) []License {
 		}
 	}
 
-	return matchingLicenses
+	// filter out duplicates because its possible, but we shouldn't report it
+	var found = map[string]bool{}
+	var filtered []License
+
+	for _, lic := range matchingLicenses {
+		b := found[lic.LicenseId]
+		if !b {
+			lic.MatchType = MatchTypeSpdx
+			filtered = append(filtered, lic)
+			found[lic.LicenseId] = true
+		}
+	}
+
+	return filtered
 }
