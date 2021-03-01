@@ -64,12 +64,17 @@ func (process *Process) StartProcess() {
 				data = data[:100_000]
 			}
 
-			if !process.isBinary(data) {
-				fmt.Println(f.Location)
-				license := lg.GuessLicense(data)
-				for _, x := range license {
-					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
-				}
+			if process.isBinary(data) {
+				continue
+			}
+
+			// is it a licence file type? of so lets really guess
+			// otherwise lets go with just SPDX
+
+			fmt.Println(f.Location)
+			license := lg.SpdxIdentify(string(data))
+			for _, x := range license {
+				fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
 			}
 		}
 
