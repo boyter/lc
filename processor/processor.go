@@ -71,23 +71,23 @@ func (process *Process) StartProcess() {
 			}
 
 			licenceFile := licenseFileRe.Match([]byte(strings.ToLower(f.Filename)))
-			readmeFile := readmeFileRe.Match([]byte(strings.ToLower(f.Filename)))
 
-			fmt.Println(f.Location)
-			if licenceFile || readmeFile {
-				licence := lg.SpdxIdentify(string(data))
-				for _, x := range licence {
-					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
-				}
-
+			if licenceFile {
+				fmt.Println(f.Location)
 				// should we should boost the guesses here because we are fairly sure there is a licence in there?
-				licence = lg.GuessLicense(data)
-				for _, x := range licence {
+				license := lg.GuessLicense(data)
+				if len(license) == 0 {
+					fmt.Println(" likely licence; unable to identify")
+				}
+				for _, x := range license {
 					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
 				}
 			} else {
 				// look for SPDX markers only as its not a licence file
 				license := lg.SpdxIdentify(string(data))
+				if len(license) != 0 {
+					fmt.Println(f.Location)
+				}
 				for _, x := range license {
 					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
 				}
