@@ -5,6 +5,7 @@ import (
 	"fmt"
 	file "github.com/boyter/go-code-walker"
 	"io/ioutil"
+	"strings"
 )
 
 var Version = "2.0.0 alpha"
@@ -16,7 +17,7 @@ var PathBlacklist = ""
 
 var FileOutput = ""
 var ExtentionBlacklist = ""
-var MaxSize = 50000
+var MaxSize = 50_000
 var DocumentName = ""
 var PackageName = ""
 var DocumentNamespace = ""
@@ -59,7 +60,8 @@ func (process *Process) StartProcess() {
 		data, err := ioutil.ReadFile(f.Location)
 		if err == nil {
 
-			// TODO should be configurable
+			// TODO should be configurable and be in the read file to avoid doing it at all
+			// TODO actually it shouldn't even read it unless the filename is useful
 			if len(data) > 100_000 {
 				data = data[:100_000]
 			}
@@ -68,14 +70,31 @@ func (process *Process) StartProcess() {
 				continue
 			}
 
-			// is it a licence file type? of so lets really guess
-			// otherwise lets go with just SPDX
+			licenceFile := licenseFileRe.Match([]byte(strings.ToLower(f.Filename)))
+			readmeFile := readmeFileRe.Match([]byte(strings.ToLower(f.Filename)))
 
-			fmt.Println(f.Location)
-			license := lg.SpdxIdentify(string(data))
-			for _, x := range license {
-				fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
+			fmt.Println(f.Location, licenceFile, readmeFile)
+			if licenceFile || readmeFile {
+				// we should boost the guesses here because we are fairly sure there is a licence in there
+				licence := lg.GuessLicense(data)
+				for _, x := range licence {
+					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
+				}
+			} else {
+				// look for SPDX markers only as its not a licence file
+				license := lg.SpdxIdentify(string(data))
+				for _, x := range license {
+					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
+				}
 			}
+			// is it a licence file type? of so lets really guess
+			// otherwise lets go with just SPDX markers
+
+			//fmt.Println(f.Location)
+			//license := lg.SpdxIdentify(string(data))
+			//for _, x := range license {
+			//	fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
+			//}
 		}
 
 	}

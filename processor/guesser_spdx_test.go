@@ -92,16 +92,16 @@ func TestSpdxGuesserMultipleLowerCase(t *testing.T) {
 
 	actual := lg.SpdxIdentify("# SPDX-License-Identifier: mit unlicense gpl-2.0")
 	if actual[0].LicenseId != "MIT" {
-		t.Errorf("Should match MIT")
+		t.Error("Should match MIT got", actual[0].LicenseId)
 	}
-	if actual[0].ScorePercentage != 99 {
-		t.Errorf("Should match 99")
+	if actual[0].ScorePercentage != 99.99 {
+		t.Error("Should match 99.99 got", actual[0].ScorePercentage)
 	}
 	if actual[1].LicenseId != "Unlicense" {
-		t.Errorf("Should match Unlicense")
+		t.Error("Should match Unlicense got", actual[1].LicenseId)
 	}
 	if actual[2].LicenseId != "GPL-2.0" {
-		t.Errorf("Should match GPL-2.0")
+		t.Error("Should match GPL-2.0 got", actual[2].LicenseId)
 	}
 }
 
