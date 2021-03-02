@@ -75,8 +75,13 @@ func (process *Process) StartProcess() {
 
 			fmt.Println(f.Location)
 			if licenceFile || readmeFile {
+				licence := lg.SpdxIdentify(string(data))
+				for _, x := range licence {
+					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
+				}
+
 				// should we should boost the guesses here because we are fairly sure there is a licence in there?
-				licence := lg.GuessLicense(data)
+				licence = lg.GuessLicense(data)
 				for _, x := range licence {
 					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
 				}
