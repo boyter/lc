@@ -73,9 +73,9 @@ func (process *Process) StartProcess() {
 			licenceFile := licenseFileRe.Match([]byte(strings.ToLower(f.Filename)))
 			readmeFile := readmeFileRe.Match([]byte(strings.ToLower(f.Filename)))
 
-			fmt.Println(f.Location, licenceFile, readmeFile)
+			fmt.Println(f.Location)
 			if licenceFile || readmeFile {
-				// we should boost the guesses here because we are fairly sure there is a licence in there
+				// should we should boost the guesses here because we are fairly sure there is a licence in there?
 				licence := lg.GuessLicense(data)
 				for _, x := range licence {
 					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
@@ -87,14 +87,6 @@ func (process *Process) StartProcess() {
 					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
 				}
 			}
-			// is it a licence file type? of so lets really guess
-			// otherwise lets go with just SPDX markers
-
-			//fmt.Println(f.Location)
-			//license := lg.SpdxIdentify(string(data))
-			//for _, x := range license {
-			//	fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
-			//}
 		}
 
 	}

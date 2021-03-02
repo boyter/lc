@@ -62,7 +62,4 @@ var (
 
 	readmeFileRe = regexp.MustCompile(fmt.Sprintf("^(readme|guidelines)(%s)$",
 		strings.Replace(strings.Join(fileExtensions, "|"), ".", "\\.", -1)))
-
-	licenseDirectoryRe = regexp.MustCompile(fmt.Sprintf(
-		"^(%s)$", strings.Join(licenseFileNames, "|")))
 )
