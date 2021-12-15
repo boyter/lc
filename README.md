@@ -14,7 +14,7 @@ In a nutshell this project is a reimplementation of http://www.boyter.org/2017/0
 
 It can produce report outputs as valid [SPDX](https://spdx.org/), CSV, XLSX, JSON and CLI formatted. It has been designed to work inside CI systems that capture either stdout or file artifacts.
 
-[![Build Status](https://travis-ci.org/boyter/lc.svg?branch=master)](https://travis-ci.org/boyter/lc)
+[![Go](https://github.com/boyter/lc/actions/workflows/go.yml/badge.svg)](https://github.com/boyter/lc/actions/workflows/go.yml)
 [![Scc Count Badge](https://sloc.xyz/github/boyter/lc/)](https://github.com/boyter/lc/)
 
 Dual-licensed under MIT or the [UNLICENSE](http://unlicense.org).
