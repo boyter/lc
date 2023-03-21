@@ -3,7 +3,8 @@ package processor
 
 import (
 	"fmt"
-	file "github.com/boyter/go-code-walker"
+
+	"github.com/boyter/gocodewalker"
 	"io/ioutil"
 	"strings"
 )
@@ -42,14 +43,14 @@ func NewProcess(directory string) Process {
 	}
 }
 
-// Process is the main entry point of the command line output it sets everything up and starts running
+// StartProcess is the main entry point of the command line output it sets everything up and starts running
 func (process *Process) StartProcess() {
 	lg := NewLicenceGuesser(true, true)
 	lg.UseFullDatabase = true
 
-	fileListQueue := make(chan *file.File, 1000)
+	fileListQueue := make(chan *gocodewalker.File, 1000)
 
-	fileWalker := file.NewFileWalker(".", fileListQueue)
+	fileWalker := gocodewalker.NewFileWalker(".", fileListQueue)
 	fileWalker.IgnoreGitIgnore = false
 	fileWalker.IgnoreIgnoreFile = false
 	//fileWalker.AllowListExtensions = append(fileWalker.AllowListExtensions, "go")
@@ -77,10 +78,10 @@ func (process *Process) StartProcess() {
 				// should we should boost the guesses here because we are fairly sure there is a licence in there?
 				license := lg.GuessLicense(data)
 				if len(license) == 0 {
-					fmt.Println(" likely licence; unable to identify")
+					fmt.Println(" possible licence file but unable to identify")
 				}
 				for _, x := range license {
-					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
+					fmt.Println(fmt.Sprintf(" Licence: %s (%.1f%%)", x.LicenseId, x.ScorePercentage))
 				}
 			} else {
 				// look for SPDX markers only as its not a licence file
@@ -89,7 +90,7 @@ func (process *Process) StartProcess() {
 					fmt.Println(f.Location)
 				}
 				for _, x := range license {
-					fmt.Println("", x.MatchType, x.LicenseId, x.ScorePercentage)
+					fmt.Println(fmt.Sprintf(" Licence: %s (%.1f%%)", x.LicenseId, x.ScorePercentage))
 				}
 			}
 		}

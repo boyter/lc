@@ -1,21 +1,21 @@
 # github.com/BobuSumisu/aho-corasick v1.0.3
-## explicit
+## explicit; go 1.14
 github.com/BobuSumisu/aho-corasick
-# github.com/boyter/go-code-walker v1.0.0
+# github.com/boyter/gocodewalker v1.0.1-0.20230321052529-86e91fcf4a3a
+## explicit; go 1.20
+github.com/boyter/gocodewalker
+github.com/boyter/gocodewalker/go-gitignore
+# github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964
 ## explicit
-github.com/boyter/go-code-walker
-github.com/boyter/go-code-walker/go-gitignore
+github.com/danwakefield/fnmatch
 # github.com/inconshreveable/mousetrap v1.0.0
 ## explicit
 github.com/inconshreveable/mousetrap
-# github.com/monochromegane/go-gitignore v0.0.0-20160105113617-38717d0a108c
-## explicit
-github.com/monochromegane/go-gitignore
 # github.com/spf13/cobra v1.0.0
-## explicit
+## explicit; go 1.12
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
-## explicit
+## explicit; go 1.12
 github.com/spf13/pflag
 # github.com/tealeg/xlsx v1.0.3
 ## explicit
@@ -23,5 +23,3 @@ github.com/tealeg/xlsx
 # github.com/texttheater/golang-levenshtein v0.0.0-20180516184445-d188e65d659e
 ## explicit
 github.com/texttheater/golang-levenshtein/levenshtein
-# github.com/urfave/cli v1.20.0
-## explicit
