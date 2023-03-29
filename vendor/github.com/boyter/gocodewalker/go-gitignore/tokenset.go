@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 package gitignore
 
 // tokenset represents an ordered list of Tokens

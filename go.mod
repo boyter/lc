@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/BobuSumisu/aho-corasick v1.0.3
-	github.com/boyter/gocodewalker v1.0.1-0.20230321052529-86e91fcf4a3a
+	github.com/boyter/gocodewalker v1.1.0
 	github.com/spf13/cobra v1.0.0
 	github.com/tealeg/xlsx v1.0.3
 	github.com/texttheater/golang-levenshtein v0.0.0-20180516184445-d188e65d659e

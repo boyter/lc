@@ -13,6 +13,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 )
@@ -25,40 +26,63 @@ const (
 // ErrTerminateWalk error which indicates that the walker was terminated
 var ErrTerminateWalk = errors.New("gocodewalker terminated")
 
-// File is a struct returned which contains the
+// File is a struct returned which contains the location and the filename of the file that passed all exclusion rules
 type File struct {
 	Location string
 	Filename string
 }
 
 type FileWalker struct {
+	fileListQueue          chan *File
+	errorsHandler          func(error) bool // If returns true will continue to process where possible, otherwise returns if possible
+	directory              string
+	LocationExcludePattern []string // Case-sensitive patterns which exclude directory/file matches
+	IncludeDirectory       []string
+	ExcludeDirectory       []string // Paths to always ignore such as .git,.svn and .hg
+	IncludeFilename        []string
+	ExcludeFilename        []string
+	IncludeDirectoryRegex  []*regexp.Regexp // Must match regex as logical OR IE can match any of them
+	ExcludeDirectoryRegex  []*regexp.Regexp
+	IncludeFilenameRegex   []*regexp.Regexp
+	ExcludeFilenameRegex   []*regexp.Regexp
+	AllowListExtensions    []string // Which extensions should be allowed case sensitive
+	ExcludeListExtensions  []string // Which extensions should be excluded case sensitive
 	walkMutex              sync.Mutex
 	terminateWalking       bool
 	isWalking              bool
-	directory              string
-	fileListQueue          chan *File
-	LocationExcludePattern []string // Case-sensitive patterns which exclude files
-	PathExclude            []string // Paths to always ignore such as .git,.svn and .hg
-	IgnoreIgnoreFile       bool     // Should .ignore files be respected?
-	IgnoreGitIgnore        bool     // Should .gitignore files be respected?
-	IncludeHidden          bool     // Should hidden files and directories be included/walked
-	AllowListExtensions    []string // Which extensions should be allowed
+	IgnoreIgnoreFile       bool // Should .ignore files be respected?
+	IgnoreGitIgnore        bool // Should .gitignore files be respected?
+	IncludeHidden          bool // Should hidden files and directories be included/walked
+	osOpen                 func(name string) (*os.File, error)
+	osReadFile             func(name string) ([]byte, error)
 }
 
 // NewFileWalker constructs a filewalker, which will walk the supplied directory
 // and output File results to the supplied queue as it finds them
 func NewFileWalker(directory string, fileListQueue chan *File) *FileWalker {
 	return &FileWalker{
-		walkMutex:              sync.Mutex{},
 		fileListQueue:          fileListQueue,
+		errorsHandler:          func(e error) bool { return true }, // a generic one that just swallows everything
 		directory:              directory,
+		LocationExcludePattern: nil,
+		IncludeDirectory:       nil,
+		ExcludeDirectory:       nil,
+		IncludeFilename:        nil,
+		ExcludeFilename:        nil,
+		IncludeDirectoryRegex:  nil,
+		ExcludeDirectoryRegex:  nil,
+		IncludeFilenameRegex:   nil,
+		ExcludeFilenameRegex:   nil,
+		AllowListExtensions:    nil,
+		ExcludeListExtensions:  nil,
+		walkMutex:              sync.Mutex{},
 		terminateWalking:       false,
 		isWalking:              false,
-		LocationExcludePattern: []string{},
-		PathExclude:            []string{},
 		IgnoreIgnoreFile:       false,
+		IgnoreGitIgnore:        false,
 		IncludeHidden:          false,
-		AllowListExtensions:    []string{},
+		osOpen:                 os.Open,
+		osReadFile:             os.ReadFile,
 	}
 }
 
@@ -78,6 +102,15 @@ func (f *FileWalker) Terminate() {
 	f.walkMutex.Lock()
 	defer f.walkMutex.Unlock()
 	f.terminateWalking = true
+}
+
+// SetErrorHandler sets the function that is called on processing any error
+// where if you return true it will attempt to continue processing, and if false
+// will return the error instantly
+func (f *FileWalker) SetErrorHandler(errors func(error) bool) {
+	if errors != nil {
+		f.errorsHandler = errors
+	}
 }
 
 // Start will start walking the supplied directory with the supplied settings
@@ -109,14 +142,22 @@ func (f *FileWalker) walkDirectoryRecursive(directory string, gitignores []gitig
 	}
 	f.walkMutex.Unlock()
 
-	d, err := os.Open(directory)
+	d, err := f.osOpen(directory)
 	if err != nil {
+		// nothing we can do with this so return nil and process as best we can
+		if f.errorsHandler(err) {
+			return nil
+		}
 		return err
 	}
 	defer d.Close()
 
 	foundFiles, err := d.ReadDir(-1)
 	if err != nil {
+		// nothing we can do with this so return nil and process as best we can
+		if f.errorsHandler(err) {
+			return nil
+		}
 		return err
 	}
 
@@ -142,31 +183,47 @@ func (f *FileWalker) walkDirectoryRecursive(directory string, gitignores []gitig
 	for _, file := range files {
 		if !f.IgnoreGitIgnore {
 			if file.Name() == GitIgnore {
-				c, err := os.ReadFile(filepath.Join(directory, file.Name()))
-				if err == nil {
-					abs, err := filepath.Abs(directory)
-					if err != nil {
-						continue
+				c, err := f.osReadFile(filepath.Join(directory, file.Name()))
+				if err != nil {
+					if f.errorsHandler(err) {
+						continue // if asked to ignore it lets continue
 					}
-
-					gitIgnore := gitignore.New(bytes.NewReader(c), abs, nil)
-					gitignores = append(gitignores, gitIgnore)
+					return err
 				}
+
+				abs, err := filepath.Abs(directory)
+				if err != nil {
+					if f.errorsHandler(err) {
+						continue // if asked to ignore it lets continue
+					}
+					return err
+				}
+
+				gitIgnore := gitignore.New(bytes.NewReader(c), abs, nil)
+				gitignores = append(gitignores, gitIgnore)
 			}
 		}
 
 		if !f.IgnoreIgnoreFile {
 			if file.Name() == Ignore {
-				c, err := os.ReadFile(filepath.Join(directory, file.Name()))
-				if err == nil {
-					abs, err := filepath.Abs(directory)
-					if err != nil {
-						continue
+				c, err := f.osReadFile(filepath.Join(directory, file.Name()))
+				if err != nil {
+					if f.errorsHandler(err) {
+						continue // if asked to ignore it lets continue
 					}
-
-					gitIgnore := gitignore.New(bytes.NewReader(c), abs, nil)
-					ignores = append(ignores, gitIgnore)
+					return err
 				}
+
+				abs, err := filepath.Abs(directory)
+				if err != nil {
+					if f.errorsHandler(err) {
+						continue // if asked to ignore it lets continue
+					}
+					return err
+				}
+
+				gitIgnore := gitignore.New(bytes.NewReader(c), abs, nil)
+				ignores = append(ignores, gitIgnore)
 			}
 		}
 	}
@@ -195,14 +252,54 @@ func (f *FileWalker) walkDirectoryRecursive(directory string, gitignores []gitig
 			}
 		}
 
+		if len(f.IncludeFilename) != 0 {
+			// include files
+			found := false
+			for _, allow := range f.IncludeFilename {
+				if file.Name() == allow {
+					found = true
+				}
+			}
+			if !found {
+				shouldIgnore = true
+			}
+		}
+		// Exclude comes after include as it takes precedence
+		for _, deny := range f.ExcludeFilename {
+			if file.Name() == deny {
+				shouldIgnore = true
+			}
+		}
+
+		if len(f.IncludeFilenameRegex) != 0 {
+			found := false
+			for _, allow := range f.IncludeFilenameRegex {
+				if allow.Match([]byte(file.Name())) {
+					found = true
+				}
+			}
+			if !found {
+				shouldIgnore = true
+			}
+		}
+		// Exclude comes after include as it takes precedence
+		for _, deny := range f.ExcludeFilenameRegex {
+			if deny.Match([]byte(file.Name())) {
+				shouldIgnore = true
+			}
+		}
+
 		// Ignore hidden files
 		if !f.IncludeHidden {
 			s, err := IsHidden(file, directory)
+			if err != nil {
+				if !f.errorsHandler(err) {
+					return err
+				}
+			}
+
 			if s {
 				shouldIgnore = true
-			}
-			if err != nil {
-				return err
 			}
 		}
 
@@ -218,10 +315,13 @@ func (f *FileWalker) walkDirectoryRecursive(directory string, gitignores []gitig
 			}
 
 			// try again because we could have one of those pesky ones such as something.spec.tsx
-			ext = GetExtension(ext)
-			for _, v := range f.AllowListExtensions {
-				if v == ext {
-					a = true
+			// but only if we didn't already find something to save on a bit of processing
+			if !a {
+				ext = GetExtension(ext)
+				for _, v := range f.AllowListExtensions {
+					if v == ext {
+						a = true
+					}
 				}
 			}
 
@@ -230,18 +330,30 @@ func (f *FileWalker) walkDirectoryRecursive(directory string, gitignores []gitig
 			}
 		}
 
-		if !shouldIgnore {
-			for _, p := range f.LocationExcludePattern {
-				if strings.Contains(joined, p) {
-					shouldIgnore = true
-				}
+		for _, deny := range f.ExcludeListExtensions {
+			ext := GetExtension(file.Name())
+			if ext == deny {
+				shouldIgnore = true
 			}
 
 			if !shouldIgnore {
-				f.fileListQueue <- &File{
-					Location: joined,
-					Filename: file.Name(),
+				ext = GetExtension(ext)
+				if ext == deny {
+					shouldIgnore = true
 				}
+			}
+		}
+
+		for _, p := range f.LocationExcludePattern {
+			if strings.Contains(joined, p) {
+				shouldIgnore = true
+			}
+		}
+
+		if !shouldIgnore {
+			f.fileListQueue <- &File{
+				Location: joined,
+				Filename: file.Name(),
 			}
 		}
 	}
@@ -266,7 +378,6 @@ func (f *FileWalker) walkDirectoryRecursive(directory string, gitignores []gitig
 				shouldIgnore = ignore.Ignore(joined)
 			}
 		}
-
 		for _, ignore := range ignores {
 			// same rules as above
 			if ignore.MatchIsDir(joined, true) != nil {
@@ -274,10 +385,43 @@ func (f *FileWalker) walkDirectoryRecursive(directory string, gitignores []gitig
 			}
 		}
 
+		// start by saying we didn't find it then check each possible
+		// choice to see if we did find it
+		// if we didn't find it then we should ignore
+		if len(f.IncludeDirectory) != 0 {
+			found := false
+			for _, allow := range f.IncludeDirectory {
+				if dir.Name() == allow {
+					found = true
+				}
+			}
+			if !found {
+				shouldIgnore = true
+			}
+		}
 		// Confirm if there are any files in the path deny list which usually includes
 		// things like .git .hg and .svn
-		for _, deny := range f.PathExclude {
-			if strings.HasSuffix(dir.Name(), deny) {
+		// Comes after include as it takes precedence
+		for _, deny := range f.ExcludeDirectory {
+			if dir.Name() == deny {
+				shouldIgnore = true
+			}
+		}
+
+		if len(f.IncludeDirectoryRegex) != 0 {
+			found := false
+			for _, allow := range f.IncludeDirectoryRegex {
+				if allow.Match([]byte(dir.Name())) {
+					found = true
+				}
+			}
+			if !found {
+				shouldIgnore = true
+			}
+		}
+		// Exclude comes after include as it takes precedence
+		for _, deny := range f.ExcludeDirectoryRegex {
+			if deny.Match([]byte(dir.Name())) {
 				shouldIgnore = true
 			}
 		}
@@ -285,11 +429,14 @@ func (f *FileWalker) walkDirectoryRecursive(directory string, gitignores []gitig
 		// Ignore hidden directories
 		if !f.IncludeHidden {
 			s, err := IsHidden(dir, directory)
+			if err != nil {
+				if !f.errorsHandler(err) {
+					return err
+				}
+			}
+
 			if s {
 				shouldIgnore = true
-			}
-			if err != nil {
-				return err
 			}
 		}
 

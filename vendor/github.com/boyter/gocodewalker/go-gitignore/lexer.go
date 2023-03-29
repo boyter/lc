@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 package gitignore
 
 import (
@@ -86,7 +88,7 @@ func (l *lexer) Next() (*Token, Error) {
 			return nil, _err
 		} else if _next == _WILDCARD {
 			// we know read() will succeed here since we used peek() above
-			l.read()
+			_, _ = l.read()
 			return l.token(ANY, []rune{_WILDCARD, _WILDCARD}, nil)
 		}
 
@@ -288,7 +290,7 @@ func (l *lexer) escape() ([]rune, Error) {
 
 	// otherwise, return the escape and the next rune
 	//      - we know read() will succeed here since we used peek() above
-	l.read()
+	_, _ = l.read()
 	return []rune{_ESCAPE, _peek}, nil
 } // escape()
 

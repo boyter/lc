@@ -13,16 +13,22 @@ https://pkg.go.dev/github.com/boyter/gocodewalker
 Package provides file operations specific to code repositories such as walking the file tree obeying .ignore and .gitignore files
 or looking for the root directory assuming already in a git project.
 
-Note that it currently has a dependency on go-gitignore which is pulled in here to avoid external dependencies. This needs to be rewritten
-as there are some bugs in that implementation.
-
 Example of usage,
 
 ```
 fileListQueue := make(chan *gocodewalker.File, 100)
 
 fileWalker := gocodewalker.NewFileWalker(".", fileListQueue)
+
+// restrict to only process files that have the .go extension
 fileWalker.AllowListExtensions = append(fileWalker.AllowListExtensions, "go")
+
+// handle the errors by printing them out and then ignore
+errorHandler := func(e error) bool {
+    fmt.Println("ERR", e.Error())
+    return true
+}
+fileWalker.SetErrorHandler(errorHandler)
 
 go fileWalker.Start()
 
@@ -36,6 +42,41 @@ only adding files with the go extension into the queue.
 
 All code is dual-licenced as either MIT or Unlicence.
 Note that as an Australian I cannot put this into the public domain, hence the choice most liberal licences I can find.
+
+### Error Handler
+
+You can supply your own error handler when walking. This allows you to perform an action when there is an error
+and decide if the walker should continue to process, or return.
+
+The simplest handler is the below, which if set will swallow all errors and continue as best it can.
+
+```
+errorHandler := func(e error) bool {
+    return true
+}
+fileWalker.SetErrorHandler(errorHandler)
+```
+
+If you wanted to return on errors you could use the following.
+
+```
+errorHandler := func(e error) bool {
+    return false
+}
+fileWalker.SetErrorHandler(errorHandler)
+```
+
+If you wanted to terminate walking on an error you could use the following, which would cause it to return the error,
+and then terminate all walking. This might be desirable where any error indicates a total failure.
+
+```
+errorHandler := func(e error) bool {
+    fileWalker.Terminate()
+    return false
+}
+fileWalker.SetErrorHandler(errorHandler)
+```
+
 
 ### Package
 

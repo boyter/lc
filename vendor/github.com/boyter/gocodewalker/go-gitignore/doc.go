@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 /*
 Package gitignore provides an interface for parsing .gitignore files,
 either individually, or within a repository, and

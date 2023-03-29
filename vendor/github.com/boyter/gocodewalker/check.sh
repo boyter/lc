@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# SPDX-License-Identifier: MIT OR Unlicense
+
 set -e
 
 if [ -t 1 ]

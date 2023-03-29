@@ -1,7 +1,7 @@
 # github.com/BobuSumisu/aho-corasick v1.0.3
 ## explicit; go 1.14
 github.com/BobuSumisu/aho-corasick
-# github.com/boyter/gocodewalker v1.0.1-0.20230321052529-86e91fcf4a3a
+# github.com/boyter/gocodewalker v1.1.0
 ## explicit; go 1.20
 github.com/boyter/gocodewalker
 github.com/boyter/gocodewalker/go-gitignore

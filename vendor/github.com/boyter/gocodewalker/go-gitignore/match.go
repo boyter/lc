@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 package gitignore
 
 // Match represents the interface of successful matches against a .gitignore
