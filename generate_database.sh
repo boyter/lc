@@ -13,4 +13,4 @@ echo "running go generate..."
 go generate
 
 echo "running all tests to see how it went..."
-go test -v -run TestKeywordFullDatabase ./processor
+go test -v ./...
