@@ -63,3 +63,11 @@ var (
 	readmeFileRe = regexp.MustCompile(fmt.Sprintf("^(readme|guidelines)(%s)$",
 		strings.Replace(strings.Join(fileExtensions, "|"), ".", "\\.", -1)))
 )
+
+func IsLicenceFile(filename string) bool {
+	if strings.Count(filename, ".") > 2 {
+		return false
+	}
+
+	return licenseFileRe.Match([]byte(strings.ToLower(filename)))
+}

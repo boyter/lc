@@ -6,10 +6,15 @@ import (
 	"github.com/boyter/lc/processor"
 	"github.com/spf13/cobra"
 	"os"
+	"runtime/pprof"
 )
 
 //go:generate go run scripts/include.go
 func main() {
+	f, _ := os.Create("profile.pprof")
+	pprof.StartCPUProfile(f)
+	defer pprof.StopCPUProfile()
+
 	rootCmd := &cobra.Command{
 		Use: "lc [flags] [files or directories]",
 		Long: "Check directory/file for licenses and list what license(s) a file is under.\n" +

@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/boyter/gocodewalker"
-	"strings"
 )
 
 var Version = "2.0.0 alpha"
@@ -48,7 +47,7 @@ func (process *Process) StartProcess() {
 	lg := NewLicenceGuesser(true, true)
 	lg.UseFullDatabase = false
 	flg := NewLicenceGuesser(true, true)
-	lg.UseFullDatabase = true
+	flg.UseFullDatabase = true
 
 	fileListQueue := make(chan *gocodewalker.File, 1000)
 
@@ -73,7 +72,8 @@ func (process *Process) StartProcess() {
 				continue
 			}
 
-			licenceFile := licenseFileRe.Match([]byte(strings.ToLower(f.Filename)))
+			licenceFile := IsLicenceFile(f.Filename)
+			//fmt.Println(licenceFile, f.Filename)
 
 			if licenceFile {
 				fmt.Println(f.Location)
