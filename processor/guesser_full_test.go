@@ -4,7 +4,7 @@ package processor
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -20,13 +20,13 @@ type LicenseJson struct {
 }
 
 func loadLicences(t *testing.T) []LicenseJson {
-	files, _ := ioutil.ReadDir("../assets/database/licenses/")
+	files, _ := os.ReadDir("../assets/database/licenses/")
 
 	var licenses []LicenseJson
 	// Load all of the licenses from disk to use as a comparison for the check
 	for _, f := range files {
 		if strings.HasSuffix(f.Name(), ".json") {
-			bytes, _ := ioutil.ReadFile(filepath.Join("../assets/database/licenses/", f.Name()))
+			bytes, _ := os.ReadFile(filepath.Join("../assets/database/licenses/", f.Name()))
 
 			var license LicenseJson
 			err := json.Unmarshal(bytes, &license)

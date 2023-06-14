@@ -119,7 +119,7 @@ func walkDirectory(directory string, rootLicenses [][]LicenseMatch, output *chan
 
 	// Determine the license for any of the possible files
 	for _, file := range possibleLicenseFiles {
-		bytes, err := ioutil.ReadFile(filepath.Join(directory, file))
+		bytes, err := os.ReadFile(filepath.Join(directory, file))
 
 		if err == nil {
 			guessLicenses := keywordGuessLicense(bytes, Database)

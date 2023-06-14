@@ -3,9 +3,9 @@ package processor
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/boyter/gocodewalker"
-	"io/ioutil"
 	"strings"
 )
 
@@ -46,6 +46,8 @@ func NewProcess(directory string) Process {
 // StartProcess is the main entry point of the command line output it sets everything up and starts running
 func (process *Process) StartProcess() {
 	lg := NewLicenceGuesser(true, true)
+	lg.UseFullDatabase = false
+	flg := NewLicenceGuesser(true, true)
 	lg.UseFullDatabase = true
 
 	fileListQueue := make(chan *gocodewalker.File, 1000)
@@ -55,10 +57,10 @@ func (process *Process) StartProcess() {
 	fileWalker.IgnoreIgnoreFile = false
 	//fileWalker.AllowListExtensions = append(fileWalker.AllowListExtensions, "go")
 
-	go fileWalker.Start()
+	go func() { _ = fileWalker.Start() }()
 
 	for f := range fileListQueue {
-		data, err := ioutil.ReadFile(f.Location)
+		data, err := os.ReadFile(f.Location)
 		if err == nil {
 
 			// TODO should be configurable and be in the read file to avoid doing it at all
@@ -77,6 +79,12 @@ func (process *Process) StartProcess() {
 				fmt.Println(f.Location)
 				// should we should boost the guesses here because we are fairly sure there is a licence in there?
 				license := lg.GuessLicense(data)
+
+				// if we didn't find anything try using everything
+				if len(license) == 0 {
+					license = flg.GuessLicense(data)
+				}
+
 				if len(license) == 0 {
 					fmt.Println(" possible licence file but unable to identify")
 				}
