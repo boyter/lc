@@ -50,8 +50,8 @@ func findNgrams(list []string, size int) []string {
 }
 
 var startNgrams = 3
-var endNgrams = 12
-var keepNgrams = 100
+var endNgrams = 6
+var keepNgrams = 200
 
 func main() {
 	// find the licence files that we need to compare against as a starting
@@ -113,21 +113,33 @@ func main() {
 			ngrams := findNgrams(split, i)
 			licenses[j].Ngrams = append(licenses[j].Ngrams, ngrams...)
 		}
+
+		// first get all ngrams for each text
+		// store them all seperately
+		// TODO store some from each one
+		// the problem we have is that we have multiple texts...
+		// but ngrams from the different texts might overlap, which
+		// isnt a problem because they still refer to a single licence
+		// so for each licence we need to get
+		// we also need to ensue we keep keywords from each license we have
+		// so that we can match, because we limit ourselves to some amount,
+		// so we must iterate each one and mix them together to give the best chance
+
 	}
-
-	fmt.Println("finding unique ngrams")
-
-	// store what we want to save here
-	outputLicenses := []LicenseOutput{}
 
 	// put every ngram into a huge map with a incrementing count, so if a ngram exists
 	// and only has a count of 1 then we know it to be unique
+	// TODO put this into the above loop so we can track uniqueness PER licence not just on keywords
 	ngramCountMap := map[string]int{}
 	for _, lic := range licenses {
 		for _, ng := range lic.Ngrams {
 			ngramCountMap[ng] = ngramCountMap[ng] + 1
 		}
 	}
+
+	fmt.Println("finding unique ngrams")
+	// store what we want to save here
+	outputLicenses := []LicenseOutput{}
 
 	// For each licence, check each ngram and see if it is unique
 	for _, currentLicense := range licenses {
