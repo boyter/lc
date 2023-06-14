@@ -73,7 +73,6 @@ func (process *Process) StartProcess() {
 			}
 
 			licenceFile := IsLicenceFile(f.Filename)
-			//fmt.Println(licenceFile, f.Filename)
 
 			if licenceFile {
 				fmt.Println(f.Location)
