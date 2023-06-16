@@ -52,22 +52,28 @@ func findNgrams(list []string, size int) []string {
 }
 
 var startNgrams = 3
-var endNgrams = 6
+var endNgrams = 17
 var keepNgrams = 200
 
 func main() {
 	// find the licence files that we need to compare against as a starting
 	// point based on the SPDX
-	files, _ := os.ReadDir("./licenses/")
+	//files, _ := os.ReadDir("./licenses/")
+	files, _ := os.ReadDir("/Users/boyter/Documents/projects/lc/assets/database/licenses/")
 
 	fmt.Println("loading licenses")
 
-	duplicateLicences := map[string]int{}
+	licenseTextCount := map[string]int{}
 	var licenses []License
 	// Load all of the licenses from disk and keep track of duplicates
 	for _, f := range files {
+		if !strings.HasPrefix(f.Name(), "AGPL") {
+			continue
+		}
+
 		if strings.HasSuffix(f.Name(), ".json") {
-			bytes, _ := os.ReadFile(filepath.Join("./licenses/", f.Name()))
+			//bytes, _ := os.ReadFile(filepath.Join("./licenses/", f.Name()))
+			bytes, _ := os.ReadFile(filepath.Join("/Users/boyter/Documents/projects/lc/assets/database/licenses/", f.Name()))
 
 			var license License
 			_ = json.Unmarshal(bytes, &license)
@@ -81,13 +87,13 @@ func main() {
 
 			licenses = append(licenses, license)
 
-			// track where the license text is the duplicateLicences
-			duplicateLicences[license.LicenseText] = duplicateLicences[license.LicenseText] + 1
+			// track where the license text is the licenseTextCount
+			licenseTextCount[license.LicenseText] = licenseTextCount[license.LicenseText] + 1
 		}
 	}
 
 	fmt.Println("the following are duplicates...")
-	for k, v := range duplicateLicences {
+	for k, v := range licenseTextCount {
 		if v != 1 {
 			var d []string
 			for _, lic := range licenses {
@@ -125,7 +131,10 @@ func main() {
 		seenIds = append(seenIds, l.LicenseIdDuplicates...)
 
 		if !seen {
+			fmt.Println("	keeping", l.LicenseId)
 			deduplicatedLicences = append(deduplicatedLicences, l)
+		} else {
+			fmt.Println("	duplicate! removing", l.LicenseId)
 		}
 	}
 
@@ -133,7 +142,6 @@ func main() {
 	licenses = deduplicatedLicences
 
 	fmt.Println("building ngrams for each license")
-	// Build ngrams for each license
 	for j := 0; j < len(licenses); j++ {
 		split := strings.Fields(processor.LcCleanText(licenses[j].LicenseText))
 		for i := startNgrams; i < endNgrams; i++ {
@@ -142,6 +150,7 @@ func main() {
 		}
 		licenses[j].LicenceNgrams = append(licenses[j].LicenceNgrams, licenses[j].Ngrams)
 
+		// now calculate all the ngrams for the extra licence examples that we have
 		for _, v := range licenses[j].ExtraLicenseText {
 			split := strings.Fields(processor.LcCleanText(v))
 			ngramsSlice := []string{}
@@ -151,18 +160,6 @@ func main() {
 			}
 			licenses[j].LicenceNgrams = append(licenses[j].LicenceNgrams, licenses[j].Ngrams)
 		}
-
-		// first get all ngrams for each text
-		// store them all seperately
-		// TODO store some from each one
-		// the problem we have is that we have multiple texts...
-		// but ngrams from the different texts might overlap, which
-		// isnt a problem because they still refer to a single licence
-		// so for each licence we need to get
-		// we also need to ensue we keep keywords from each license we have
-		// so that we can match, because we limit ourselves to some amount,
-		// so we must iterate each one and mix them together to give the best chance
-
 	}
 
 	// put every ngram into a huge map with a incrementing count, so if a ngram exists
@@ -189,6 +186,11 @@ func main() {
 			if ngramCountMap[ngram] == 1 {
 				uniqueNgrams = append(uniqueNgrams, ngram)
 			}
+		}
+
+		if len(uniqueNgrams) == 0 {
+			fmt.Println("need to ", currentLicense.LicenseId)
+			// find which ones its very close to, because its possible this is actually a duplicate...
 		}
 
 		fmt.Println(currentLicense.LicenseId, "ngrams", len(currentLicense.Ngrams), "unique ngrams", len(uniqueNgrams))
