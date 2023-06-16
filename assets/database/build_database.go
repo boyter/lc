@@ -132,8 +132,6 @@ func main() {
 	fmt.Println("from", len(licenses), "licences to", len(deduplicatedLicences))
 	licenses = deduplicatedLicences
 
-	return
-
 	fmt.Println("building ngrams for each license")
 	// Build ngrams for each license
 	for j := 0; j < len(licenses); j++ {
