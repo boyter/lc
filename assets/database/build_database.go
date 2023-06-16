@@ -58,8 +58,7 @@ var keepNgrams = 200
 func main() {
 	// find the licence files that we need to compare against as a starting
 	// point based on the SPDX
-	//files, _ := os.ReadDir("./licenses/")
-	files, _ := os.ReadDir("/Users/boyter/Documents/projects/lc/assets/database/licenses/")
+	files, _ := os.ReadDir("./licenses/")
 
 	fmt.Println("loading licenses")
 
@@ -67,13 +66,8 @@ func main() {
 	var licenses []License
 	// Load all of the licenses from disk and keep track of duplicates
 	for _, f := range files {
-		if !strings.HasPrefix(f.Name(), "AGPL") {
-			continue
-		}
-
 		if strings.HasSuffix(f.Name(), ".json") {
-			//bytes, _ := os.ReadFile(filepath.Join("./licenses/", f.Name()))
-			bytes, _ := os.ReadFile(filepath.Join("/Users/boyter/Documents/projects/lc/assets/database/licenses/", f.Name()))
+			bytes, _ := os.ReadFile(filepath.Join("./licenses/", f.Name()))
 
 			var license License
 			_ = json.Unmarshal(bytes, &license)
@@ -88,7 +82,7 @@ func main() {
 			licenses = append(licenses, license)
 
 			// track where the license text is the licenseTextCount
-			licenseTextCount[license.LicenseText] = licenseTextCount[license.LicenseText] + 1
+			licenseTextCount[processor.LcCleanText(license.LicenseText)] = licenseTextCount[processor.LcCleanText(license.LicenseText)] + 1
 		}
 	}
 
@@ -97,14 +91,14 @@ func main() {
 		if v != 1 {
 			var d []string
 			for _, lic := range licenses {
-				if lic.LicenseText == k {
+				if processor.LcCleanText(lic.LicenseText) == k {
 					d = append(d, lic.LicenseId)
 				}
 			}
 
 			// update any license with this text to tell it about all the duplicates
 			for i := 0; i < len(licenses); i++ {
-				if licenses[i].LicenseText == k {
+				if processor.LcCleanText(licenses[i].LicenseText) == k {
 					licenses[i].LicenseIdDuplicates = d
 					fmt.Println(fmt.Sprintf("	%v %v duplicates %v", licenses[i].LicenseId, len(d), d))
 				}
@@ -188,24 +182,21 @@ func main() {
 			}
 		}
 
-		if len(uniqueNgrams) == 0 {
-			fmt.Println("need to ", currentLicense.LicenseId)
-			// find which ones its very close to, because its possible this is actually a duplicate...
-		}
-
 		fmt.Println(currentLicense.LicenseId, "ngrams", len(currentLicense.Ngrams), "unique ngrams", len(uniqueNgrams))
 
-		if len(uniqueNgrams) > keepNgrams {
-			uniqueNgrams = uniqueNgrams[:keepNgrams]
-		}
+		if len(uniqueNgrams) != 0 {
+			if len(uniqueNgrams) > keepNgrams {
+				uniqueNgrams = uniqueNgrams[:keepNgrams]
+			}
 
-		outputLicenses = append(outputLicenses, LicenseOutput{
-			LicenseId:               currentLicense.LicenseId,
-			Name:                    currentLicense.Name,
-			LicenseText:             currentLicense.LicenseText,
-			StandardLicenseTemplate: currentLicense.StandardLicenseTemplate,
-			Keywords:                uniqueNgrams,
-		})
+			outputLicenses = append(outputLicenses, LicenseOutput{
+				LicenseId:               currentLicense.LicenseId,
+				Name:                    currentLicense.Name,
+				LicenseText:             currentLicense.LicenseText,
+				StandardLicenseTemplate: currentLicense.StandardLicenseTemplate,
+				Keywords:                uniqueNgrams,
+			})
+		}
 	}
 
 	out, _ := os.Create("database_keywords.json")
