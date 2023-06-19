@@ -79,6 +79,11 @@ func main() {
 				license.ExtraLicenseText = mitExtra
 			}
 
+			if license.LicenseId == "BSD-3-Clause" {
+				fmt.Println("adding extra to BSD-3-Clause")
+				license.ExtraLicenseText = bsd3ClauseExtra
+			}
+
 			licenses = append(licenses, license)
 
 			// track where the license text is the licenseTextCount
