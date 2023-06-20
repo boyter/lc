@@ -35,6 +35,7 @@ type LicenseOutput struct {
 	LicenseId               string   `json:"licenseId"`
 	Keywords                []string `json:"keywords"`
 	LicenseIdDuplicates     []string `json:"duplicates"`
+	ExtraLicenseText        []string `json:"extraLicenseText"`
 }
 
 // returns all the ngrams of a supplied size for supplied list
@@ -52,7 +53,7 @@ func findNgrams(list []string, size int) []string {
 }
 
 var startNgrams = 3
-var endNgrams = 17
+var endNgrams = 6
 var keepNgrams = 200
 
 func main() {
@@ -66,6 +67,11 @@ func main() {
 	var licenses []License
 	// Load all of the licenses from disk and keep track of duplicates
 	for _, f := range files {
+		if !strings.HasPrefix(f.Name(), "GPL") {
+			continue
+		}
+		fmt.Println(f.Name())
+
 		if strings.HasSuffix(f.Name(), ".json") {
 			bytes, _ := os.ReadFile(filepath.Join("./licenses/", f.Name()))
 
@@ -130,10 +136,10 @@ func main() {
 		seenIds = append(seenIds, l.LicenseIdDuplicates...)
 
 		if !seen {
-			fmt.Println("	keeping", l.LicenseId)
+			fmt.Println("	keeping", l.LicenseId, l.LicenseIdDuplicates)
 			deduplicatedLicences = append(deduplicatedLicences, l)
 		} else {
-			fmt.Println("	duplicate! removing", l.LicenseId)
+			fmt.Println("	duplicate! removing", l.LicenseId, l.LicenseIdDuplicates)
 		}
 	}
 
@@ -187,21 +193,20 @@ func main() {
 			}
 		}
 
-		fmt.Println(currentLicense.LicenseId, "ngrams", len(currentLicense.Ngrams), "unique ngrams", len(uniqueNgrams))
+		fmt.Println("	", currentLicense.LicenseId, "ngrams", len(currentLicense.Ngrams), "unique ngrams", len(uniqueNgrams))
 
-		if len(uniqueNgrams) != 0 {
-			if len(uniqueNgrams) > keepNgrams {
-				uniqueNgrams = uniqueNgrams[:keepNgrams]
-			}
-
-			outputLicenses = append(outputLicenses, LicenseOutput{
-				LicenseId:               currentLicense.LicenseId,
-				Name:                    currentLicense.Name,
-				LicenseText:             currentLicense.LicenseText,
-				StandardLicenseTemplate: currentLicense.StandardLicenseTemplate,
-				Keywords:                uniqueNgrams,
-			})
+		if len(uniqueNgrams) > keepNgrams {
+			uniqueNgrams = uniqueNgrams[:keepNgrams]
 		}
+
+		outputLicenses = append(outputLicenses, LicenseOutput{
+			LicenseId:               currentLicense.LicenseId,
+			Name:                    currentLicense.Name,
+			LicenseText:             currentLicense.LicenseText,
+			StandardLicenseTemplate: currentLicense.StandardLicenseTemplate,
+			Keywords:                uniqueNgrams,
+			LicenseIdDuplicates:     currentLicense.LicenseIdDuplicates,
+		})
 	}
 
 	out, _ := os.Create("database_keywords.json")
@@ -209,40 +214,4 @@ func main() {
 	data, _ := json.Marshal(outputLicenses)
 	_, _ = out.Write(data)
 	_ = out.Close()
-
-	/*
-		//// Write out
-		//files, _ = ioutil.ReadDir(".")
-		//out, _ = os.Create("./database.go")
-		//
-		//// Open constants
-		//out.Write([]byte("package processor \n\nvar LicenseDatabase = []License{\n"))
-		//for _, f := range outputLicenses {
-		//
-		//	key := ""
-		//	if len(f.Keywords) != 0 {
-		//		for _, k := range f.Keywords {
-		//			key += fmt.Sprintf(`"%s",`, k)
-		//		}
-		//	}
-		//
-		//	out.Write(bytes.Trim([]byte(fmt.Sprintf(`{
-		//		LicenseText:             ` + "`" + `%s` + "`" + `,
-		//		StandardLicenseTemplate: ` + "`" + `%s` + "`" + `,
-		//		Name:                    ` + "`" + `%s` + "`" + `,
-		//		LicenseId:               ` + "`" + `%s` + "`" + `,
-		//		Keywords:                []string{
-		//			%s
-		//		},
-		//	},`,
-		//		strings.Replace(f.LicenseText, "`", "` + \"`\" + `", -1),
-		//		strings.Replace(f.StandardLicenseTemplate, "`", "` + \"`\" + `", -1),
-		//		strings.Replace(f.Name, "`", "` + \"`\" + `", -1),
-		//		strings.Replace(f.LicenseId, "`", "` + \"`\" + `", -1),
-		//		key)), "\xef\xbb\xbf"))
-		//}
-		//
-		//out.Write([]byte("}\n"))
-		//out.Close()
-	*/
 }

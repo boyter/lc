@@ -11,6 +11,8 @@ type License struct {
 	Name                    string            `json:"name"`
 	LicenseId               string            `json:"licenseId"`
 	Keywords                []string          `json:"keywords"`
+	LicenseIdDuplicates     []string          `json:"duplicates"`
+	ExtraLicenseText        []string          `json:"extraLicenseText"`
 	ScorePercentage         float64           `json:"scorePercentage"` // this is used so we don't have a new struct
 	Trie                    *ahocorasick.Trie // used for faster matching
 	Concordance             Concordance       // used for vector matching

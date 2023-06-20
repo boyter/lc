@@ -2,10 +2,18 @@
 
 package processor
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
+// TODO does not work because not aware of related licences
 func TestSpdxGuesser(t *testing.T) {
 	lg := NewLicenceGuesser(false, false)
+
+	for _, l := range lg.Database {
+		fmt.Println(l.LicenseIdDuplicates)
+	}
 
 	actual := lg.SpdxIdentify("test")
 	if len(actual) != 0 {
@@ -13,25 +21,25 @@ func TestSpdxGuesser(t *testing.T) {
 	}
 
 	actual = lg.SpdxIdentify("# SPDX-License-Identifier: GPL-2.0")
-	if actual[0].LicenseId != "GPL-2.0" {
+	if len(actual) == 0 || actual[0].LicenseId != "GPL-2.0" {
 		t.Errorf("Should match GPL-2.0")
 	}
 
 	actual = lg.SpdxIdentify("/* SPDX-License-Identifier: GPL-2.0 */")
-	if actual[0].LicenseId != "GPL-2.0" {
+	if len(actual) == 0 || actual[0].LicenseId != "GPL-2.0" {
 		t.Errorf("Should match GPL-2.0")
 	}
 
 	actual = lg.SpdxIdentify("# SPDX-License-Identifier: GPL-2.0 ")
-	if actual[0].LicenseId != "GPL-2.0" {
+	if len(actual) == 0 || actual[0].LicenseId != "GPL-2.0" {
 		t.Errorf("Should match GPL-2.0")
 	}
 
 	actual = lg.SpdxIdentify("# SPDX-License-Identifier: GPL-2.0 \n # SPDX-License-Identifier: GPL-3.0+")
-	if actual[0].LicenseId != "GPL-2.0" {
+	if len(actual) == 0 || actual[0].LicenseId != "GPL-2.0" {
 		t.Errorf("Should match GPL-2.0")
 	}
-	if actual[1].LicenseId != "GPL-3.0+" {
+	if len(actual) == 0 || actual[1].LicenseId != "GPL-3.0+" {
 		t.Errorf("Should match GPL-3.0+")
 	}
 
@@ -55,10 +63,10 @@ if __name__ == '__main__':
     })
     cherrypy.quickstart(Example())
 `)
-	if actual[0].LicenseId != "GPL-2.0" {
+	if len(actual) == 0 || actual[0].LicenseId != "GPL-2.0" {
 		t.Errorf("Should match GPL-2.0")
 	}
-	if actual[1].LicenseId != "GPL-3.0+" {
+	if len(actual) == 0 || actual[1].LicenseId != "GPL-3.0+" {
 		t.Errorf("Should match GPL-3.0+")
 	}
 }

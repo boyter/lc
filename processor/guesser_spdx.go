@@ -2,7 +2,10 @@
 
 package processor
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 // SpdxIdentify will identify licenses in the text which are using the SPDX indicator
 // which is reasonably cheap in terms of looking things up
@@ -41,6 +44,22 @@ func (l *LicenceGuesser) SpdxIdentify(content string) []License {
 					matchingLicenses = append(matchingLicenses, license)
 					found = true
 				}
+
+				for _, li := range license.LicenseIdDuplicates {
+					if license.LicenseId == li {
+						license.ScorePercentage = 100 // set the score to be 100% IE we are 100% confidence in this guess
+						matchingLicenses = append(matchingLicenses, license)
+						found = true
+					}
+				}
+
+				//GPL-2.0
+				for _, li := range license.LicenseIdDuplicates {
+					if li == "GPL-2.0" {
+						fmt.Println("HERE YA MORNNG")
+					}
+				}
+
 			}
 
 			// if we didn't find anything try using lower case because hey why not
@@ -51,6 +70,14 @@ func (l *LicenceGuesser) SpdxIdentify(content string) []License {
 					if strings.ToLower(license.LicenseId) == x {
 						license.ScorePercentage = 99.99 // set the score to be 99.99% because we are still very confident
 						matchingLicenses = append(matchingLicenses, license)
+					}
+
+					for _, li := range license.LicenseIdDuplicates {
+						if strings.ToLower(li) == x {
+							license.ScorePercentage = 99.99 // set the score to be 100% IE we are 100% confidence in this guess
+							matchingLicenses = append(matchingLicenses, license)
+							found = true
+						}
 					}
 				}
 			}

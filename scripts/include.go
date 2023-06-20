@@ -5,14 +5,13 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 )
 
 func readFile(filepath string) []byte {
 	// TODO only read as deep into the file as we need
-	bytes, err := ioutil.ReadFile(filepath)
+	bytes, err := os.ReadFile(filepath)
 
 	if err != nil {
 		fmt.Print(err)
@@ -25,7 +24,7 @@ func readFile(filepath string) []byte {
 // and encodes them as strings literals in constants.go
 func main() {
 	fmt.Println("running...")
-	files, err := ioutil.ReadDir(".")
+	files, err := os.ReadDir(".")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
