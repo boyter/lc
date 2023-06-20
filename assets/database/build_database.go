@@ -63,14 +63,15 @@ func main() {
 
 	fmt.Println("loading licenses")
 
+	var allLicenseIds []string
 	licenseTextCount := map[string]int{}
 	var licenses []License
 	// Load all of the licenses from disk and keep track of duplicates
 	for _, f := range files {
-		if !strings.HasPrefix(f.Name(), "GPL") {
-			continue
-		}
-		fmt.Println(f.Name())
+		//if !strings.HasPrefix(f.Name(), "GPL") {
+		//	continue
+		//}
+		//fmt.Println(f.Name())
 
 		if strings.HasSuffix(f.Name(), ".json") {
 			bytes, _ := os.ReadFile(filepath.Join("./licenses/", f.Name()))
@@ -89,6 +90,8 @@ func main() {
 				fmt.Println("adding extra to BSD-3-Clause")
 				license.ExtraLicenseText = bsd3ClauseExtra
 			}
+
+			allLicenseIds = append(allLicenseIds, license.LicenseId)
 
 			licenses = append(licenses, license)
 
@@ -214,4 +217,8 @@ func main() {
 	data, _ := json.Marshal(outputLicenses)
 	_, _ = out.Write(data)
 	_ = out.Close()
+
+	// now write out a list of every licence id that can be used for SPDX identification
+
+	fmt.Println(fmt.Sprintf(`var spdxLicenseIds = []string{"%v"}`, strings.Join(allLicenseIds, `", "`)))
 }

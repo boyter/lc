@@ -97,7 +97,7 @@ func (process *Process) StartProcess() {
 					fmt.Println(f.Location)
 				}
 				for _, x := range license {
-					fmt.Println(fmt.Sprintf(" Licence: %s (%.1f%%)", x.LicenseId, x.ScorePercentage))
+					fmt.Println(fmt.Sprintf(" Licence: %s 100%%)", x))
 				}
 			}
 		}
