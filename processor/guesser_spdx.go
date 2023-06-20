@@ -45,6 +45,9 @@ func (l *LicenceGuesser) SpdxIdentify(content string) []string {
 					found = true
 				}
 
+				if found {
+					break
+				}
 			}
 
 			// if we didn't find anything try using lower case because hey why not
@@ -68,6 +71,7 @@ func (l *LicenceGuesser) SpdxIdentify(content string) []string {
 		b := found[lic]
 		if !b {
 			filtered = append(filtered, lic)
+			found[lic] = true
 		}
 	}
 
