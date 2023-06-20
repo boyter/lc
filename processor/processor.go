@@ -49,6 +49,8 @@ func (process *Process) StartProcess() {
 	flg := NewLicenceGuesser(true, true)
 	flg.UseFullDatabase = true
 
+	spdxGuesser := SpdxIdentifier{}
+
 	fileListQueue := make(chan *gocodewalker.File, 1000)
 
 	fileWalker := gocodewalker.NewFileWalker(".", fileListQueue)
@@ -92,7 +94,7 @@ func (process *Process) StartProcess() {
 				}
 			} else {
 				// look for SPDX markers only as its not a licence file
-				license := lg.SpdxIdentify(string(data))
+				license := spdxGuesser.SpdxIdentify(string(data))
 				if len(license) != 0 {
 					fmt.Println(f.Location)
 				}

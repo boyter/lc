@@ -8,7 +8,7 @@ import (
 
 // TODO does not work because not aware of related licences
 func TestSpdxGuesser(t *testing.T) {
-	lg := NewLicenceGuesser(false, false)
+	lg := SpdxIdentifier{}
 
 	actual := lg.SpdxIdentify("test")
 	if len(actual) != 0 {
@@ -67,7 +67,7 @@ if __name__ == '__main__':
 }
 
 func TestSpdxGuesserMultipleOr(t *testing.T) {
-	lg := NewLicenceGuesser(false, false)
+	lg := SpdxIdentifier{}
 
 	actual := lg.SpdxIdentify("# SPDX-License-Identifier: MIT OR Unlicense")
 	if actual[0] != "MIT" {
@@ -79,7 +79,7 @@ func TestSpdxGuesserMultipleOr(t *testing.T) {
 }
 
 func TestSpdxGuesserMultipleAnd(t *testing.T) {
-	lg := NewLicenceGuesser(false, false)
+	lg := SpdxIdentifier{}
 
 	actual := lg.SpdxIdentify("# SPDX-License-Identifier: MIT AND Unlicense")
 	if actual[0] != "MIT" {
@@ -91,7 +91,7 @@ func TestSpdxGuesserMultipleAnd(t *testing.T) {
 }
 
 func TestSpdxGuesserMultipleLowerCase(t *testing.T) {
-	lg := NewLicenceGuesser(false, false)
+	lg := SpdxIdentifier{}
 
 	actual := lg.SpdxIdentify("# SPDX-License-Identifier: mit unlicense gpl-2.0")
 	if actual[0] != "MIT" {
@@ -106,7 +106,7 @@ func TestSpdxGuesserMultipleLowerCase(t *testing.T) {
 }
 
 func TestSpdxGuesserDuplicates(t *testing.T) {
-	lg := NewLicenceGuesser(false, false)
+	lg := SpdxIdentifier{}
 
 	actual := lg.SpdxIdentify(`# SPDX-License-Identifier: mit
 # SPDX-License-Identifier: mit`)
