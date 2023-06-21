@@ -3,10 +3,11 @@
 package processor
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 )
 
-// TODO does not work because not aware of related licences
 func TestSpdxGuesser(t *testing.T) {
 	lg := SpdxDetector{}
 
@@ -113,5 +114,25 @@ func TestSpdxGuesserDuplicates(t *testing.T) {
 
 	if len(actual) != 1 {
 		t.Error("should only get 1 got", len(actual))
+	}
+}
+
+func TestSpdxDetector_SpdxDetectAll(t *testing.T) {
+	lg := SpdxDetector{}
+	for _, l := range spdxLicenseIds {
+		actual := lg.SpdxDetect(fmt.Sprintf(`# SPDX-License-Identifier: %s`, l))
+		if actual[0] != l {
+			t.Errorf("expected %s got %s", l, actual[0])
+		}
+	}
+}
+
+func TestSpdxDetector_SpdxDetectAllLower(t *testing.T) {
+	lg := SpdxDetector{}
+	for _, l := range spdxLicenseIds {
+		actual := lg.SpdxDetect(fmt.Sprintf(`# SPDX-License-Identifier: %s`, strings.ToLower(l)))
+		if actual[0] != l {
+			t.Errorf("expected %s got %s", l, actual[0])
+		}
 	}
 }

@@ -6,12 +6,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	corasick "github.com/BobuSumisu/aho-corasick"
-	"regexp"
 	"strings"
 )
-
-var spdxLicenceIdentifier = "SPDX-License-Identifier:"
-var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
 
 func NewLicenceGuesser(keyword bool, vectorspace bool) LicenceGuesser {
 	l := LicenceGuesser{}
