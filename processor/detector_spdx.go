@@ -16,7 +16,6 @@ var spdxLicenseIds = []string{"0BSD", "AAL", "ADSL", "AFL-1.1", "AFL-1.2", "AFL-
 type SpdxDetector struct{}
 
 // SpdxDetect will identify licenses in the text which are using the SPDX indicator
-// which is reasonably cheap in terms of looking things up
 func (l *SpdxDetector) SpdxDetect(content string) []string {
 	// cheap check to see if there might be on in the source code
 	if strings.Index(content, fileLicenceIdentifier) == -1 {
