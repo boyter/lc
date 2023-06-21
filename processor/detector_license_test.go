@@ -35,7 +35,7 @@ func TestLicenceDetector_Detect(t *testing.T) {
 			name:   "spdx identifier gpl multiple",
 			fields: fields{true},
 			args: args{
-				filename: "",
+				filename: "GPL-2.0",
 				content:  spdxIdentifierGpl,
 			},
 			want: []License{
@@ -65,7 +65,7 @@ func TestLicenceDetector_Detect(t *testing.T) {
 			name:   "spdx identifier mit",
 			fields: fields{true},
 			args: args{
-				filename: "",
+				filename: "MIT",
 				content:  spdxIdentifierMit,
 			},
 			want: []License{
@@ -80,7 +80,7 @@ func TestLicenceDetector_Detect(t *testing.T) {
 			name:   "spdx identifier lgpl multiple",
 			fields: fields{true},
 			args: args{
-				filename: "",
+				filename: "LGPL-2.1",
 				content:  spdxIdentifierLgpl,
 			},
 			want: []License{
@@ -100,7 +100,7 @@ func TestLicenceDetector_Detect(t *testing.T) {
 			name:   "spdx identifier bsd3 singular",
 			fields: fields{true},
 			args: args{
-				filename: "",
+				filename: "BSD-3-Clause",
 				content:  spdxIdentifierBsd3,
 			},
 			want: []License{
