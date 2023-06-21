@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var spdxLicenceIdentifier = "SPDX-License-Identifier:"
+var fileLicenceIdentifier = "SPDX-License-Identifier:"
 var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
 
 // these were generated based on the full list from SPDX
@@ -19,7 +19,7 @@ type SpdxDetector struct{}
 // which is reasonably cheap in terms of looking things up
 func (l *SpdxDetector) SpdxDetect(content string) []string {
 	// cheap check to see if there might be on in the source code
-	if strings.Index(content, spdxLicenceIdentifier) == -1 {
+	if strings.Index(content, fileLicenceIdentifier) == -1 {
 		return nil
 	}
 
