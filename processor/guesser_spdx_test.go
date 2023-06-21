@@ -8,29 +8,29 @@ import (
 
 // TODO does not work because not aware of related licences
 func TestSpdxGuesser(t *testing.T) {
-	lg := SpdxIdentifier{}
+	lg := SpdxDetector{}
 
-	actual := lg.SpdxIdentify("test")
+	actual := lg.SpdxDetect("test")
 	if len(actual) != 0 {
 		t.Errorf("Should be no matches")
 	}
 
-	actual = lg.SpdxIdentify("# SPDX-License-Identifier: GPL-2.0")
+	actual = lg.SpdxDetect("# SPDX-License-Identifier: GPL-2.0")
 	if len(actual) == 0 || actual[0] != "GPL-2.0" {
 		t.Errorf("Should match GPL-2.0")
 	}
 
-	actual = lg.SpdxIdentify("/* SPDX-License-Identifier: GPL-2.0 */")
+	actual = lg.SpdxDetect("/* SPDX-License-Identifier: GPL-2.0 */")
 	if len(actual) == 0 || actual[0] != "GPL-2.0" {
 		t.Errorf("Should match GPL-2.0")
 	}
 
-	actual = lg.SpdxIdentify("# SPDX-License-Identifier: GPL-2.0 ")
+	actual = lg.SpdxDetect("# SPDX-License-Identifier: GPL-2.0 ")
 	if len(actual) == 0 || actual[0] != "GPL-2.0" {
 		t.Errorf("Should match GPL-2.0")
 	}
 
-	actual = lg.SpdxIdentify("# SPDX-License-Identifier: GPL-2.0 \n # SPDX-License-Identifier: GPL-3.0+")
+	actual = lg.SpdxDetect("# SPDX-License-Identifier: GPL-2.0 \n # SPDX-License-Identifier: GPL-3.0+")
 	if len(actual) == 0 || actual[0] != "GPL-2.0" {
 		t.Errorf("Should match GPL-2.0")
 	}
@@ -38,7 +38,7 @@ func TestSpdxGuesser(t *testing.T) {
 		t.Errorf("Should match GPL-3.0+")
 	}
 
-	actual = lg.SpdxIdentify(`# SPDX-License-Identifier: GPL-2.0
+	actual = lg.SpdxDetect(`# SPDX-License-Identifier: GPL-2.0
 
 import cherrypy
 
@@ -67,9 +67,9 @@ if __name__ == '__main__':
 }
 
 func TestSpdxGuesserMultipleOr(t *testing.T) {
-	lg := SpdxIdentifier{}
+	lg := SpdxDetector{}
 
-	actual := lg.SpdxIdentify("# SPDX-License-Identifier: MIT OR Unlicense")
+	actual := lg.SpdxDetect("# SPDX-License-Identifier: MIT OR Unlicense")
 	if actual[0] != "MIT" {
 		t.Errorf("Should match MIT")
 	}
@@ -79,9 +79,9 @@ func TestSpdxGuesserMultipleOr(t *testing.T) {
 }
 
 func TestSpdxGuesserMultipleAnd(t *testing.T) {
-	lg := SpdxIdentifier{}
+	lg := SpdxDetector{}
 
-	actual := lg.SpdxIdentify("# SPDX-License-Identifier: MIT AND Unlicense")
+	actual := lg.SpdxDetect("# SPDX-License-Identifier: MIT AND Unlicense")
 	if actual[0] != "MIT" {
 		t.Errorf("Should match MIT")
 	}
@@ -91,9 +91,9 @@ func TestSpdxGuesserMultipleAnd(t *testing.T) {
 }
 
 func TestSpdxGuesserMultipleLowerCase(t *testing.T) {
-	lg := SpdxIdentifier{}
+	lg := SpdxDetector{}
 
-	actual := lg.SpdxIdentify("# SPDX-License-Identifier: mit unlicense gpl-2.0")
+	actual := lg.SpdxDetect("# SPDX-License-Identifier: mit unlicense gpl-2.0")
 	if actual[0] != "MIT" {
 		t.Error("Should match MIT got", actual[0])
 	}
@@ -106,9 +106,9 @@ func TestSpdxGuesserMultipleLowerCase(t *testing.T) {
 }
 
 func TestSpdxGuesserDuplicates(t *testing.T) {
-	lg := SpdxIdentifier{}
+	lg := SpdxDetector{}
 
-	actual := lg.SpdxIdentify(`# SPDX-License-Identifier: mit
+	actual := lg.SpdxDetect(`# SPDX-License-Identifier: mit
 # SPDX-License-Identifier: mit`)
 
 	if len(actual) != 1 {
