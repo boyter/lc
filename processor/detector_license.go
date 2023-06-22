@@ -37,7 +37,7 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 
 	// Step 2. Check the filename to determine if there is something we can use there
 	// If the name matches and the length of the content is close to the real one its probably safe
-	// say its that
+	// say it's that
 	for _, lic := range spdxLicenseIds {
 		if lic == filename {
 

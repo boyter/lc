@@ -8,6 +8,7 @@ import (
 	"github.com/boyter/lc/processor"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -21,21 +22,17 @@ type License struct {
 	LicenseId               string `json:"licenseId"`
 
 	// the below are used internally when processing
-	Ngrams              []string   // the unique bits of string we used to identify a licence
-	LicenceNgrams       [][]string // for each extra text + the main ngrams so we can get a selection from each
-	LicenseIdDuplicates []string   `json:"duplicates"` // indicates that this has 100% the same LicenseText such as AGPL-3.0-only and AGPL-3.0-or-later
-	ExtraLicenseText    []string   // things like MIT have multiple variants of the same license and we need to track that
+	Ngrams           []string   // the unique bits of string we used to identify a licence
+	LicenceNgrams    [][]string // for each extra text + the main ngrams so we can get a selection from each
+	LicenseIds       []string   // indicates that this has 100% the same LicenseText such as AGPL-3.0-only and AGPL-3.0-or-later
+	ExtraLicenseText []string   // things like MIT have multiple variants of the same license and we need to track that
 }
 
 // LicenseOutput is the output format that we save to disk and import into lc
 type LicenseOutput struct {
-	LicenseText             string   `json:"licenseText"`
-	StandardLicenseTemplate string   `json:"standardLicenseTemplate"`
-	Name                    string   `json:"name"`
-	LicenseId               string   `json:"licenseId"`
-	Keywords                []string `json:"keywords"`
-	LicenseIdDuplicates     []string `json:"duplicates"`
-	ExtraLicenseText        []string `json:"extraLicenseText"`
+	LicenseTexts []string `json:"licenseTexts"` // examples of text that we have for these licences
+	LicenseIds   []string `json:"licenseIds"`   // SPDX ids where licences are considered identical
+	Keywords     []string `json:"keywords"`     // keywords that are unique and can be used to identify this group of licences
 }
 
 // returns all the ngrams of a supplied size for supplied list
@@ -66,7 +63,7 @@ func main() {
 	var allLicenseIds []string
 	licenseTextCount := map[string]int{}
 	var licenses []License
-	// Load all of the licenses from disk and keep track of duplicates
+	// Load all the licenses from disk and keep track of duplicates
 	for _, f := range files {
 		//if !strings.HasPrefix(f.Name(), "GPL") {
 		//	continue
@@ -79,20 +76,21 @@ func main() {
 			var license License
 			_ = json.Unmarshal(bytes, &license)
 			license.Ngrams = []string{}
+			license.ExtraLicenseText = append(license.ExtraLicenseText, license.LicenseText)
 
 			// if MIT add in the other example so we can match it better...
 			if license.LicenseId == "MIT" {
 				fmt.Println("adding extra to MIT")
-				license.ExtraLicenseText = mitExtra
+				license.ExtraLicenseText = append(license.ExtraLicenseText, mitExtra...)
 			}
 
 			if license.LicenseId == "BSD-3-Clause" {
 				fmt.Println("adding extra to BSD-3-Clause")
-				license.ExtraLicenseText = bsd3ClauseExtra
+				license.ExtraLicenseText = append(license.ExtraLicenseText, bsd3ClauseExtra...)
 			}
 
 			allLicenseIds = append(allLicenseIds, license.LicenseId)
-
+			license.LicenseIds = append(license.LicenseIds, license.LicenseId)
 			licenses = append(licenses, license)
 
 			// track where the license text is the licenseTextCount
@@ -102,20 +100,25 @@ func main() {
 
 	fmt.Println("the following are duplicates...")
 	for k, v := range licenseTextCount {
-		if v != 1 {
-			var d []string
-			for _, lic := range licenses {
-				if processor.LcCleanText(lic.LicenseText) == k {
-					d = append(d, lic.LicenseId)
-				}
-			}
+		// if we have only 1 there is no point doing anything else
+		if v == 1 {
+			continue
+		}
 
-			// update any license with this text to tell it about all the duplicates
-			for i := 0; i < len(licenses); i++ {
-				if processor.LcCleanText(licenses[i].LicenseText) == k {
-					licenses[i].LicenseIdDuplicates = d
-					fmt.Println(fmt.Sprintf("	%v %v duplicates %v", licenses[i].LicenseId, len(d), d))
-				}
+		// go through each licence we have and if its text matches what we are checking keep track of which one it is
+		// such that we can mark them as duplicates
+		var d []string
+		for _, lic := range licenses {
+			if processor.LcCleanText(lic.LicenseText) == k {
+				d = append(d, lic.LicenseId)
+			}
+		}
+
+		// update any license with this text to tell it about all the duplicates
+		for i := 0; i < len(licenses); i++ {
+			if processor.LcCleanText(licenses[i].LicenseText) == k {
+				licenses[i].LicenseIds = d
+				fmt.Println(fmt.Sprintf("	%v %v duplicates %v", licenses[i].LicenseId, len(d), d))
 			}
 		}
 	}
@@ -126,7 +129,7 @@ func main() {
 	var seenIds []string
 	for _, l := range licenses {
 		seen := false
-		if len(l.LicenseIdDuplicates) != 0 {
+		if len(l.LicenseIds) != 0 {
 			// ok have we already kept this one?
 			for _, s := range seenIds {
 				if l.LicenseId == s {
@@ -136,13 +139,13 @@ func main() {
 		}
 
 		seenIds = append(seenIds, l.LicenseId)
-		seenIds = append(seenIds, l.LicenseIdDuplicates...)
+		seenIds = append(seenIds, l.LicenseIds...)
 
 		if !seen {
-			fmt.Println("	keeping", l.LicenseId, l.LicenseIdDuplicates)
+			fmt.Println("	keeping", l.LicenseId, l.LicenseIds)
 			deduplicatedLicences = append(deduplicatedLicences, l)
 		} else {
-			fmt.Println("	duplicate! removing", l.LicenseId, l.LicenseIdDuplicates)
+			fmt.Println("	duplicate! removing", l.LicenseId, l.LicenseIds)
 		}
 	}
 
@@ -203,12 +206,9 @@ func main() {
 		}
 
 		outputLicenses = append(outputLicenses, LicenseOutput{
-			LicenseId:               currentLicense.LicenseId,
-			Name:                    currentLicense.Name,
-			LicenseText:             currentLicense.LicenseText,
-			StandardLicenseTemplate: currentLicense.StandardLicenseTemplate,
-			Keywords:                uniqueNgrams,
-			LicenseIdDuplicates:     currentLicense.LicenseIdDuplicates,
+			LicenseTexts: currentLicense.ExtraLicenseText,
+			Keywords:     uniqueNgrams,
+			LicenseIds:   DedupeString(currentLicense.LicenseIds),
 		})
 	}
 
@@ -221,4 +221,21 @@ func main() {
 	// now write out a list of every licence id that can be used for SPDX identification
 
 	fmt.Println(fmt.Sprintf(`var spdxLicenseIds = []string{"%v"}`, strings.Join(allLicenseIds, `", "`)))
+}
+
+func DedupeString(s []string) []string {
+	if len(s) < 2 {
+		return s
+	}
+	sort.Slice(s, func(x, y int) bool { return s[x] > s[y] })
+	var e = 1
+	for i := 1; i < len(s); i++ {
+		if s[i] == s[i-1] {
+			continue
+		}
+		s[e] = s[i]
+		e++
+	}
+
+	return s[:e]
 }
