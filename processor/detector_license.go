@@ -20,6 +20,8 @@ var licenceIdentifier = "Valid-License-Identifier:"
 var licenceRegex = regexp.MustCompile(`Valid-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
 
 func (l *LicenceDetector) Detect(filename string, content string) []License {
+	// Step 1. Check if there is a SPDX identifier, and if that is found assume
+	// that it is correct because why else would it be there
 	spdxIdentified := l.SpdxDetect(content)
 	if len(spdxIdentified) != 0 {
 		var licenses []License
@@ -31,6 +33,26 @@ func (l *LicenceDetector) Detect(filename string, content string) []License {
 			})
 		}
 		return licenses
+	}
+
+	// Step 2. Check the filename to determine if there is something we can use there
+	// If the name matches and the length of the content is close to the real one its probably safe
+	// say its that
+	for _, lic := range spdxLicenseIds {
+		if lic == filename {
+
+			// now we check the content to see if its a similar size then we vector compare
+			// to determine how close it is
+			// note that we need to do it for all the possible licence texts as things like
+			// MIT have multiple
+			return []License{
+				{
+					Name:            "",
+					LicenseId:       lic,
+					ScorePercentage: 100,
+				},
+			}
+		}
 	}
 
 	return nil
