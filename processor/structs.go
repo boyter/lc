@@ -18,3 +18,10 @@ type License struct {
 	Concordance             Concordance       // used for vector matching
 	MatchType               string            // indicates how this license match was made
 }
+
+// IdentifiedLicense
+type IdentifiedLicense struct {
+	Name            string  `json:"name"`
+	LicenseId       string  `json:"licenseId"`
+	ScorePercentage float64 `json:"scorePercentage"` // this is used so we don't have a new struct
+}

@@ -29,7 +29,7 @@ func TestLicenceDetector_Detect(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want   []License
+		want   []IdentifiedLicense
 	}{
 		{
 			name:   "spdx identifier gpl multiple",
@@ -38,24 +38,20 @@ func TestLicenceDetector_Detect(t *testing.T) {
 				filename: "GPL-2.0",
 				content:  spdxIdentifierGpl,
 			},
-			want: []License{
+			want: []IdentifiedLicense{
 				{
-					LicenseText:     "",
 					LicenseId:       "GPL-2.0",
 					ScorePercentage: 100,
 				},
 				{
-					LicenseText:     "",
 					LicenseId:       "GPL-2.0-only",
 					ScorePercentage: 100,
 				},
 				{
-					LicenseText:     "",
 					LicenseId:       "GPL-2.0+",
 					ScorePercentage: 100,
 				},
 				{
-					LicenseText:     "",
 					LicenseId:       "GPL-2.0-or-later",
 					ScorePercentage: 100,
 				},
@@ -68,9 +64,8 @@ func TestLicenceDetector_Detect(t *testing.T) {
 				filename: "MIT",
 				content:  spdxIdentifierMit,
 			},
-			want: []License{
+			want: []IdentifiedLicense{
 				{
-					LicenseText:     "",
 					LicenseId:       "MIT",
 					ScorePercentage: 100,
 				},
@@ -83,14 +78,12 @@ func TestLicenceDetector_Detect(t *testing.T) {
 				filename: "LGPL-2.1",
 				content:  spdxIdentifierLgpl,
 			},
-			want: []License{
+			want: []IdentifiedLicense{
 				{
-					LicenseText:     "",
 					LicenseId:       "LGPL-2.1",
 					ScorePercentage: 100,
 				},
 				{
-					LicenseText:     "",
 					LicenseId:       "LGPL-2.1+",
 					ScorePercentage: 100,
 				},
@@ -103,9 +96,8 @@ func TestLicenceDetector_Detect(t *testing.T) {
 				filename: "BSD-3-Clause",
 				content:  spdxIdentifierBsd3,
 			},
-			want: []License{
+			want: []IdentifiedLicense{
 				{
-					LicenseText:     "",
 					LicenseId:       "BSD-3-Clause",
 					ScorePercentage: 100,
 				},
@@ -118,9 +110,8 @@ func TestLicenceDetector_Detect(t *testing.T) {
 				filename: "BSD-3-Clause",
 				content:  spdxIdentifierBsd3Duplicate,
 			},
-			want: []License{
+			want: []IdentifiedLicense{
 				{
-					LicenseText:     "",
 					LicenseId:       "BSD-3-Clause",
 					ScorePercentage: 100,
 				},
@@ -158,7 +149,7 @@ func TestLicenceDetector_DetectFilename(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want   []License
+		want   []IdentifiedLicense
 	}{
 		{
 			name:   "filename spdx identifier",
@@ -167,9 +158,8 @@ func TestLicenceDetector_DetectFilename(t *testing.T) {
 				filename: "MIT",
 				content:  "",
 			},
-			want: []License{
+			want: []IdentifiedLicense{
 				{
-					LicenseText:     "",
 					LicenseId:       "MIT",
 					ScorePercentage: 100,
 				},

@@ -19,14 +19,14 @@ type LicenceDetector struct {
 var licenceIdentifier = "Valid-License-Identifier:"
 var licenceRegex = regexp.MustCompile(`Valid-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
 
-func (l *LicenceDetector) Detect(filename string, content string) []License {
+func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLicense {
 	// Step 1. Check if there is a SPDX identifier, and if that is found assume
 	// that it is correct because why else would it be there
 	spdxIdentified := l.SpdxDetect(content)
 	if len(spdxIdentified) != 0 {
-		var licenses []License
+		var licenses []IdentifiedLicense
 		for _, s := range spdxIdentified {
-			licenses = append(licenses, License{
+			licenses = append(licenses, IdentifiedLicense{
 				Name:            "", // TODO need lookup to get the name
 				LicenseId:       s,
 				ScorePercentage: 100,
@@ -45,7 +45,7 @@ func (l *LicenceDetector) Detect(filename string, content string) []License {
 			// to determine how close it is
 			// note that we need to do it for all the possible licence texts as things like
 			// MIT have multiple
-			return []License{
+			return []IdentifiedLicense{
 				{
 					Name:            "",
 					LicenseId:       lic,
@@ -54,6 +54,11 @@ func (l *LicenceDetector) Detect(filename string, content string) []License {
 			}
 		}
 	}
+
+	// Step 3. We suspect it is a licence but we don't have a clue which one. Start the 3 step program
+	// to determine what it might be starting with
+	// a. keywords
+	// b. vector space
 
 	return nil
 }
