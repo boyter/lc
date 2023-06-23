@@ -12,8 +12,7 @@ import (
 	"strings"
 )
 
-// License contains details from loading off the SPDX list and holds state for changes
-// we make before saving to disk so it can be used in lc itself
+// License contains details from loading off the SPDX list
 type License struct {
 	LicenseText             string `json:"licenseText"`
 	StandardLicenseTemplate string `json:"standardLicenseTemplate"`
@@ -22,10 +21,17 @@ type License struct {
 	LicenseId               string `json:"licenseId"`
 
 	// the below are used internally when processing
-	Ngrams           []string   // the unique bits of string we used to identify a licence
-	LicenceNgrams    [][]string // for each extra text + the main ngrams so we can get a selection from each
-	LicenseIds       []string   // indicates that this has 100% the same LicenseText such as AGPL-3.0-only and AGPL-3.0-or-later
-	ExtraLicenseText []string   // things like MIT have multiple variants of the same license and we need to track that
+	//Ngrams           []string   // the unique bits of string we used to identify a licence
+	//LicenceNgrams    [][]string // for each extra text + the main ngrams so we can get a selection from each
+	//LicenseIds       []string   // indicates that this has 100% the same LicenseText such as AGPL-3.0-only and AGPL-3.0-or-later
+	//ExtraLicenseText []string   // things like MIT have multiple variants of the same license and we need to track that
+}
+
+// LicenseConverted holds state that we use for processing before converted to output
+type LicenseConverted struct {
+	LicenceNgrams [][]string // for each extra text + the main ngrams so we can get a selection from each
+	LicenseIds    []string   // indicates that this has 100% the same LicenseTexts such as AGPL-3.0-only and AGPL-3.0-or-later
+	LicenseTexts  []string   // things like MIT have multiple variants of the same license and we need to track that
 }
 
 // LicenseOutput is the output format that we save to disk and import into lc
@@ -62,7 +68,8 @@ func main() {
 
 	var allLicenseIds []string
 	licenseTextCount := map[string]int{}
-	var licenses []License
+	//var licenses []License
+	var licenses []LicenseConverted
 	// Load all the licenses from disk and keep track of duplicates
 	for _, f := range files {
 		//if !strings.HasPrefix(f.Name(), "GPL") {
@@ -75,23 +82,27 @@ func main() {
 
 			var license License
 			_ = json.Unmarshal(bytes, &license)
-			license.Ngrams = []string{}
-			license.ExtraLicenseText = append(license.ExtraLicenseText, license.LicenseText)
+
+			// in flight representation of what we are doing
+			licenseConverted := LicenseConverted{
+				LicenceNgrams: [][]string{},
+				LicenseIds:    []string{license.LicenseId},
+				LicenseTexts:  []string{license.LicenseText},
+			}
 
 			// if MIT add in the other example so we can match it better...
 			if license.LicenseId == "MIT" {
 				fmt.Println("adding extra to MIT")
-				license.ExtraLicenseText = append(license.ExtraLicenseText, mitExtra...)
+				licenseConverted.LicenseTexts = append(licenseConverted.LicenseTexts, mitExtra...)
 			}
 
 			if license.LicenseId == "BSD-3-Clause" {
 				fmt.Println("adding extra to BSD-3-Clause")
-				license.ExtraLicenseText = append(license.ExtraLicenseText, bsd3ClauseExtra...)
+				licenseConverted.LicenseTexts = append(licenseConverted.LicenseTexts, bsd3ClauseExtra...)
 			}
 
 			allLicenseIds = append(allLicenseIds, license.LicenseId)
-			license.LicenseIds = append(license.LicenseIds, license.LicenseId)
-			licenses = append(licenses, license)
+			licenses = append(licenses, licenseConverted)
 
 			// track where the license text is the licenseTextCount
 			licenseTextCount[processor.LcCleanText(license.LicenseText)] = licenseTextCount[processor.LcCleanText(license.LicenseText)] + 1
@@ -109,43 +120,44 @@ func main() {
 		// such that we can mark them as duplicates
 		var d []string
 		for _, lic := range licenses {
-			if processor.LcCleanText(lic.LicenseText) == k {
-				d = append(d, lic.LicenseId)
+			// the first is the main one we are checking as that should always be the one from SPDX
+			if processor.LcCleanText(lic.LicenseTexts[0]) == k {
+				d = append(d, lic.LicenseIds[0])
 			}
 		}
 
 		// update any license with this text to tell it about all the duplicates
 		for i := 0; i < len(licenses); i++ {
-			if processor.LcCleanText(licenses[i].LicenseText) == k {
+			if processor.LcCleanText(licenses[i].LicenseTexts[0]) == k {
 				licenses[i].LicenseIds = d
-				fmt.Println(fmt.Sprintf("	%v %v duplicates %v", licenses[i].LicenseId, len(d), d))
+				fmt.Println(fmt.Sprintf("	%v %v duplicates %v", licenses[i].LicenseIds[0], len(d), d))
 			}
 		}
 	}
 
 	fmt.Println("removing duplicates...")
 	// now we have identified the duplicates lets remove them such that we only have a single item
-	var deduplicatedLicences []License
+	var deduplicatedLicences []LicenseConverted
 	var seenIds []string
 	for _, l := range licenses {
 		seen := false
 		if len(l.LicenseIds) != 0 {
 			// ok have we already kept this one?
 			for _, s := range seenIds {
-				if l.LicenseId == s {
+				if l.LicenseIds[0] == s {
 					seen = true
 				}
 			}
 		}
 
-		seenIds = append(seenIds, l.LicenseId)
+		seenIds = append(seenIds, l.LicenseIds[0])
 		seenIds = append(seenIds, l.LicenseIds...)
 
 		if !seen {
-			fmt.Println("	keeping", l.LicenseId, l.LicenseIds)
+			fmt.Println("	keeping", l.LicenseIds[0], l.LicenseIds)
 			deduplicatedLicences = append(deduplicatedLicences, l)
 		} else {
-			fmt.Println("	duplicate! removing", l.LicenseId, l.LicenseIds)
+			fmt.Println("	duplicate! removing", l.LicenseIds[0], l.LicenseIds)
 		}
 	}
 
@@ -154,32 +166,27 @@ func main() {
 
 	fmt.Println("building ngrams for each license")
 	for j := 0; j < len(licenses); j++ {
-		split := strings.Fields(processor.LcCleanText(licenses[j].LicenseText))
-		for i := startNgrams; i < endNgrams; i++ {
-			ngrams := findNgrams(split, i)
-			licenses[j].Ngrams = append(licenses[j].Ngrams, ngrams...)
-		}
-		licenses[j].LicenceNgrams = append(licenses[j].LicenceNgrams, licenses[j].Ngrams)
-
 		// now calculate all the ngrams for the extra licence examples that we have
-		for _, v := range licenses[j].ExtraLicenseText {
+		for _, v := range licenses[j].LicenseTexts {
 			split := strings.Fields(processor.LcCleanText(v))
 			ngramsSlice := []string{}
 			for i := startNgrams; i < endNgrams; i++ {
 				ngrams := findNgrams(split, i)
 				ngramsSlice = append(ngramsSlice, ngrams...)
 			}
-			licenses[j].LicenceNgrams = append(licenses[j].LicenceNgrams, licenses[j].Ngrams)
+			licenses[j].LicenceNgrams = append(licenses[j].LicenceNgrams, ngramsSlice)
 		}
 	}
 
 	// put every ngram into a huge map with a incrementing count, so if a ngram exists
 	// and only has a count of 1 then we know it to be unique
-	// TODO put this into the above loop so we can track uniqueness PER licence not just on keywords
+	// TODO try to track uniqueness PER licence not just on keywords?
 	ngramCountMap := map[string]int{}
 	for _, lic := range licenses {
-		for _, ng := range lic.Ngrams {
-			ngramCountMap[ng] = ngramCountMap[ng] + 1
+		for _, ngrams := range lic.LicenceNgrams {
+			for _, ng := range ngrams {
+				ngramCountMap[ng] = ngramCountMap[ng] + 1
+			}
 		}
 	}
 
@@ -191,22 +198,24 @@ func main() {
 	for _, currentLicense := range licenses {
 		// go through every ngram for this currentLicense and check that it does not occur anywhere else
 		var uniqueNgrams []string
-		for _, ngram := range currentLicense.Ngrams {
-			// if its count is 1 that means its globally unique because it only exists in this
-			// license as there is only a count of 1
-			if ngramCountMap[ngram] == 1 {
-				uniqueNgrams = append(uniqueNgrams, ngram)
+		for _, ngrams := range currentLicense.LicenceNgrams {
+			for _, ngram := range ngrams {
+				// if its count is 1 that means its globally unique because it only exists in this
+				// license as there is only a count of 1
+				if ngramCountMap[ngram] == 1 {
+					uniqueNgrams = append(uniqueNgrams, ngram)
+				}
 			}
 		}
 
-		fmt.Println("	", currentLicense.LicenseId, "ngrams", len(currentLicense.Ngrams), "unique ngrams", len(uniqueNgrams))
+		fmt.Println("	", currentLicense.LicenseIds, "ngrams", len(currentLicense.LicenceNgrams[0]), "unique ngrams", len(uniqueNgrams))
 
 		if len(uniqueNgrams) > keepNgrams {
 			uniqueNgrams = uniqueNgrams[:keepNgrams]
 		}
 
 		outputLicenses = append(outputLicenses, LicenseOutput{
-			LicenseTexts: currentLicense.ExtraLicenseText,
+			LicenseTexts: currentLicense.LicenseTexts,
 			Keywords:     uniqueNgrams,
 			LicenseIds:   DedupeString(currentLicense.LicenseIds),
 		})
