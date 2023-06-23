@@ -3,7 +3,6 @@ package processor
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"regexp"
 	"strings"
 )
@@ -58,23 +57,30 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 			// if we have a potential match, so now find the licence that matches and check the distance
 			ld, ok := l.findLicenseById(filename)
 			if ok {
-				con := BuildConcordance(strings.Fields(LcCleanText(content)))
 
+				// now we check the content to see if its a similar size then we vector compare
+				// to determine how close it is
+				// note that we need to do it for all the possible licence texts as things like
+				// MIT have multiple
+				var bestScore float64
+
+				con := BuildConcordance(strings.Fields(LcCleanText(content)))
 				for _, te := range ld.LicenseTexts {
 					con2 := BuildConcordance(strings.Fields(LcCleanText(te)))
-					fmt.Println(len(te), len(content), Relation(con, con2)*100)
+					score := Relation(con, con2)
+					if bestScore < score {
+						bestScore = score
+					}
 				}
-			}
 
-			// now we check the content to see if its a similar size then we vector compare
-			// to determine how close it is
-			// note that we need to do it for all the possible licence texts as things like
-			// MIT have multiple
-			return []IdentifiedLicense{
-				{
-					LicenseId:       lic,
-					ScorePercentage: 100,
-				},
+				if bestScore >= 0.7 {
+					return []IdentifiedLicense{
+						{
+							LicenseId:       lic,
+							ScorePercentage: bestScore * 100,
+						},
+					}
+				}
 			}
 		}
 	}
