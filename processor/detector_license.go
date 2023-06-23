@@ -55,20 +55,14 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 	for _, lic := range spdxLicenseIds {
 		if lic == filename {
 
-			// we have a potential match, so now find the licence that matches and check all of the texts
+			// if we have a potential match, so now find the licence that matches and check the distance
+			ld, ok := l.findLicenseById(filename)
+			if ok {
+				con := BuildConcordance(strings.Fields(LcCleanText(content)))
 
-			for _, ld := range l.LicenseData {
-				found := false
-				for _, ln := range ld.LicenseIds {
-					if ln == filename {
-						found = true
-					}
-				}
-
-				if found {
-					for _, te := range ld.LicenseTexts {
-						fmt.Println(len(te), len(content))
-					}
+				for _, te := range ld.LicenseTexts {
+					con2 := BuildConcordance(strings.Fields(LcCleanText(te)))
+					fmt.Println(len(te), len(content), Relation(con, con2)*100)
 				}
 			}
 
@@ -91,6 +85,18 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 	// b. vector space
 
 	return nil
+}
+
+func (l *LicenceDetector) findLicenseById(id string) (LicenseData, bool) {
+	for _, ld := range l.LicenseData {
+		for _, ln := range ld.LicenseIds {
+			if id == ln {
+				return ld, true
+			}
+		}
+	}
+
+	return LicenseData{}, false
 }
 
 // SpdxDetect will identify licenses in the text which are using the SPDX indicator for licences
