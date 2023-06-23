@@ -35,11 +35,11 @@ type LicenseConverted struct {
 }
 
 // LicenseOutput is the output format that we save to disk and import into lc
-type LicenseOutput struct {
-	LicenseTexts []string `json:"licenseTexts"` // examples of text that we have for these licences
-	LicenseIds   []string `json:"licenseIds"`   // SPDX ids where licences are considered identical
-	Keywords     []string `json:"keywords"`     // keywords that are unique and can be used to identify this group of licences
-}
+//type LicenseOutput struct {
+//	LicenseTexts []string `json:"licenseTexts"` // examples of text that we have for these licences
+//	LicenseIds   []string `json:"licenseIds"`   // SPDX ids where licences are considered identical
+//	Keywords     []string `json:"keywords"`     // keywords that are unique and can be used to identify this group of licences
+//}
 
 // returns all the ngrams of a supplied size for supplied list
 func findNgrams(list []string, size int) []string {
@@ -192,7 +192,7 @@ func main() {
 
 	fmt.Println("finding unique ngrams")
 	// store what we want to save here
-	outputLicenses := []LicenseOutput{}
+	outputLicenses := []processor.LicenseData{}
 
 	// For each licence, check each ngram and see if it is unique
 	for _, currentLicense := range licenses {
@@ -214,7 +214,7 @@ func main() {
 			uniqueNgrams = uniqueNgrams[:keepNgrams]
 		}
 
-		outputLicenses = append(outputLicenses, LicenseOutput{
+		outputLicenses = append(outputLicenses, processor.LicenseData{
 			LicenseTexts: currentLicense.LicenseTexts,
 			Keywords:     uniqueNgrams,
 			LicenseIds:   DedupeString(currentLicense.LicenseIds),

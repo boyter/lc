@@ -5,6 +5,12 @@ import (
 	"strings"
 )
 
+type LicenseData struct {
+	LicenseTexts []string `json:"licenseTexts"` // examples of text that we have for these licences
+	LicenseIds   []string `json:"licenseIds"`   // SPDX ids where licences are considered identical
+	Keywords     []string `json:"keywords"`     // keywords that are unique and can be used to identify this group of licences
+}
+
 func NewLicenceDetector(useFullDatabase bool) LicenceDetector {
 	l := LicenceDetector{
 		UseFullDatabase: useFullDatabase,
@@ -27,7 +33,6 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 		var licenses []IdentifiedLicense
 		for _, s := range spdxIdentified {
 			licenses = append(licenses, IdentifiedLicense{
-				Name:            "", // TODO need lookup to get the name
 				LicenseId:       s,
 				ScorePercentage: 100,
 			})
@@ -47,7 +52,6 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 			// MIT have multiple
 			return []IdentifiedLicense{
 				{
-					Name:            "",
 					LicenseId:       lic,
 					ScorePercentage: 100,
 				},
