@@ -7,7 +7,7 @@ import (
 )
 
 func TestLicenceDetector_DetectAll(t *testing.T) {
-	l := &LicenceDetector{true}
+	l := NewLicenceDetector(true)
 
 	for _, li := range spdxLicenseIds {
 		detected := l.Detect(li, fmt.Sprintf("Valid-License-Identifier: %s", li))
@@ -121,9 +121,7 @@ func TestLicenceDetector_Detect(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			l := &LicenceDetector{
-				UseFullDatabase: tt.fields.UseFullDatabase,
-			}
+			l := NewLicenceDetector(tt.fields.UseFullDatabase)
 			if got := l.Detect(tt.args.filename, tt.args.content); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Detect() = %v, want %v", got, tt.want)
 			}
@@ -156,7 +154,7 @@ func TestLicenceDetector_DetectFilename(t *testing.T) {
 			fields: fields{true},
 			args: args{
 				filename: "MIT",
-				content:  "",
+				content:  mitLicense,
 			},
 			want: []IdentifiedLicense{
 				{
@@ -169,12 +167,12 @@ func TestLicenceDetector_DetectFilename(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			l := &LicenceDetector{
-				UseFullDatabase: tt.fields.UseFullDatabase,
-			}
+			l := NewLicenceDetector(tt.fields.UseFullDatabase)
 			if got := l.Detect(tt.args.filename, tt.args.content); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Detect() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
+
+var mitLicense = " MIT License\n\nCopyright (c) 2018 Ben Boyter\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE."

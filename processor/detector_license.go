@@ -1,6 +1,9 @@
 package processor
 
 import (
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -11,19 +14,25 @@ type LicenseData struct {
 	Keywords     []string `json:"keywords"`     // keywords that are unique and can be used to identify this group of licences
 }
 
-func NewLicenceDetector(useFullDatabase bool) LicenceDetector {
-	l := LicenceDetector{
-		UseFullDatabase: useFullDatabase,
-	}
-	return l
-}
-
 type LicenceDetector struct {
 	UseFullDatabase bool
+	LicenseData     []LicenseData
 }
 
 var licenceIdentifier = "Valid-License-Identifier:"
 var licenceRegex = regexp.MustCompile(`Valid-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
+
+func NewLicenceDetector(useFullDatabase bool) *LicenceDetector {
+	l := LicenceDetector{
+		UseFullDatabase: useFullDatabase,
+		LicenseData:     []LicenseData{},
+	}
+
+	data, _ := base64.StdEncoding.DecodeString(database_keywords)
+	_ = json.Unmarshal(data, &l.LicenseData)
+
+	return &l
+}
 
 func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLicense {
 	// Step 1. Check if there is a SPDX identifier, and if that is found assume
@@ -45,6 +54,23 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 	// say it's that
 	for _, lic := range spdxLicenseIds {
 		if lic == filename {
+
+			// we have a potential match, so now find the licence that matches and check all of the texts
+
+			for _, ld := range l.LicenseData {
+				found := false
+				for _, ln := range ld.LicenseIds {
+					if ln == filename {
+						found = true
+					}
+				}
+
+				if found {
+					for _, te := range ld.LicenseTexts {
+						fmt.Println(len(te), len(content))
+					}
+				}
+			}
 
 			// now we check the content to see if its a similar size then we vector compare
 			// to determine how close it is
