@@ -73,7 +73,8 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 					}
 				}
 
-				if bestScore >= 0.7 {
+				// TODO move this into something configurable
+				if bestScore >= 0.9 {
 					return []IdentifiedLicense{
 						{
 							LicenseId:       lic,
@@ -88,6 +89,7 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 	// Step 3. We suspect it is a licence but we don't have a clue which one. Start the 3 step program
 	// to determine what it might be starting with
 	// a. keywords
+	//	if the keywords is not conclusive then fall back to vector space
 	// b. vector space
 
 	return nil

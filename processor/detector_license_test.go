@@ -150,7 +150,7 @@ func TestLicenceDetector_DetectFilename(t *testing.T) {
 		want   []IdentifiedLicense
 	}{
 		{
-			name:   "filename spdx identifier",
+			name:   "filename spdx identifier mit",
 			fields: fields{true},
 			args: args{
 				filename: "MIT",
@@ -164,7 +164,7 @@ func TestLicenceDetector_DetectFilename(t *testing.T) {
 			},
 		},
 		{
-			name:   "filename spdx identifier",
+			name:   "filename spdx identifier mit modified",
 			fields: fields{true},
 			args: args{
 				filename: "MIT",
@@ -176,6 +176,15 @@ func TestLicenceDetector_DetectFilename(t *testing.T) {
 					ScorePercentage: 99.60854968169237,
 				},
 			},
+		},
+		{
+			name:   "filename spdx identifier gpl-2.0 wrong",
+			fields: fields{true},
+			args: args{
+				filename: "GPL-2.0",
+				content:  mitLicense2,
+			},
+			want: nil,
 		},
 	}
 
