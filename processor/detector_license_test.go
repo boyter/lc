@@ -211,13 +211,32 @@ func TestLicenceDetector_keywordDetect(t *testing.T) {
 		want []IdentifiedLicense
 	}{
 		{
-			name: "mit",
+			name: "MIT",
 			args: args{
 				content: mitLicense,
 			},
 			want: []IdentifiedLicense{{
 				LicenseId:       "MIT",
 				ScorePercentage: 17,
+			}},
+		},
+		{
+			name: "LGPL",
+			args: args{
+				content: spdxIdentifierLgpl,
+			},
+			want: []IdentifiedLicense{{
+				LicenseId:       "LGPL-2.1-or-later",
+				ScorePercentage: 200,
+			}, {
+				LicenseId:       "LGPL-2.1-only",
+				ScorePercentage: 200,
+			}, {
+				LicenseId:       "LGPL-2.1+",
+				ScorePercentage: 200,
+			}, {
+				LicenseId:       "LGPL-2.1",
+				ScorePercentage: 200,
 			}},
 		},
 	}
