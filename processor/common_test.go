@@ -40,3 +40,63 @@ func TestIsLicenceFile(t *testing.T) {
 		})
 	}
 }
+
+func TestContainsString(t *testing.T) {
+	type args struct {
+		ids []string
+		lst []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "empty",
+			args: args{
+				ids: []string{},
+				lst: []string{},
+			},
+			want: false,
+		},
+		{
+			name: "empty lst",
+			args: args{
+				ids: []string{"a", "b", "c"},
+				lst: []string{},
+			},
+			want: false,
+		},
+		{
+			name: "contains a",
+			args: args{
+				ids: []string{"a", "b", "c"},
+				lst: []string{"a"},
+			},
+			want: true,
+		},
+		{
+			name: "contains b",
+			args: args{
+				ids: []string{"a", "b", "c"},
+				lst: []string{"b"},
+			},
+			want: true,
+		},
+		{
+			name: "contains multiple",
+			args: args{
+				ids: []string{"a", "b", "c"},
+				lst: []string{"a", "b", "c"},
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ContainsString(tt.args.ids, tt.args.lst); got != tt.want {
+				t.Errorf("ContainsString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

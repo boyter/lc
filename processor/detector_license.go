@@ -22,6 +22,7 @@ type LicenceDetector struct {
 
 var licenceIdentifier = "Valid-License-Identifier:"
 var licenceRegex = regexp.MustCompile(`Valid-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
+var commonLicences = []string{"MIT", "Apache-2.0", "GPL-3.0", "AGPL-3.0", "BSD-3-Clause", "GPL-2.0", "BSD-2-Clause", "CC0-1.0", "LGPL-3.0", "LGPL-2.1", "ISC", "0BSD", "LGPL-2.0", "Unlicense", "BSD-3-Clause-No-Nuclear-License-2014", "MPL-2.0", "EPL-1.0", "MPL-2.0-no-copyleft-exception", "AGPL-1.0", "CC-BY-4.0", "IPL-1.0", "CPL-1.0", "CC-BY-3.0", "CC-BY-SA-4.0", "WTFPL", "Zlib", "CC-BY-SA-3.0", "Cube", "JSON", "BitTorrent-1.0"}
 
 func NewLicenceDetector(useFullDatabase bool) *LicenceDetector {
 	l := LicenceDetector{
@@ -101,17 +102,23 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 func (l *LicenceDetector) vectorDetect(content string) []IdentifiedLicense {
 	con := BuildConcordance(strings.Fields(LcCleanText(content)))
 
-	for _, te := range l.LicenseData {
+	for _, ld := range l.LicenseData {
+		if !l.UseFullDatabase {
+			if !ContainsString(ld.Keywords, commonLicences) {
+				continue
+			}
+		}
+
 		bestScore := 0.0
 
-		for _, lt := range te.LicenseTexts {
+		for _, lt := range ld.LicenseTexts {
 			con2 := BuildConcordance(strings.Fields(LcCleanText(lt)))
 			score := Relation(con, con2)
 			if bestScore < score {
 				bestScore = score
 			}
 		}
-		fmt.Println(bestScore, te.LicenseIds)
+		fmt.Println(bestScore, ld.LicenseIds)
 	}
 
 	return nil
@@ -120,14 +127,17 @@ func (l *LicenceDetector) vectorDetect(content string) []IdentifiedLicense {
 func (l *LicenceDetector) levenshteinDetect(content string) []IdentifiedLicense {
 	lev1 := LcCleanText(content)
 
-	for _, te := range l.LicenseData {
-		//bestScore := 0.0
-
-		for _, lt := range te.LicenseTexts {
-			lev2 := LcCleanText(lt)
-			fmt.Println(levenshtein.DistanceForStrings([]rune(lev1), []rune(lev2), levenshtein.DefaultOptions), te.LicenseIds)
+	for _, ld := range l.LicenseData {
+		if !l.UseFullDatabase {
+			if !ContainsString(ld.Keywords, commonLicences) {
+				continue
+			}
 		}
-		//fmt.Println(bestScore, te.LicenseIds)
+
+		for _, lt := range ld.LicenseTexts {
+			lev2 := LcCleanText(lt)
+			fmt.Println(levenshtein.DistanceForStrings([]rune(lev1), []rune(lev2), levenshtein.DefaultOptions), ld.LicenseIds)
+		}
 	}
 
 	return nil
@@ -138,6 +148,12 @@ func (l *LicenceDetector) keywordDetect(content string) []IdentifiedLicense {
 	var possible []IdentifiedLicense
 
 	for _, ld := range l.LicenseData {
+		if !l.UseFullDatabase {
+			if !ContainsString(ld.Keywords, commonLicences) {
+				continue
+			}
+		}
+
 		count := 0
 		for _, v := range ld.Keywords {
 			if strings.Contains(cleaned, v) {

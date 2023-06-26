@@ -65,9 +65,22 @@ var (
 )
 
 func IsLicenceFile(filename string) bool {
+	// attempt to filter out false positives that come from java due to filenames
 	if strings.Count(filename, ".") > 2 {
 		return false
 	}
 
 	return licenseFileRe.Match([]byte(strings.ToLower(filename)))
+}
+
+func ContainsString(ids []string, lst []string) bool {
+	for _, j := range ids {
+		for _, i := range lst {
+			if i == j {
+				return true
+			}
+		}
+	}
+
+	return false
 }
