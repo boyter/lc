@@ -249,3 +249,63 @@ func TestLicenceDetector_keywordDetect(t *testing.T) {
 		})
 	}
 }
+
+func TestLicenceDetector_vectorDetect(t *testing.T) {
+	type args struct {
+		content string
+	}
+	var tests = []struct {
+		name string
+		args args
+		want []IdentifiedLicense
+	}{
+		{
+			name: "MIT",
+			args: args{
+				content: mitLicense2,
+			},
+			want: []IdentifiedLicense{{
+				LicenseId:       "MIT",
+				ScorePercentage: 17,
+			}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			l := NewLicenceDetector(true)
+			if got := l.vectorDetect(tt.args.content); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("keywordDetect() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestLicenceDetector_levenshteinDetect(t *testing.T) {
+	type args struct {
+		content string
+	}
+	var tests = []struct {
+		name string
+		args args
+		want []IdentifiedLicense
+	}{
+		{
+			name: "MIT",
+			args: args{
+				content: mitLicense2,
+			},
+			want: []IdentifiedLicense{{
+				LicenseId:       "MIT",
+				ScorePercentage: 17,
+			}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			l := NewLicenceDetector(true)
+			if got := l.levenshteinDetect(tt.args.content); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("keywordDetect() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

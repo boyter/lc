@@ -3,6 +3,8 @@ package processor
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
+	"github.com/boyter/lc/processor/levenshtein"
 	"regexp"
 	"strings"
 )
@@ -97,6 +99,37 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 }
 
 func (l *LicenceDetector) vectorDetect(content string) []IdentifiedLicense {
+	con := BuildConcordance(strings.Fields(LcCleanText(content)))
+
+	for _, te := range l.LicenseData {
+		bestScore := 0.0
+
+		for _, lt := range te.LicenseTexts {
+			con2 := BuildConcordance(strings.Fields(LcCleanText(lt)))
+			score := Relation(con, con2)
+			if bestScore < score {
+				bestScore = score
+			}
+		}
+		fmt.Println(bestScore, te.LicenseIds)
+	}
+
+	return nil
+}
+
+func (l *LicenceDetector) levenshteinDetect(content string) []IdentifiedLicense {
+	lev1 := LcCleanText(content)
+
+	for _, te := range l.LicenseData {
+		//bestScore := 0.0
+
+		for _, lt := range te.LicenseTexts {
+			lev2 := LcCleanText(lt)
+			fmt.Println(levenshtein.DistanceForStrings([]rune(lev1), []rune(lev2), levenshtein.DefaultOptions), te.LicenseIds)
+		}
+		//fmt.Println(bestScore, te.LicenseIds)
+	}
+
 	return nil
 }
 
