@@ -74,6 +74,7 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 				}
 
 				// TODO move this into something configurable
+				// TODO need to move to keyword matching and whatever else we do...
 				if bestScore >= 0.9 {
 					return []IdentifiedLicense{
 						{
@@ -93,6 +94,49 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 	// b. vector space
 
 	return nil
+}
+
+func (l *LicenceDetector) vectorDetect(content string) []IdentifiedLicense {
+	return nil
+}
+
+func (l *LicenceDetector) keywordDetect(content string) []IdentifiedLicense {
+	cleaned := LcCleanText(content)
+	var possible []IdentifiedLicense
+
+	for _, ld := range l.LicenseData {
+		count := 0
+		for _, v := range ld.Keywords {
+			if strings.Contains(cleaned, v) {
+				count++
+			}
+		}
+
+		if count != 0 {
+			for _, l := range ld.LicenseIds {
+				possible = append(possible, IdentifiedLicense{
+					LicenseId:       l,
+					ScorePercentage: float64(count),
+				})
+			}
+		}
+	}
+
+	// now that we have some, lets find the average and remove anything that's less than the average
+	average := 0.0
+	for _, il := range possible {
+		average += il.ScorePercentage
+	}
+	average = average / float64(len(possible))
+
+	var bestPossible []IdentifiedLicense
+	for _, p := range possible {
+		if p.ScorePercentage > average {
+			bestPossible = append(bestPossible, p)
+		}
+	}
+
+	return bestPossible
 }
 
 func (l *LicenceDetector) findLicenseById(id string) (LicenseData, bool) {
