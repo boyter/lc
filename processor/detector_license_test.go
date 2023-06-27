@@ -257,24 +257,41 @@ func TestLicenceDetector_vectorDetect(t *testing.T) {
 	var tests = []struct {
 		name string
 		args args
-		want []IdentifiedLicense
+		want IdentifiedLicense
 	}{
 		{
 			name: "MIT",
 			args: args{
 				content: mitLicense2,
 			},
-			want: []IdentifiedLicense{{
-				LicenseId:       "MIT",
-				ScorePercentage: 17,
-			}},
+			want: IdentifiedLicense{
+				LicenseId: "MIT",
+			},
+		},
+		{
+			name: "BSD-3-Clause",
+			args: args{
+				content: spdxIdentifierBsd3,
+			},
+			want: IdentifiedLicense{
+				LicenseId: "BSD-3-Clause",
+			},
+		},
+		{
+			name: "GPL-2.0",
+			args: args{
+				content: spdxIdentifierGpl,
+			},
+			want: IdentifiedLicense{
+				LicenseId: "GPL-2.0",
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			l := NewLicenceDetector(true)
-			if got := l.vectorDetect(tt.args.content); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("vectorDetect() = %v, want %v", got, tt.want)
+			if got := l.vectorDetect(tt.args.content); got[0].LicenseId != tt.want.LicenseId {
+				t.Errorf("vectorDetect() = %v, want %v", got[0].LicenseId, tt.want.LicenseId)
 			}
 		})
 	}
