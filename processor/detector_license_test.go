@@ -274,7 +274,7 @@ func TestLicenceDetector_vectorDetect(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			l := NewLicenceDetector(true)
 			if got := l.vectorDetect(tt.args.content); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("keywordDetect() = %v, want %v", got, tt.want)
+				t.Errorf("vectorDetect() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -304,7 +304,7 @@ func TestLicenceDetector_levenshteinDetect(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			l := NewLicenceDetector(true)
 			if got := l.levenshteinDetect(tt.args.content); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("keywordDetect() = %v, want %v", got, tt.want)
+				t.Errorf("levenshteinDetect() = %v, want %v", got, tt.want)
 			}
 		})
 	}

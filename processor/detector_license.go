@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/boyter/lc/processor/levenshtein"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -102,6 +103,7 @@ func (l *LicenceDetector) Detect(filename string, content string) []IdentifiedLi
 func (l *LicenceDetector) vectorDetect(content string) []IdentifiedLicense {
 	con := BuildConcordance(strings.Fields(LcCleanText(content)))
 
+	var possible []IdentifiedLicense
 	for _, ld := range l.LicenseData {
 		if !l.UseFullDatabase {
 			if !ContainsString(ld.Keywords, commonLicences) {
@@ -109,19 +111,37 @@ func (l *LicenceDetector) vectorDetect(content string) []IdentifiedLicense {
 			}
 		}
 
-		bestScore := 0.0
-
 		for _, lt := range ld.LicenseTexts {
 			con2 := BuildConcordance(strings.Fields(LcCleanText(lt)))
 			score := Relation(con, con2)
-			if bestScore < score {
-				bestScore = score
+
+			for _, li := range ld.LicenseIds {
+				possible = append(possible, IdentifiedLicense{
+					LicenseId:       li,
+					ScorePercentage: score,
+				})
 			}
 		}
-		fmt.Println(bestScore, ld.LicenseIds)
 	}
 
-	return nil
+	sort.Slice(possible, func(i, j int) bool {
+		return possible[i].ScorePercentage >= possible[j].ScorePercentage
+	})
+
+	average := 0.0
+	for _, il := range possible {
+		average += il.ScorePercentage
+	}
+	average = average / float64(len(possible))
+
+	var bestPossible []IdentifiedLicense
+	for _, p := range possible {
+		if p.ScorePercentage > average {
+			bestPossible = append(bestPossible, p)
+		}
+	}
+
+	return bestPossible
 }
 
 func (l *LicenceDetector) levenshteinDetect(content string) []IdentifiedLicense {
