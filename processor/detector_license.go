@@ -147,6 +147,7 @@ func (l *LicenceDetector) vectorDetect(content string) []IdentifiedLicense {
 func (l *LicenceDetector) levenshteinDetect(content string) []IdentifiedLicense {
 	lev1 := LcCleanText(content)
 
+	var possible []IdentifiedLicense
 	for _, ld := range l.LicenseData {
 		if !l.UseFullDatabase {
 			if !ContainsString(ld.Keywords, commonLicences) {
@@ -154,11 +155,36 @@ func (l *LicenceDetector) levenshteinDetect(content string) []IdentifiedLicense 
 			}
 		}
 
-		for _, lt := range ld.LicenseTexts {
-			lev2 := LcCleanText(lt)
-			fmt.Println(levenshtein.DistanceForStrings([]rune(lev1), []rune(lev2), levenshtein.DefaultOptions), ld.LicenseIds)
+		for _, li := range ld.LicenseTexts {
+			lev2 := LcCleanText(li)
+
+			possible = append(possible, IdentifiedLicense{
+				LicenseId:       li,
+				ScorePercentage: float64(levenshtein.DistanceForStrings([]rune(lev1), []rune(lev2), levenshtein.DefaultOptions)),
+			})
 		}
 	}
+
+	sort.Slice(possible, func(i, j int) bool {
+		return possible[i].ScorePercentage <= possible[j].ScorePercentage
+	})
+
+	// only take the top quartile 
+
+	average := 0.0
+	for _, il := range possible {
+		average += il.ScorePercentage
+	}
+	average = average / float64(len(possible))
+
+	var bestPossible []IdentifiedLicense
+	for _, p := range possible {
+		if p.ScorePercentage < average {
+			bestPossible = append(bestPossible, p)
+		}
+	}
+
+	fmt.Println(bestPossible)
 
 	return nil
 }
