@@ -238,3 +238,4 @@ Rank 	Open Source License 	                            %
 * https://github.com/boyter/boyter.org/blob/01601a2cafc2b2788b29b6943ad45ad40316d9a8/content/posts/improving-lc-performance.md
 * https://reuse.software/
 * /Users/boyter/Documents/projects/linux/LICENSES/preferred <-- add to the list
+* https://github.com/go-enry/go-license-detector/blob/master/FAILURES.md

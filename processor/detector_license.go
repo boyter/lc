@@ -169,7 +169,7 @@ func (l *LicenceDetector) levenshteinDetect(content string) []IdentifiedLicense 
 		return possible[i].ScorePercentage <= possible[j].ScorePercentage
 	})
 
-	// only take the top quartile 
+	// only take the top quartile
 
 	average := 0.0
 	for _, il := range possible {
