@@ -19,6 +19,10 @@ It can produce report outputs as valid [SPDX](https://spdx.org/), CSV, XLSX, JSO
 
 Dual-licensed under MIT or the [UNLICENSE](http://unlicense.org).
 
+### Support
+
+Using `lc` commercially? If you want priority support for `lc` you can purchase a years worth https://boyter.gumroad.com/l/vixqn which entitles you to priority direct email support from the developer.
+
 ### Why
 
 In short taken from, http://ben.balter.com/licensee/
