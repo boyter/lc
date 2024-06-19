@@ -12,6 +12,8 @@ github.com/boyter/gocodewalker v1.0.1-0.20230321052529-86e91fcf4a3a h1:/r8uPJqza
 github.com/boyter/gocodewalker v1.0.1-0.20230321052529-86e91fcf4a3a/go.mod h1:CppTdM9RtednxKPcit+Zn36FXqwYaDIGufs/tenbswo=
 github.com/boyter/gocodewalker v1.1.0 h1:R/BOXRB5WcE5x/Q6Ln95GUQOQE4PAk86nq6WccZqZmM=
 github.com/boyter/gocodewalker v1.1.0/go.mod h1:CppTdM9RtednxKPcit+Zn36FXqwYaDIGufs/tenbswo=
+github.com/boyter/gocodewalker v1.3.3 h1:yPSbWT1wGmPSC73jASY0GaJu4EDN3FROfwYUDQjTmuE=
+github.com/boyter/gocodewalker v1.3.3/go.mod h1:hXG8xzR1uURS+99P5/3xh3uWHjaV2XfoMMmvPyhrCDg=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/coreos/bbolt v1.3.2/go.mod h1:iRUV2dpdMOn7Bo10OQBFzIJO9kkE559Wcmn+qkEiiKk=
@@ -118,6 +120,8 @@ golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAG
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20181108010431-42b317875d0f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
+golang.org/x/sync v0.7.0 h1:YsImfSBoP9QPYL0xyKJPq0gcaJdG3rInoqxTWbfQu9M=
+golang.org/x/sync v0.7.0/go.mod h1:Czt+wKu1gCyEFDUtn0jG5QVvpJ6rzVqr5aXyt9drQfk=
 golang.org/x/sys v0.0.0-20180830151530-49385e6e1522/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20180905080454-ebe1bf3edb33/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20181107165924-66b7b1311ac8/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
