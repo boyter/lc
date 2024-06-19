@@ -158,6 +158,18 @@ func TestLicenceDetector_GuessFilenameReadmeLogic(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "README ISC",
+			args: args{
+				filename: "README.md",
+				content:  iscLicense,
+			},
+			want: []LicenseGuess{
+				{
+					Name: "ISC",
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
