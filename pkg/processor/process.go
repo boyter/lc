@@ -2,9 +2,14 @@ package processor
 
 import (
 	"fmt"
+	"github.com/boyter/gocodewalker"
 	"os"
 	"path/filepath"
+	"runtime"
 )
+
+// PathDenyList sets the paths that should be skipped
+var PathDenyList = []string{}
 
 // DirFilePaths is not set via flags but by arguments following the flags for file or directory to process
 var DirFilePaths = []string{}
@@ -35,16 +40,36 @@ func Process() {
 		}
 	}
 
-	//fileWalker := gocodewalker.NewParallelFileWalker(dirPaths, potentialFilesQueue)
-	//fileWalker.SetErrorHandler(func(e error) bool {
-	//	printError(e.Error())
-	//	return true
-	//})
+	potentialFilesQueue := make(chan *gocodewalker.File, runtime.NumCPU()) // files that pass the .gitignore checks
+
+	fileWalker := gocodewalker.NewParallelFileWalker(dirPaths, potentialFilesQueue)
+	fileWalker.SetErrorHandler(func(e error) bool {
+		fmt.Println(e.Error())
+		return true
+	})
 	//fileWalker.IgnoreGitIgnore = GitIgnore
 	//fileWalker.IgnoreIgnoreFile = Ignore
 	//fileWalker.IgnoreGitModules = GitModuleIgnore
-	//fileWalker.IncludeHidden = true
+	fileWalker.IncludeHidden = true
 	//fileWalker.ExcludeDirectory = PathDenyList
 	//fileWalker.SetConcurrency(DirectoryWalkerJobWorkers)
+
+	go func() {
+		err := fileWalker.Start()
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}()
+
+	for fi := range potentialFilesQueue {
+		fileInfo, err := os.Lstat(fi.Location)
+		if err != nil {
+			continue
+		}
+
+		if !fileInfo.IsDir() {
+			fmt.Println(fi.Location, fi.Filename, fileInfo)
+		}
+	}
 
 }
