@@ -51,8 +51,7 @@ func Process() {
 	//fileWalker.IgnoreIgnoreFile = Ignore
 	//fileWalker.IgnoreGitModules = GitModuleIgnore
 	fileWalker.IncludeHidden = true
-	//fileWalker.ExcludeDirectory = PathDenyList
-	//fileWalker.SetConcurrency(DirectoryWalkerJobWorkers)
+	fileWalker.ExcludeDirectory = PathDenyList
 
 	go func() {
 		err := fileWalker.Start()
