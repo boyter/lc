@@ -19,3 +19,5 @@ lc
 
 # Accuracy + Benchmarks
 /assets/accuracy/
+
+.DS_Store
