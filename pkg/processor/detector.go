@@ -3,6 +3,8 @@
 package processor
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"github.com/boyter/lc/pkg/levenshtein"
 	"math"
 	"strings"
@@ -24,6 +26,16 @@ type License struct {
 	Keywords     []string `json:"keywords"`     // keywords that are unique and can be used to identify this group of licences
 }
 
+// LoadDatabase will initialize the database values and should only be called once such as in an init
+func (l *LicenceDetector) LoadDatabase() {
+	if len(l.Database) != 0 {
+		return
+	}
+
+	data, _ := base64.StdEncoding.DecodeString(database_keywords)
+	_ = json.Unmarshal(data, &l.Database)
+}
+
 type LicenseGuess struct {
 	Name string
 }
@@ -40,6 +52,16 @@ func (l *LicenceDetector) Guess(filename string, content string) []LicenseGuess 
 						Name: li,
 					},
 				}
+			}
+		}
+
+		// try a fast keyword match first
+		keywordMatches := l.keyWordMatch(content)
+		if len(keywordMatches) != 0 {
+			return []LicenseGuess{
+				{
+					Name: keywordMatches[0].Name,
+				},
 			}
 		}
 
@@ -71,9 +93,17 @@ func (l *LicenceDetector) Guess(filename string, content string) []LicenseGuess 
 	}
 
 	if IsReadmeFile(filename) {
-		// at this point we are confident we have a licence file, but we don't know which one, so lets
-		// start by firstly assuming there is only 1 license in the file
-		// and then try to determine what is actually inside the file
+		// try a fast keyword match first
+		keywordMatches := l.keyWordMatch(content)
+		if len(keywordMatches) != 0 {
+			return []LicenseGuess{
+				{
+					Name: keywordMatches[0].Name,
+				},
+			}
+		}
+
+		// we don't know if there is a licence in here or not, but lets have a try at guessing...
 		var bestGuess License
 		bestMatch := math.MaxInt
 		con := []rune(compareOptimize(content))
@@ -93,6 +123,36 @@ func (l *LicenceDetector) Guess(filename string, content string) []LicenseGuess 
 					Name: bestGuess.LicenseIds[0],
 				},
 			}
+		}
+	}
+
+	return nil
+}
+
+func (l *LicenceDetector) keyWordMatch(content string) []LicenseGuess {
+	// try MIT
+	contentLower := strings.ToLower(content)
+	if strings.Contains(contentLower, "mit license") {
+		return []LicenseGuess{
+			{
+				Name: "MIT",
+			},
+		}
+	}
+
+	if strings.Contains(contentLower, "http://unlicense.org/") {
+		return []LicenseGuess{
+			{
+				Name: "Unlicense",
+			},
+		}
+	}
+
+	if strings.Contains(contentLower, "isc or compatible") {
+		return []LicenseGuess{
+			{
+				Name: "ISC",
+			},
 		}
 	}
 

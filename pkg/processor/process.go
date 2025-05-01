@@ -8,6 +8,17 @@ import (
 	"runtime"
 )
 
+const (
+	Version = "2.0.0"
+)
+
+var IncludeBinaryFiles = false
+var IgnoreIgnoreFile = false
+var IgnoreGitIgnore = false
+var IncludeHidden = false
+var AllowListExtensions []string
+var Format = ""
+
 // PathDenyList sets the paths that should be skipped
 var PathDenyList = []string{}
 
