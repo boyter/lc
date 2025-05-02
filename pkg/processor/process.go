@@ -71,6 +71,8 @@ func Process() {
 		}
 	}()
 
+	l := NewLicenceDetector()
+
 	for fi := range potentialFilesQueue {
 		fileInfo, err := os.Lstat(fi.Location)
 		if err != nil {
@@ -78,7 +80,15 @@ func Process() {
 		}
 
 		if !fileInfo.IsDir() {
-			fmt.Println(fi.Location, fi.Filename, fileInfo)
+			//fmt.Println(fi.Location, fi.Filename, fileInfo)
+			file, err := os.ReadFile(fi.Location)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+			guess := l.Guess(fi.Filename, string(file))
+			if len(guess) != 0 {
+				fmt.Println(fi.Location, guess)
+			}
 		}
 	}
 

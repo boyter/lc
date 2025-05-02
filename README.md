@@ -17,7 +17,7 @@ It can produce report outputs as valid [SPDX](https://spdx.org/), CSV, XLSX, JSO
 [![Go](https://github.com/boyter/lc/actions/workflows/go.yml/badge.svg)](https://github.com/boyter/lc/actions/workflows/go.yml)
 [![Scc Count Badge](https://sloc.xyz/github/boyter/lc/)](https://github.com/boyter/lc/)
 
-Dual-licensed under MIT or the [UNLICENSE](http://unlicense.org).
+Licenced under GNU Affero General Public License v3.0 or later
 
 ### Support
 

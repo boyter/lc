@@ -101,6 +101,18 @@ func TestLicenceDetector_GuessFilenameLogic(t *testing.T) {
 			},
 		},
 		{
+			name: "AGPL-3.0-or-later",
+			args: args{
+				filename: "license",
+				content:  agplLicense,
+			},
+			want: []LicenseGuess{
+				{
+					Name: "AGPL-3.0-or-later",
+				},
+			},
+		},
+		{
 			name: "BSD-2-Clause",
 			args: args{
 				filename: "BSD-2-Clause",
