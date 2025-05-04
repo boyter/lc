@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"github.com/boyter/lc/pkg/levenshtein"
 	"math"
+	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -126,7 +128,7 @@ func (l *LicenceDetector) Guess(filename string, content string) []LicenseGuess 
 		}
 	}
 
-	return nil
+	return l.SPDXIdentifierGuessLicence(content)
 }
 
 func (l *LicenceDetector) keyWordMatch(content string) []LicenseGuess {
@@ -157,4 +159,25 @@ func (l *LicenceDetector) keyWordMatch(content string) []LicenseGuess {
 	}
 
 	return nil
+}
+
+var spdxLicenceRegex = regexp.MustCompile(`SPDX-License-Identifier:\s+(.*)[ |\n|\r\n]*?`)
+
+// SPDXIdentifierGuessLicence will identify licenses in the text which is using the SPDX indicator
+// Note that it can return multiple license matches
+func (l *LicenceDetector) SPDXIdentifierGuessLicence(content string) []LicenseGuess {
+	var matchingLicenses []LicenseGuess
+	matches := spdxLicenceRegex.FindAllStringSubmatch(content, -1)
+
+	for _, val := range matches {
+		for _, license := range l.Database {
+			if slices.Contains(license.LicenseIds, strings.TrimSpace(val[1])) {
+				matchingLicenses = append(matchingLicenses, LicenseGuess{
+					Name: strings.TrimSpace(val[1]),
+				})
+			}
+		}
+	}
+
+	return matchingLicenses
 }

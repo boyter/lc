@@ -50,6 +50,15 @@ func IsLicenceFile(filename string) bool {
 		return false
 	}
 
+	// filter out things with _ in it because they seem like bad candidates
+	// for example license_test.go
+	s := strings.Split(filename, ".")
+	if len(s) != 0 {
+		if strings.Contains(s[0], "_") {
+			return false
+		}
+	}
+
 	return licenseFileRe.Match([]byte(strings.ToLower(filename)))
 }
 
