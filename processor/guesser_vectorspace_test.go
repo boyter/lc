@@ -20,7 +20,7 @@ func TestVectorSpaceGuess0BSD(t *testing.T) {
   "isOsiApproved": false
 }`))
 
-	if licenses[0].LicenseId != "0BSD" {
+	if licenses[0].LicenseIds[0] != "0BSD" {
 		t.Errorf("expected 0BSD")
 	}
 }
@@ -52,8 +52,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 `))
 
-	if licenses[0].LicenseId != "MIT" {
-		t.Error("expected MIT got", licenses[0].LicenseId)
+	if licenses[0].LicenseIds[0] != "MIT" {
+		t.Error("expected MIT got", licenses[0].LicenseIds[0])
 	}
 }
 
@@ -87,8 +87,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org/>
 `))
 
-	if licenses[0].LicenseId != "Unlicense" {
-		t.Error("expected Unlicense got", licenses[0].LicenseId)
+	if licenses[0].LicenseIds[0] != "Unlicense" {
+		t.Error("expected Unlicense got", licenses[0].LicenseIds[0])
 	}
 }
 
@@ -104,8 +104,8 @@ The Software shall be used for Good, not Evil.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 `))
 
-	if licenses[0].LicenseId != "JSON" {
-		t.Error("expected JSON got", licenses[0].LicenseId)
+	if licenses[0].LicenseIds[0] != "JSON" {
+		t.Error("expected JSON got", licenses[0].LicenseIds[0])
 	}
 }
 
@@ -1026,8 +1026,8 @@ limitations under the license`}
 	for i, l := range samples {
 		license := lg.VectorSpaceGuessLicence([]byte(l))
 
-		if license[0].LicenseId != "Apache-2.0" {
-			t.Error("expected Apache-2.0 got", license[0].LicenseId, "for", i)
+		if license[0].LicenseIds[0] != "Apache-2.0" {
+			t.Error("expected Apache-2.0 got", license[0].LicenseIds[0], "for", i)
 		}
 	}
 }

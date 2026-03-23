@@ -76,19 +76,32 @@ func (l *LicenceGuesser) LoadDatabase() {
 			l.Database[i].Trie = corasick.NewTrieBuilder().
 				AddStrings(l.Database[i].Keywords).
 				Build()
+			// Precompute word sets for Jaccard similarity
+			if len(l.Database[i].LicenseTexts) > 0 {
+				words := strings.Fields(LcCleanText(l.Database[i].LicenseTexts[0]))
+				ws := make(map[string]struct{}, len(words))
+				for _, w := range words {
+					ws[w] = struct{}{}
+				}
+				l.Database[i].WordSet = ws
+			}
 		}
 	}
 
 	if l.vectorspace {
 		for i := 0; i < len(l.Database); i++ {
-			l.Database[i].Concordance = BuildConcordance(strings.Split(LcCleanText(l.Database[i].LicenseText), " "))
+			if len(l.Database[i].LicenseTexts) > 0 {
+				l.Database[i].Concordance = BuildConcordance(strings.Split(LcCleanText(l.Database[i].LicenseTexts[0]), " "))
+			}
 		}
 	}
 
 	for _, license := range l.Database {
 		for _, com := range common {
-			if license.LicenseId == com {
-				l.CommonDatabase = append(l.CommonDatabase, license)
+			for _, lid := range license.LicenseIds {
+				if lid == com {
+					l.CommonDatabase = append(l.CommonDatabase, license)
+				}
 			}
 		}
 	}

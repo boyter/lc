@@ -3,7 +3,6 @@ package processor
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"github.com/boyter/lc/processor/levenshtein"
 	"regexp"
 	"sort"
@@ -106,7 +105,7 @@ func (l *LicenceDetector) vectorDetect(content string) []IdentifiedLicense {
 	var possible []IdentifiedLicense
 	for _, ld := range l.LicenseData {
 		if !l.UseFullDatabase {
-			if !ContainsString(ld.Keywords, commonLicences) {
+			if !ContainsString(ld.LicenseIds, commonLicences) {
 				continue
 			}
 		}
@@ -150,18 +149,20 @@ func (l *LicenceDetector) levenshteinDetect(content string) []IdentifiedLicense 
 	var possible []IdentifiedLicense
 	for _, ld := range l.LicenseData {
 		if !l.UseFullDatabase {
-			if !ContainsString(ld.Keywords, commonLicences) {
+			if !ContainsString(ld.LicenseIds, commonLicences) {
 				continue
 			}
 		}
 
-		for _, li := range ld.LicenseTexts {
-			lev2 := LcCleanText(li)
+		for _, lt := range ld.LicenseTexts {
+			lev2 := LcCleanText(lt)
 
-			possible = append(possible, IdentifiedLicense{
-				LicenseId:       li,
-				ScorePercentage: float64(levenshtein.DistanceForStrings([]rune(lev1), []rune(lev2), levenshtein.DefaultOptions)),
-			})
+			for _, li := range ld.LicenseIds {
+				possible = append(possible, IdentifiedLicense{
+					LicenseId:       li,
+					ScorePercentage: float64(levenshtein.DistanceForStrings([]rune(lev1), []rune(lev2), levenshtein.DefaultOptions)),
+				})
+			}
 		}
 	}
 
@@ -184,9 +185,7 @@ func (l *LicenceDetector) levenshteinDetect(content string) []IdentifiedLicense 
 		}
 	}
 
-	fmt.Println(bestPossible)
-
-	return nil
+	return bestPossible
 }
 
 func (l *LicenceDetector) keywordDetect(content string) []IdentifiedLicense {
@@ -195,7 +194,7 @@ func (l *LicenceDetector) keywordDetect(content string) []IdentifiedLicense {
 
 	for _, ld := range l.LicenseData {
 		if !l.UseFullDatabase {
-			if !ContainsString(ld.Keywords, commonLicences) {
+			if !ContainsString(ld.LicenseIds, commonLicences) {
 				continue
 			}
 		}

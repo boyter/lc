@@ -22,7 +22,7 @@ func (l *LicenceGuesser) GuessLicense(content []byte) []License {
 
 		for _, x := range fkeyWordGuessLicence {
 			for _, y := range fvectorSpaceGuessLicence {
-				if x.LicenseId == y.LicenseId {
+				if ContainsString(x.LicenseIds, y.LicenseIds) {
 					x.ScorePercentage = (x.ScorePercentage + y.ScorePercentage) / 2
 					x.MatchType = MatchTypeBlended
 					common = append(common, x)

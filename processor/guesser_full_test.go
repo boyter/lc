@@ -10,11 +10,8 @@ import (
 
 // Represents what the JSON looks like on disk enough for loading
 type LicenseJson struct {
-	LicenseText             string `json:"licenseText"`
-	StandardLicenseTemplate string `json:"standardLicenseTemplate"`
-	StandardLicenseHeader   string `json:"standardLicenseHeader"`
-	Name                    string `json:"name"`
-	LicenseId               string `json:"licenseId"`
+	LicenseTexts []string `json:"licenseTexts"`
+	LicenseIds   []string `json:"licenseIds"`
 }
 
 func loadLicences() []LicenseJson {
@@ -33,16 +30,19 @@ func TestKeywordCommonDatabase(t *testing.T) {
 	pass := 0
 
 	for _, l := range licenses {
-		guesses := lg.KeyWordGuessLicence([]byte(l.LicenseText))
+		if len(l.LicenseTexts) == 0 || len(l.LicenseIds) == 0 {
+			continue
+		}
+		guesses := lg.KeyWordGuessLicence([]byte(l.LicenseTexts[0]))
 
 		if len(guesses) == 0 {
 			fail++
-			t.Error("expected", l.LicenseId)
+			t.Error("expected", l.LicenseIds[0])
 			continue
 		}
 
-		if guesses[0].LicenseId != l.LicenseId {
-			t.Error("expected", l.LicenseId, "got", guesses[0].LicenseId)
+		if !ContainsString(guesses[0].LicenseIds, l.LicenseIds) {
+			t.Error("expected", l.LicenseIds[0], "got", guesses[0].LicenseIds[0])
 			fail++
 		} else {
 			pass++

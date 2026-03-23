@@ -5,6 +5,7 @@ package processor
 import (
 	"github.com/texttheater/golang-levenshtein/levenshtein"
 	"sort"
+	"strings"
 )
 
 // KeyWordGuessLicence will some content try to guess what the licence is based on checking for unique keywords
@@ -12,10 +13,9 @@ import (
 func (l *LicenceGuesser) KeyWordGuessLicence(content []byte) []License {
 	haystack := LcCleanText(string(content))
 
-	var matchingLicenses []License
-	var totalScore float64
-	var maxScore float64
-	var highestMatch int
+	var keywordMatches []License
+	var jaccardCandidates []License
+	var maxKeywordScore float64
 
 	// Swap out the database to the full one if configured to use it
 	db := l.CommonDatabase
@@ -23,94 +23,142 @@ func (l *LicenceGuesser) KeyWordGuessLicence(content []byte) []License {
 		db = l.Database
 	}
 
+	// Build word set once for Jaccard comparisons
+	contentWords := wordSet(haystack)
+
 	for _, lic := range db {
-		match := lic.Trie.Match([]byte(haystack))
+		if len(lic.LicenseTexts) == 0 {
+			continue
+		}
 
-		if len(match) != 0 {
-			lic.ScorePercentage = float64(len(match))
-			totalScore += lic.ScorePercentage
-			lic.MatchType = MatchTypeKeyword
-			matchingLicenses = append(matchingLicenses, lic)
+		matched := false
 
-			if len(match) > highestMatch {
-				highestMatch = len(match)
+		// Try keyword matching first
+		if len(lic.Keywords) > 0 {
+			match := lic.Trie.Match([]byte(haystack))
+			if len(match) != 0 {
+				lic.ScorePercentage = (float64(len(match)) / float64(len(lic.Keywords))) * 100
+				lic.MatchType = MatchTypeKeyword
+				keywordMatches = append(keywordMatches, lic)
+				matched = true
+
+				if lic.ScorePercentage > maxKeywordScore {
+					maxKeywordScore = lic.ScorePercentage
+				}
+			}
+		}
+
+		// Also score via Jaccard for licenses that didn't match keywords
+		if !matched {
+			licWords := lic.WordSet
+			if licWords == nil {
+				licWords = wordSet(LcCleanText(lic.LicenseTexts[0]))
+			}
+			jScore := jaccardSimilarity(contentWords, licWords) * 100
+			if jScore > 20 {
+				lic.ScorePercentage = jScore
+				lic.MatchType = MatchTypeKeyword
+				jaccardCandidates = append(jaccardCandidates, lic)
 			}
 		}
 	}
 
-	// licences come in with a count of terms found like the below
-	// 1 1 1 1 1 13 2 1 1 1
-	// what the above is saying is that one option is 13 times more likely to be correct than most of the others
-	// because it has a lot more matches...
-	// so lets scale in accordance to this, were we say that
-
-	for i := 0; i < len(matchingLicenses); i++ {
-		matchingLicenses[i].ScorePercentage = (matchingLicenses[i].ScorePercentage / float64(highestMatch)) * 100
-
-		// keep track of the highest score
-		if matchingLicenses[i].ScorePercentage > maxScore {
-			maxScore = matchingLicenses[i].ScorePercentage
+	// Filter keyword matches to keep only those close to the max score
+	var filtered []License
+	for _, lic := range keywordMatches {
+		if lic.ScorePercentage >= (maxKeywordScore * 0.5) {
+			filtered = append(filtered, lic)
 		}
 	}
-
-	// Normalise the scores based on the total so we can make a reasonable guess of how confident we are
-	// TODO the problem with this is that when we have more false matches we weigh down the highest match...
-	//for i := 0; i < len(matchingLicenses); i++ {
-	//	matchingLicenses[i].ScorePercentage = (matchingLicenses[i].ScorePercentage / totalScore) * 100
-	//
-	//	// keep track of the highest score
-	//	if matchingLicenses[i].ScorePercentage > maxScore {
-	//		maxScore = matchingLicenses[i].ScorePercentage
-	//	}
-	//}
-
-	// TODO the problem with this is that its limited based on precanned values which might not be true
-	// if we have more than 5 matches consider it a 100% match
-	//for i := 0; i < len(matchingLicenses); i++ {
-	//	if matchingLicenses[i].ScorePercentage >= 10 {
-	//		matchingLicenses[i].ScorePercentage = 100
-	//	} else if matchingLicenses[i].ScorePercentage >= 5 {
-	//		matchingLicenses[i].ScorePercentage = 80
-	//	} else if matchingLicenses[i].ScorePercentage >= 4 {
-	//		matchingLicenses[i].ScorePercentage = 70
-	//	} else if matchingLicenses[i].ScorePercentage >= 3 {
-	//		matchingLicenses[i].ScorePercentage = 50
-	//	} else if matchingLicenses[i].ScorePercentage >= 2 {
-	//		matchingLicenses[i].ScorePercentage = 30
-	//	}
-	//
-	//	if matchingLicenses[i].ScorePercentage > maxScore {
-	//		maxScore = matchingLicenses[i].ScorePercentage
-	//	}
-	//}
-
-	// only keep those close to the max score so we can ignore anything that isn't even close
-	var t []License
-	for _, lic := range matchingLicenses {
-		if lic.ScorePercentage >= (maxScore * 0.6) {
-			t = append(t, lic)
-		}
-	}
-	if len(t) != 0 {
-		matchingLicenses = t
+	if len(filtered) != 0 {
+		keywordMatches = filtered
 	}
 
-	// if we have multiple licences compare them directly to determine which one it actually is
-	if len(matchingLicenses) >= 2 {
-		for i := 0; i < len(matchingLicenses); i++ {
-			distance := levenshtein.DistanceForStrings([]rune(string(content)), []rune(matchingLicenses[i].LicenseText), levenshtein.DefaultOptions)
-			if distance == 0 {
-				matchingLicenses[i].ScorePercentage = 100
-			} else {
-				matchingLicenses[i].ScorePercentage = float64(100) / float64(distance)
-			}
-		}
-	}
-
-	// Sort so if someone wants to get the best candidate they can get the 0 index of the return
-	sort.Slice(matchingLicenses, func(i, j int) bool {
-		return matchingLicenses[i].ScorePercentage > matchingLicenses[j].ScorePercentage
+	// Sort Jaccard candidates and keep top 3
+	sort.Slice(jaccardCandidates, func(i, j int) bool {
+		return jaccardCandidates[i].ScorePercentage > jaccardCandidates[j].ScorePercentage
 	})
+	if len(jaccardCandidates) > 3 {
+		jaccardCandidates = jaccardCandidates[:3]
+	}
 
-	return matchingLicenses
+	// Combine both pools
+	candidates := append(keywordMatches, jaccardCandidates...)
+
+	// Use Levenshtein on top candidates to get final ranking
+	const maxLevRunes = 1500
+	if len(candidates) >= 2 {
+		// Sort by current score to pick top N for expensive Levenshtein
+		sort.Slice(candidates, func(i, j int) bool {
+			return candidates[i].ScorePercentage > candidates[j].ScorePercentage
+		})
+
+		topN := 5
+		if len(candidates) < topN {
+			topN = len(candidates)
+		}
+
+		contentRunes := []rune(string(content))
+		if len(contentRunes) > maxLevRunes {
+			contentRunes = contentRunes[:maxLevRunes]
+		}
+
+		for i := 0; i < topN; i++ {
+			licText := ""
+			if len(candidates[i].LicenseTexts) > 0 {
+				licText = candidates[i].LicenseTexts[0]
+			}
+
+			licRunes := []rune(licText)
+			if len(licRunes) > maxLevRunes {
+				licRunes = licRunes[:maxLevRunes]
+			}
+			distance := levenshtein.DistanceForStrings(contentRunes, licRunes, levenshtein.DefaultOptions)
+
+			maxLen := len(contentRunes)
+			if len(licRunes) > maxLen {
+				maxLen = len(licRunes)
+			}
+			if maxLen == 0 {
+				candidates[i].ScorePercentage = 100
+			} else {
+				candidates[i].ScorePercentage = (1.0 - float64(distance)/float64(maxLen)) * 100
+			}
+		}
+
+		// Re-sort the top candidates by Levenshtein score
+		sort.Slice(candidates[:topN], func(i, j int) bool {
+			return candidates[i].ScorePercentage > candidates[j].ScorePercentage
+		})
+	}
+
+	return candidates
+}
+
+// wordSet splits text into a set of unique words
+func wordSet(text string) map[string]struct{} {
+	words := strings.Fields(text)
+	set := make(map[string]struct{}, len(words))
+	for _, w := range words {
+		set[w] = struct{}{}
+	}
+	return set
+}
+
+// jaccardSimilarity computes the Jaccard similarity between two word sets
+func jaccardSimilarity(a, b map[string]struct{}) float64 {
+	if len(a) == 0 && len(b) == 0 {
+		return 0
+	}
+	intersection := 0
+	for w := range a {
+		if _, ok := b[w]; ok {
+			intersection++
+		}
+	}
+	union := len(a) + len(b) - intersection
+	if union == 0 {
+		return 0
+	}
+	return float64(intersection) / float64(union)
 }

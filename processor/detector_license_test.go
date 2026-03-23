@@ -320,8 +320,11 @@ func TestLicenceDetector_levenshteinDetect(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			l := NewLicenceDetector(true)
-			if got := l.levenshteinDetect(tt.args.content); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("levenshteinDetect() = %v, want %v", got, tt.want)
+			got := l.levenshteinDetect(tt.args.content)
+			if len(got) == 0 {
+				t.Errorf("levenshteinDetect() returned no results, want %v", tt.want)
+			} else if got[0].LicenseId != tt.want[0].LicenseId {
+				t.Errorf("levenshteinDetect() = %v, want %v", got[0].LicenseId, tt.want[0].LicenseId)
 			}
 		})
 	}

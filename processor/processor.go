@@ -90,7 +90,11 @@ func (process *Process) StartProcess() {
 					fmt.Println(" possible licence file but unable to identify")
 				}
 				for _, x := range license {
-					fmt.Println(fmt.Sprintf(" Licence: %s (%.1f%%)", x.LicenseId, x.ScorePercentage))
+					lid := "Unknown"
+				if len(x.LicenseIds) > 0 {
+					lid = x.LicenseIds[0]
+				}
+				fmt.Println(fmt.Sprintf(" Licence: %s (%.1f%%)", lid, x.ScorePercentage))
 				}
 			} else {
 				// look for SPDX markers only as its not a licence file
