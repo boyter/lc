@@ -59,4 +59,4 @@ indicates that it could be one of the above.
 
 
 Alturnate idea, pick one of them to be the defacto version for that. So in the case of GPL-3.0 go with GPL-3.0 because
-that seems like a resonable guess. Should resolve it for most of them.
+that seems like a reasonable guess. Should resolve it for most of them.

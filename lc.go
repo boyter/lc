@@ -43,12 +43,12 @@ package main
 //		cli.StringFlag{
 //			Name:        "licensefiles, lf",
 //			Usage:       "Possible license files to inspect for over-arching license as comma separated list `copying,readme`",
-//			Value:       "license,licence,lisence,lisense,copying,readme,legal,copyright,copyleft,gpl,bsd,mit,apache,unlicense,unlicence",
+//			Value:       "license,licence,lisence,lisense,copying,readme,legal,copyright,copyleft,gpl,bsd,mit,apache,unlicense,unlicence",  // codespell:ignore lisence,lisense
 //			Destination: &parsers.PossibleLicenceFiles,
 //		},
 //		cli.StringFlag{
 //			Name:        "pathblacklist, pbl",
-//			Usage:       "Which directories should be ignored as comma seperated list `.git,.hg,.svn`",
+//			Usage:       "Which directories should be ignored as comma separated list `.git,.hg,.svn`",
 //			Value:       ".git,.hg,.svn",
 //			Destination: &parsers.PathBlacklist,
 //		},

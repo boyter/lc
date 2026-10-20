@@ -79,9 +79,9 @@ GLOBAL OPTIONS:
    --confidence 0.95, -c 0.95                          Set required confidence level for licence matching between 0 and 1 E.G. 0.95 (default: "0.85")
    --deepguess true, --dg true                         Should attempt to deep guess the licence false or true true (default: "true")
    --filesize 50000, --fs 50000                        How large a file in bytes should be processed 50000 (default: "50000")
-   --licensefiles copying,readme, --lf copying,readme  Possible license files to inspect for over-arching license as comma seperated list copying,readme (default: "license,licence,copying,readme")
-   --pathblacklist .git,.hg,.svn, --pbl .git,.hg,.svn  Which directories should be ignored as comma seperated list .git,.hg,.svn (default: ".git,.hg,.svn")
-   --extblacklist gif,jpg,png, --xbl gif,jpg,png       Which file extensions should be ignored for deep analysis as comma seperated list E.G. gif,jpg,png (default: "woff,eot,cur,dm,xpm,emz,db,scc,idx,
+   --licensefiles copying,readme, --lf copying,readme  Possible license files to inspect for over-arching license as comma separated list copying,readme (default: "license,licence,copying,readme")
+   --pathblacklist .git,.hg,.svn, --pbl .git,.hg,.svn  Which directories should be ignored as comma separated list .git,.hg,.svn (default: ".git,.hg,.svn")
+   --extblacklist gif,jpg,png, --xbl gif,jpg,png       Which file extensions should be ignored for deep analysis as comma separated list E.G. gif,jpg,png (default: "woff,eot,cur,dm,xpm,emz,db,scc,idx,
 mpp,dot,pspimage,stl,dml,wmf,rvm,resources,tlb,docx,doc,xls,xlsx,ppt,pptx,msg,vsd,chm,fm,book,dgn,blines,cab,lib,obj,jar,pdb,dll,bin,out,elf,so,msi,nupkg,pyc,ttf,woff2,jpg,jpeg,png,gif,bmp,psd,tif,tif
 f,yuv,ico,xls,xlsx,pdb,pdf,apk,com,exe,bz2,7z,tgz,rar,gz,zip,zipx,tar,rpm,bin,dmg,iso,vcd,mp3,flac,wma,wav,mid,m4a,3gp,flv,mov,mp4,mpg,rm,wmv,avi,m4v,sqlite,class,rlib,ncb,suo,opt,o,os,pch,pbm,pnm,ppm
 ,pyd,pyo,raw,uyv,uyvy,xlsm,swf")
@@ -179,7 +179,7 @@ Directory              File               License                        Confide
 
 ### SPDX
 
-The ouput of SPDX is a valid SPDX 2.1 document. Validation was checked against the tools supplied by the SPDX group.
+The output of SPDX is a valid SPDX 2.1 document. Validation was checked against the tools supplied by the SPDX group.
 Running master against itself to produce a SPDX and the validating using the tools from https://github.com/spdx/tools
 
 ```
@@ -236,7 +236,7 @@ Rank 	Open Source License 	                            %
 
 * Add error handling for all the file operations and just in general. Most are currently ignored
 * Add logic to guess the file type for SPDX value FileType
-* Add addtional unit and integration tests
+* Add additional unit and integration tests
 * Investigate using "github.com/gosuri/uitable" for formatting https://github.com/gosuri/uitable
 * https://web.archive.org/web/20180822173147/https://blog.sourced.tech/post/gld/
 * https://github.com/boyter/boyter.org/blob/01601a2cafc2b2788b29b6943ad45ad40316d9a8/content/posts/improving-lc-performance.md

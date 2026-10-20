@@ -27,7 +27,7 @@ could have multiple licenses in them. Example github.com/valkey/valkey/COPYING
     ".html",
     ".txt",
 	
-Where the file matchs the above patterns, where it has has no extention or 
+Where the file matches the above patterns, where it has no extension or 
 one of the others we should inspect it to see if it has a license. Its possible 
 a licence exists here, but we cannot be sure. Note that its possible there are multiple
 licences in the file which needs to be dealt with.
