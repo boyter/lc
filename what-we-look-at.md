@@ -35,7 +35,7 @@ For individual files the file is scanned in the same way but in addition is scan
 
 Which will take precedence over any fuzzy matching. The indicators must match known SPDX licenses or they will be disregarded.
 
-When finished the license determined is based on the SDPX identifiers if present, fuzzy matching if over the confidence value and then the root license(s). If multiples match they are treated as an `AND`.
+When finished the license determined is based on the SPDX identifiers if present, fuzzy matching if over the confidence value and then the root license(s). If multiples match they are treated as an `AND`.
 
 Take for example,
 
