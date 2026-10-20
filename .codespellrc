@@ -1,6 +1,13 @@
 [codespell]
 # Ref: https://github.com/codespell-project/codespell#using-a-config-file
-skip = .git,.gitignore,.gitattributes,go.sum,vendor,*.lock,.codespellrc
+# assets/database/licenses and database_keywords.json hold verbatim SPDX
+# license texts (incl. non-English ones); processor/constants.go embeds them
+skip = .git,.git-meta,.gitignore,.gitattributes,.*cache,go.sum,vendor,*.lock,.codespellrc,./assets/database/licenses,./database_keywords.json,./processor/constants.go
 check-hidden = true
-# ignore-regex = 
-# ignore-words-list =
+# ignore-regex =
+ignore-words-list =
+  # loop variable for a license text in processor/detector_license.go
+  te,
+  # verbatim typo in honk's license text, used as a test fixture (raw string)
+  # in pkg/license_test.go
+  dependenices
