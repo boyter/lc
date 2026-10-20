@@ -48,7 +48,7 @@ package main
 //		},
 //		cli.StringFlag{
 //			Name:        "pathblacklist, pbl",
-//			Usage:       "Which directories should be ignored as comma seperated list `.git,.hg,.svn`",
+//			Usage:       "Which directories should be ignored as comma separated list `.git,.hg,.svn`",
 //			Value:       ".git,.hg,.svn",
 //			Destination: &parsers.PathBlacklist,
 //		},

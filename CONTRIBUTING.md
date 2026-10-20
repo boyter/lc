@@ -14,7 +14,7 @@
 
 * Before submitting, please specify that you explicitly licence your contribution under MIT License AND UNLICENSE.
 
-* If you include compatible code from a third party souce with an alternate license please add a SPDX tag to indicate this, see https://github.com/boyter/lc/blob/master/parsers/helpers.go bytesToHuman function as a reference exmaple.
+* If you include compatible code from a third party source with an alternate license please add a SPDX tag to indicate this, see https://github.com/boyter/lc/blob/master/parsers/helpers.go bytesToHuman function as a reference example.
 
 
 #### **Always remember**
